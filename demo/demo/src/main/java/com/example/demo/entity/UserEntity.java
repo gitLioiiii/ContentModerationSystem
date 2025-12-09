@@ -16,7 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-//tag 用户表
+// 用户表
 @Data
 @Document(collection = "user")
 public class UserEntity {
@@ -40,7 +40,6 @@ public class UserEntity {
     @Field("username")
     private String username;
 
-    // 名字最小可以为一个字，且登录不需要
     @Size(
         max = 32, 
         groups = {
@@ -103,6 +102,12 @@ public class UserEntity {
 
     @Field("gender")
     private String gender = "none"; // man, woman, none
+
+    @Field("province")
+    private String province; // 省份
+
+    @Field("city")
+    private String city; // 城市
 
     // 登录状态可登录和不可登录
     @Field("status")

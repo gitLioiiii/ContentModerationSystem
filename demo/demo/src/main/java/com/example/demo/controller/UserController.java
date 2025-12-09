@@ -30,7 +30,6 @@ import com.example.demo.validator.UserValidateGroup;
 public class UserController {
 
     private final UserService userService;
-
     private final PasswordEncoder passwordEncoder;
 
     public UserController(
@@ -41,18 +40,23 @@ public class UserController {
         this.passwordEncoder    = passwordEncoder;
     }
 
-    //mark 分页显示用户
+    // 管理所有用户
     @GetMapping("")
     public ResultTemplate index(
-        @RequestParam(name = "page", required = false) Integer page, 
-        @RequestParam(name = "pageSize", required = false) Integer pageSize, 
-        @RequestParam(name = "keywords", required = false) String keywords
+        @RequestParam(required = false) Integer page,
+        @RequestParam(required = false) Integer pageSize,
+        @RequestParam(required = false) String keywords,
+        @RequestParam(required = false) String role
     ) {
         ResultTemplate result   = new ResultTemplate();
         Map<String, Object> filter  = new HashMap<>();
 
         if (keywords != null) {
             filter.put("keywords", keywords);
+        }
+
+        if (role != null) {
+            filter.put("role", role);
         }
 
         Integer total       = this.userService.count(filter);
@@ -68,12 +72,12 @@ public class UserController {
         return result;
     }
 
-    // mark 创建用户
+    // 创建用户
     @PostMapping("/create")
     public ResultTemplate create(
         @RequestBody @Validated({UserValidateGroup.Create.class}) UserEntity user, 
         BindingResult bindingResult
-    ) {
+    ) throws ValidateFailedException {
         ResultTemplate result   = new ResultTemplate();
 
         if (bindingResult.hasErrors()) {
@@ -96,7 +100,7 @@ public class UserController {
         return result;
     }
 
-    //mark 当前登录用户信息
+    // 当前登录用户信息
     @GetMapping("/current")
     public ResultTemplate current() throws NotFoundException {
         ResultTemplate result = new ResultTemplate();
@@ -121,7 +125,7 @@ public class UserController {
         return result;
     }
 
-    // mark 更新用户信息
+    // 更新用户信息
     @PostMapping("/update")
     public ResultTemplate update(
         @RequestBody @Validated(UserValidateGroup.Update.class) UserEntity user,
@@ -134,59 +138,76 @@ public class UserController {
         }
 
         // 验证用户是否存在
-        UserEntity exist_User = this.userService.fetchById(user.getId()).orElseThrow(
+        UserEntity User = this.userService.fetchById(user.getId()).orElseThrow(
             () -> new NotFoundException()
         );
 
         // 更新姓名
         if (user.getName() != null) {
-            exist_User.setName(user.getName());
+            User.setName(user.getName());
         }
 
         // 如果提供了新密码，则更新密码
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            exist_User.setPassword(this.passwordEncoder.encode(user.getPassword()));
+            User.setPassword(this.passwordEncoder.encode(user.getPassword()));
         }
 
         // 如果提供了新头像，则更新头像
         if (user.getAvatar() != null) {
-            exist_User.setAvatar(user.getAvatar());
+            User.setAvatar(user.getAvatar());
         }
 
         // 如果提供了新主题背景图片，则更新主题背景图片
         if (user.getThemeImage() != null) {
-            exist_User.setThemeImage(user.getThemeImage());
+            User.setThemeImage(user.getThemeImage());
         }
 
         // 更新邮箱
         if (user.getEmail() != null) {
-            exist_User.setEmail(user.getEmail());
+            User.setEmail(user.getEmail());
         }
 
         // 更新手机号
         if (user.getPhone() != null) {
-            exist_User.setPhone(user.getPhone());
+            User.setPhone(user.getPhone());
         }
 
         // 更新生日
         if (user.getBirthday() != null) {
-            exist_User.setBirthday(user.getBirthday());
+            User.setBirthday(user.getBirthday());
         }
 
         // 更新性别
         if (user.getGender() != null) {
-            exist_User.setGender(user.getGender());
+            User.setGender(user.getGender());
         }
 
-        this.userService.update(exist_User);
+        // 更新省份
+        if (user.getProvince() != null) {
+            User.setProvince(user.getProvince());
+        }
 
-        // 返回更新后的用户信息
-        result.putPayload("user", exist_User);
+        // 更新城市
+        if (user.getCity() != null) {
+            User.setCity(user.getCity());
+        }
+
+        // 更新角色
+        if (user.getRole() != null) {
+            User.setRole(user.getRole());
+        }
+
+        // 更新账号状态
+        if (user.getStatus() != null) {
+            User.setStatus(user.getStatus());
+        }
+
+        this.userService.update(User);
 
         return result;
     }
 
-    // mark 软删除用户信息
+    // 软删除用户信息
     @PostMapping("/remove")
     public ResultTemplate remove(
         @RequestBody @Validated(UserValidateGroup.Remove.class) UserEntity fields, 
@@ -208,10 +229,10 @@ public class UserController {
         return result;
     }
 
-    // mark 根据id查询用户信息
+    // 根据id查询用户信息
     @GetMapping("/{id}")
     public ResultTemplate fetch(
-        @PathVariable("id") String id
+        @PathVariable String id
     ) throws NotFoundException {
         ResultTemplate result   = new ResultTemplate();
 

@@ -162,6 +162,50 @@
                             </div>
                         </ElButton>
                     </div>
+
+                    <!-- 省份 -->
+                    <div class="information-item" @click="openEditDialog('province')">
+                        <ElButton text class="information-button">
+                            <div class="item-content">
+                                <div class="item-start">
+                                    <div class="item-icon">
+                                        <ElIcon :size="24" color="#5f6368">
+                                            <Location />
+                                        </ElIcon>
+                                    </div>
+                                    <div class="item-main">
+                                        <div class="item-label">省份</div>
+                                    </div>
+                                </div>
+                                <div class="item-value">
+                                    <div class="value-text">{{ model.province || '未设置' }}</div>
+                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                </div>
+                            </div>
+                        </ElButton>
+                    </div>
+
+                    <!-- 城市 -->
+                    <div class="information-item" @click="openEditDialog('city')">
+                        <ElButton text class="information-button">
+                            <div class="item-content">
+                                <div class="item-start">
+                                    <div class="item-icon">
+                                        <ElIcon :size="24" color="#5f6368">
+                                            <Location />
+                                        </ElIcon>
+                                    </div>
+                                    <div class="item-main">
+                                        <div class="item-label">城市</div>
+                                    </div>
+                                </div>
+                                <div class="item-value">
+                                    <div class="value-text">{{ model.city || '未设置' }}</div>
+                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                </div>
+                            </div>
+                        </ElButton>
+                    </div>
                 </div>
             </ElCard>
 
@@ -318,6 +362,43 @@
                     <ElInput v-model="editModel.value" placeholder="请输入手机号" />
                 </ElFormItem>
 
+                <!-- 省份 -->
+                <ElFormItem v-if="editField === 'province'" prop="value" label="省份">
+                    <ElSelect
+                        v-model="editModel.value"
+                        placeholder="请选择省份"
+                        filterable
+                        @change="handleProvinceChange"
+                    >
+                        <ElOption
+                            v-for="province in provinceList"
+                            :key="province.value"
+                            :label="province.label"
+                            :value="province.value"
+                        />
+                    </ElSelect>
+                </ElFormItem>
+
+                <!-- 城市 -->
+                <ElFormItem v-if="editField === 'city'" prop="value" label="城市">
+                    <ElSelect
+                        v-model="editModel.value"
+                        placeholder="请选择城市"
+                        filterable
+                        :disabled="cityList.length === 0"
+                    >
+                        <ElOption
+                            v-for="city in cityList"
+                            :key="city.value"
+                            :label="city.label"
+                            :value="city.value"
+                        />
+                    </ElSelect>
+                    <div v-if="cityList.length === 0" style="color: #909399; font-size: 12px; margin-top: 4px;">
+                        请先选择省份
+                    </div>
+                </ElFormItem>
+
                 <!-- 密码 -->
                 <ElFormItem v-if="editField === 'password'" prop="value" label="新密码">
                     <ElInput
@@ -354,7 +435,9 @@ import {
     ElRadioGroup,
     ElRadio,
     ElIcon,
-    ElAvatar
+    ElAvatar,
+    ElSelect,
+    ElOption
 } from 'element-plus'
 import {
     Camera,
@@ -365,13 +448,15 @@ import {
     Phone,
     Monitor,
     Lock,
-    Picture
+    Picture,
+    Location
 } from '@element-plus/icons-vue'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import request from '@/utils/request'
 import { buildURL } from '@/utils/helper'
 import { useUserStore } from '@/stores/user'
+import { getProvinceList, getCitiesByProvince } from '@/utils/regions'
 
 const userStore = useUserStore()
 const editForm = ref(null)
@@ -389,12 +474,29 @@ const model = reactive({
     gender: 'none',
     email: '',
     phone: '',
+    province: '',
+    city: '',
     themeImage: [],
 })
 
 const editModel = reactive({
     value: ''
 })
+
+// 省份和城市列表
+const provinceList = ref(getProvinceList())
+const cityList = ref([])
+
+// 监听省份变化
+const handleProvinceChange = (province) => {
+    // 获取该省份的城市列表
+    cityList.value = getCitiesByProvince(province)
+    // 清空城市选择
+    if (editField.value === 'province') {
+        // 如果当前正在编辑省份，同时更新城市为空
+        model.city = ''
+    }
+}
 
 // 字段标题映射
 const fieldTitleMap = {
@@ -403,6 +505,8 @@ const fieldTitleMap = {
     gender: '编辑性别',
     email: '编辑邮箱',
     phone: '编辑手机号',
+    province: '编辑省份',
+    city: '编辑城市',
     password: '修改密码'
 }
 
@@ -418,6 +522,12 @@ const editRules = computed(() => {
         ],
         phone: [
             { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号格式。', trigger: 'blur' },
+        ],
+        province: [
+            { max: 50, message: '省份最多50个字符。', trigger: 'change' },
+        ],
+        city: [
+            { max: 50, message: '城市最多50个字符。', trigger: 'change' },
         ],
         password: [
             { required: true, message: '请输入新密码。', trigger: 'blur' },
@@ -442,6 +552,8 @@ const fetchUserInfo = () => {
             model.gender = userData.gender || 'none'
             model.email = userData.email || ''
             model.phone = userData.phone || ''
+            model.province = userData.province || ''
+            model.city = userData.city || ''
             // 如果有头像，初始化头像数组
             if (userData.avatar) {
                 model.avatar = [{ filename: userData.avatar }]
@@ -493,6 +605,8 @@ const uploadBackground = () => {
                         gender: model.gender,
                         email: model.email,
                         phone: model.phone,
+                        province: model.province,
+                        city: model.city,
                         avatar: model.avatar.length > 0 ? model.avatar[0].filename : null,
                         themeImage: model.themeImage[0].filename
                     }
@@ -554,6 +668,15 @@ const openEditDialog = (field) => {
         editModel.value = model[field]
     }
 
+    // 如果编辑城市，需要根据当前省份加载城市列表
+    if (field === 'city') {
+        if (model.province) {
+            cityList.value = getCitiesByProvince(model.province)
+        } else {
+            cityList.value = []
+        }
+    }
+
     editDialogVisible.value = true
 }
 
@@ -573,6 +696,8 @@ const saveEdit = () => {
                 gender: model.gender,
                 email: model.email,
                 phone: model.phone,
+                province: model.province,
+                city: model.city,
                 avatar: model.avatar.length > 0 ? model.avatar[0].filename : null,
                 themeImage: model.themeImage.length > 0 ? model.themeImage[0].filename : null
             }
@@ -633,6 +758,8 @@ const changeAvatar = () => {
                         gender: model.gender,
                         email: model.email,
                         phone: model.phone,
+                        province: model.province,
+                        city: model.city,
                         avatar: model.avatar[0].filename,
                         themeImage: model.themeImage.length > 0 ? model.themeImage[0].filename : null
                     }
@@ -680,7 +807,7 @@ const removeAvatar = () => {
 
 .cards-wrapper {
     width: 100%;
-    max-width: 48rem;
+    max-width: 40rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;

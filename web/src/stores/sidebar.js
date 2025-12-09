@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
+// 侧边栏状态
 export const useSidebarStore = defineStore('sidebar', () => {
   // 侧边栏是否隐藏
   const isHidden = ref(false)

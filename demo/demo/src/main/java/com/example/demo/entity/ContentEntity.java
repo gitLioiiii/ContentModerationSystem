@@ -29,11 +29,12 @@ public class ContentEntity {
     @Field("userId")
     private String userId; // 发布者的用户ID
 
+    @Indexed
+    @Field("categories")
+    private List<String> categories; // 内容类别（技术、生活、娱乐、新闻等），支持多选
+
     @Field("contentItems")
     private List<ContentItem> contentItems; // 内容项数组
-
-    @Field("location")
-    private Location location; // 用户发布地理位置
 
     @Indexed
     @Field("status")
@@ -83,18 +84,5 @@ public class ContentEntity {
 
         @Field("height")
         private Integer height; // 媒体高度（像素，图片/视频时可选）
-    }
-
-    /**
-     * 地理位置
-     */
-    @Data
-    public static class Location {
-
-        @Field("city")
-        private String city; // 城市
-
-        @Field("province")
-        private String province; // 省份（可选）
     }
 }

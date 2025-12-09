@@ -1,72 +1,87 @@
 package com.example.demo.utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Pagination {
 
-    private Integer total;
-    private Integer pageSize;
-    private Integer currentPage;
-    private Integer totalPages;
-    private Integer offset;
-    private Integer limit;
+    private final Integer total;
 
-    public Pagination(Integer total, Integer pageSize, Integer currentPage) {
-        this.total = total;
-        this.pageSize = pageSize != null && pageSize > 0 ? pageSize : 10;
-        this.currentPage = currentPage != null && currentPage > 0 ? currentPage : 1;
-        this.totalPages = (int) Math.ceil((double) this.total / this.pageSize);
-        this.offset = (this.currentPage - 1) * this.pageSize;
-        this.limit = this.pageSize;
-    }
+    private final Integer limit;
 
-    public static Pagination paginate(Integer total, Integer pageSize, Integer currentPage) {
-        return new Pagination(total, pageSize, currentPage);
+    private final Integer offset;
+
+    private final Integer pageSize;
+
+    private final Integer pageCount;
+
+    private final Integer currentPage;
+
+    private Pagination(
+        Integer total, Integer limit, Integer offset, 
+        Integer pageSize, Integer pageCount, Integer currentPage
+    ) {
+        this.total          = total;
+        this.limit          = limit;
+        this.offset         = offset;
+        this.pageSize       = pageSize;
+        this.pageCount      = pageCount;
+        this.currentPage    = currentPage;
     }
 
     public Integer getTotal() {
-        return total;
+        return this.total;
     }
 
-    public void setTotal(Integer total) {
-        this.total = total;
+    @JsonIgnore
+    public Integer getLimit() {
+        return this.limit;
+    }
+
+    @JsonIgnore
+    public Integer getOffset() {
+        return this.offset;
     }
 
     public Integer getPageSize() {
-        return pageSize;
+        return this.pageSize;
     }
 
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
+    public Integer getPageCount() {
+        return this.pageCount;
     }
 
     public Integer getCurrentPage() {
-        return currentPage;
+        return this.currentPage;
     }
 
-    public void setCurrentPage(Integer currentPage) {
-        this.currentPage = currentPage;
+    public static Pagination paginate(
+        Integer total, Integer pageSize, Integer currentPage
+    ) {
+        if (currentPage == null || currentPage < 1) {
+            currentPage = 1;
+        }
+
+        if (pageSize == null || pageSize < 1) {
+            pageSize    = 10;
+        }
+
+        Integer pageCount   = (int) Math.ceil(
+            (double) total / (double) pageSize
+        );
+
+        if (pageCount < 1) {
+            pageCount   = 1;
+        }
+
+        if (currentPage > pageCount) {
+            currentPage = pageCount;
+        }
+
+        Integer offset      = (currentPage - 1) * pageSize;
+        
+        return new Pagination(
+            total, pageSize, offset, pageSize, pageCount, currentPage
+        );
     }
 
-    public Integer getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(Integer totalPages) {
-        this.totalPages = totalPages;
-    }
-
-    public Integer getOffset() {
-        return offset;
-    }
-
-    public void setOffset(Integer offset) {
-        this.offset = offset;
-    }
-
-    public Integer getLimit() {
-        return limit;
-    }
-
-    public void setLimit(Integer limit) {
-        this.limit = limit;
-    }
 }

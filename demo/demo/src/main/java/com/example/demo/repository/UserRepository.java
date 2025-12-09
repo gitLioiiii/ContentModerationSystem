@@ -15,43 +15,42 @@ import com.example.demo.entity.UserEntity;
 @Repository
 public interface UserRepository extends MongoRepository<UserEntity, String> {
 
-    // 查找所有未删除的用户（支持分页）
+    // 显示所有未删除的用户
     @Query("{ 'deletedAt': null }")
     Page<UserEntity> fetchByNotDeleted(Pageable pageable);
-    // 统计未删除的用户数
     @Query(value = "{ 'deletedAt': null }", count = true)
     long countByNotDeleted();
 
-    // 根据关键字搜索用户（用户名或姓名模糊匹配）
-    @Query("{ 'deletedAt': null, $or: [ {'username': {$regex: ?0, $options: 'i'}}, {'name': {$regex: ?0, $options: 'i'}} ] }")
+    // 根据关键字搜索用户（用户名、姓名或手机号模糊匹配）
+    @Query("{ 'deletedAt': null, $or: [ {'username': {$regex: ?0, $options: 'i'}}, {'name': {$regex: ?0, $options: 'i'}}, {'phone': {$regex: ?0, $options: 'i'}} ] }")
     Page<UserEntity> searchByKeywords(String keywords, Pageable pageable);
     // 根据关键字统计用户数
-    @Query(value = "{ 'deletedAt': null, $or: [ {'username': {$regex: ?0, $options: 'i'}}, {'name': {$regex: ?0, $options: 'i'}} ] }", count = true)
-    long countByKeywords(String keywords);
+    // @Query(value = "{ 'deletedAt': null, $or: [ {'username': {$regex: ?0, $options: 'i'}}, {'name': {$regex: ?0, $options: 'i'}}, {'phone': {$regex: ?0, $options: 'i'}} ] }", count = true)
+    // long countByKeywords(String keywords);
 
-    
-    // Optional可以避免空值
-    // 根据用户名查找用户（deletedAt为null的用户）
+    // 根据角色筛选用户
+    @Query("{ 'deletedAt': null, 'role': ?0 }")
+    Page<UserEntity> searchByRole(String role, Pageable pageable);
+    // 根据角色统计用户数
+    // @Query(value = "{ 'deletedAt': null, 'role': ?0 }", count = true)
+    // long countByRole(String role);
+
+    // 根据关键字用户名、姓名、手机号和角色同时筛选用户
+    @Query("{ 'deletedAt': null, 'role': ?0, $or: [ {'username': {$regex: ?1, $options: 'i'}}, {'name': {$regex: ?1, $options: 'i'}}, {'phone': {$regex: ?1, $options: 'i'}} ] }")
+    Page<UserEntity> searchByKeywordsAndRole(String role, String keywords, Pageable pageable);
+    // 根据关键字用户名、姓名、手机号和角色统计用户数
+    // @Query(value = "{ 'deletedAt': null, 'role': ?0, $or: [ {'username': {$regex: ?1, $options: 'i'}}, {'name': {$regex: ?1, $options: 'i'}}, {'phone': {$regex: ?1, $options: 'i'}} ] }", count = true)
+    // long countByKeywordsAndRole(String role, String keywords);
+
+    // 登录时根据用户名查找用户
     @Query("{ 'username': ?0, 'deletedAt': null }")
     Optional<UserEntity> fetchByUsername(String username);
 
-    // 根据ID查找用户（deletedAt为null的用户）
-    @Query("{ '_id': ?0, 'deletedAt': null }")
-    Optional<UserEntity> fetchById(String id);
-
-    // 根据邮箱查找用户
-    @Query("{ 'email': ?0, 'deletedAt': null }")
-    Optional<UserEntity> fetchByEmail(String email);
-
-    // 根据手机号查找用户
-    @Query("{ 'phone': ?0, 'deletedAt': null }")
-    Optional<UserEntity> fetchByPhone(String phone);
-
-    // 根据角色查找用户
-    @Query("{ 'role': ?0, 'deletedAt': null }")
-    List<UserEntity> fetchByRole(String role);
-
-    // 根据状态查找用户
+    // 状态异常的用户
     @Query("{ 'status': ?0, 'deletedAt': null }")
     List<UserEntity> fetchByStatus(String status);
+    
+    // 利用id更新用户
+    @Query("{ '_id': ?0, 'deletedAt': null }")
+    Optional<UserEntity> fetchById(String id);
 }

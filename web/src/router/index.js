@@ -14,6 +14,74 @@ const router = createRouter({
         breadcrumbCurrent: '发布新内容',
       },
     },
+
+    //用户管理
+    {
+      path: '/users',
+      name: 'user_base',
+      component: () => import('@/views/adminView/users/BaseView.vue'),
+      children: [
+        {
+          path: "",
+          name: 'user_index',
+          component: () => import('@/views/adminView/users/IndexView.vue'),
+        },
+        {
+          path: "create",
+          name: 'user_create',
+          component: () => import('@/views/adminView/users/CreateView.vue'),
+        },
+      ],
+    },
+    // AI审核
+    {
+      path: '/text',
+      name: 'text',
+      component: () => import('@/views/adminView/ai/TextReview.vue'),
+      meta: {
+        breadcrumbParent: '自动审核',
+        breadcrumbCurrent: '文本审核',
+      },
+    },
+    // 敏感词管理
+    {
+      path: '/sensitive',
+      name: 'sensitive_base',
+      component: () => import('@/views/adminView/sensitive/BaseView.vue'),
+      children: [
+        {
+          path: '',
+          name: 'sensitive_index',
+          component: () => import('@/views/adminView/sensitive/IndexView.vue'),
+          meta: {
+            breadcrumbParent: '规则管理',
+            breadcrumbCurrent: '敏感词列表',
+          },
+        },
+        {
+          path: 'create',
+          name: 'sensitive_create',
+          component: () => import('@/views/adminView/sensitive/CreateView.vue'),
+          meta: {
+            breadcrumbParent: '规则管理',
+            breadcrumbCurrent: '新增敏感词',
+          },
+        },
+      ],
+    },
+
+    // 用户
+    // 个人信息路由
+    {
+      path: '/Personal',
+      name: 'Personal',
+      component: () => import('@/views/userView/PersonalView.vue'),
+      meta: {
+        breadcrumbParent: '用户中心',
+        breadcrumbCurrent: '个人信息',
+      },
+    },
+    //登录、注册
     {
       path: '/login',
       name: 'login',
@@ -31,45 +99,6 @@ const router = createRouter({
       name: 'denied',
       component: () => import('@/views/DeniedView.vue'),
       meta: { HideChrome: true },
-    },
-    // 自动审核路由
-    {
-      path: '/auto-review/text',
-      name: 'auto-review-text',
-      component: () => import('@/views/auto-review/TextReview.vue'),
-      meta: {
-        breadcrumbParent: '自动审核',
-        breadcrumbCurrent: '文本审核',
-      },
-    },
-    {
-      path: '/auto-review/image',
-      name: 'auto-review-image',
-      component: () => import('@/views/auto-review/ImageReview.vue'),
-      meta: {
-        breadcrumbParent: '自动审核',
-        breadcrumbCurrent: '图像审核',
-      },
-    },
-    {
-      path: '/auto-review/video',
-      name: 'auto-review-video',
-      component: () => import('@/views/auto-review/VideoReview.vue'),
-      meta: {
-        breadcrumbParent: '自动审核',
-        breadcrumbCurrent: '视频审核',
-      },
-    },
-    // 用户
-    // 个人信息路由
-    {
-      path: '/Personal',
-      name: 'Personal',
-      component: () => import('@/views/userView/PersonalView.vue'),
-      meta: {
-        breadcrumbParent: '用户中心',
-        breadcrumbCurrent: '个人信息',
-      },
     },
   ]
 })

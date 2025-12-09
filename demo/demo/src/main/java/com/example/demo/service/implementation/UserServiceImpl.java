@@ -26,23 +26,37 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserEntity> fetch(Map<String, Object> filter) {
         String keywords = (String) filter.get("keywords");
+        String role = (String) filter.get("role");
         Integer offset = (Integer) filter.get("offset");
         Integer limit = (Integer) filter.get("limit");
 
-        // 创建分页对象
+        // 分页对象
         Pageable pageable = PageRequest.of(
             offset != null && limit != null ? offset / limit : 0,
             limit != null ? limit : 10
         );
 
-        Page<UserEntity> page;
-        if (keywords != null && !keywords.isEmpty()) {
-            page = this.userRepository.searchByKeywords(keywords, pageable);
+        Page<UserEntity> count;
+
+        // 判断筛选条件组合
+        boolean hasKeywords = keywords != null && !keywords.isEmpty();
+        boolean hasRole = role != null && !role.isEmpty();
+
+        if (hasKeywords && hasRole) {
+            // 关键字和角色
+            count = this.userRepository.searchByKeywordsAndRole(role, keywords, pageable);
+        } else if (hasKeywords) {
+            // 关键字
+            count = this.userRepository.searchByKeywords(keywords, pageable);
+        } else if (hasRole) {
+            // 角色
+            count = this.userRepository.searchByRole(role, pageable);
         } else {
-            page = this.userRepository.fetchByNotDeleted(pageable);
+            // 未删除的
+            count = this.userRepository.fetchByNotDeleted(pageable);
         }
 
-        return page.getContent();
+        return count.getContent();
     }
 
     @Override
@@ -67,12 +81,32 @@ public class UserServiceImpl implements UserService {
     @Override
     public Integer count(Map<String, Object> filter) {
         String keywords = (String) filter.get("keywords");
+        String role = (String) filter.get("role");
 
-        if (keywords != null && !keywords.isEmpty()) {
-            return (int) this.userRepository.countByKeywords(keywords);
+        // 获取总数
+        Pageable pageable = PageRequest.of(0, 1);
+
+        // 判断筛选条件组合
+        boolean hasKeywords = keywords != null && !keywords.isEmpty();
+        boolean hasRole = role != null && !role.isEmpty();
+
+        Page<UserEntity> page;
+
+        if (hasKeywords && hasRole) {
+            // 关键字和角色
+            page = this.userRepository.searchByKeywordsAndRole(role, keywords, pageable);
+        } else if (hasKeywords) {
+            // 关键字
+            page = this.userRepository.searchByKeywords(keywords, pageable);
+        } else if (hasRole) {
+            // 角色
+            page = this.userRepository.searchByRole(role, pageable);
         } else {
-            return (int) this.userRepository.countByNotDeleted();
+            // 未删除的
+            page = this.userRepository.fetchByNotDeleted(pageable);
         }
+
+        return (int) page.getTotalElements();
     }
 
     @Override

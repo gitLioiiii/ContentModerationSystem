@@ -59,7 +59,6 @@ public class SecurityConfiguration {
                 ).permitAll();
                 // 放行用户匿名注册接口
 				authorize.requestMatchers("/user/create").permitAll();
-                // 其他所有请求需要认证
                 authorize.anyRequest().authenticated();
             })
             // JwtDecoder，用于解码JWT token

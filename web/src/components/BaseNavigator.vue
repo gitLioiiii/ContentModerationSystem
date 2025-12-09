@@ -6,7 +6,7 @@
       width: sidebarCollapsed ? '60px' : '220px',
     }"
   >
-    <!-- Logo 区域 -->
+    <!-- 左上角顶部Logo -->
     <div class="logo-section">
       <RouterLink class="logo-link" to="/" tabindex="-1">
         <div class="logo-image-wrapper">
@@ -20,122 +20,84 @@
       </RouterLink>
     </div>
 
-    <!-- 菜单滚动区域 -->
-    <ElScrollbar class="menu-scrollbar" @scroll="handleScroll">
-      <!-- 顶部阴影 -->
-      <div
-        class="scrollbar-shadow scrollbar-top-shadow"
-        :class="{ 'is-visible': showTopShadow }"
-      ></div>
-
-      <!-- 菜单 -->
-      <ElMenu
+    <!-- 菜单 收缩使用条件渲染-->
+    <ElMenu
         :default-active="activeMenu"
         :collapse="sidebarCollapsed"
         :unique-opened="false"
         class="sidebar-menu"
         router
       >
-        <!-- 内容发布 -->
-        <ElMenuItem index="/" class="menu-item">
-          <template #title>
-            <i class="bi bi-send menu-icon"></i>
-            <span class="menu-title">内容发布</span>
-          </template>
+        <!-- 用户发布 -->
+        <ElMenuItem index="/" :route="{ name: 'index' }" class="menu-item">
+          <i class="bi bi-send menu-icon"></i>
+          <span v-if="!sidebarCollapsed">内容发布</span>
         </ElMenuItem>
 
-        <!-- A. 自动审核 -->
-        <ElSubMenu index="auto-review" class="sub-menu">
-          <template #title>
-            <i class="bi bi-check-circle menu-icon"></i>
-            <span class="menu-title">自动审核</span>
-          </template>
-          <ElMenuItem index="/auto-review/text" class="sub-menu-item">
-            <template #title>
-              <i class="bi bi-fonts menu-icon"></i>
-              <span>文本审核</span>
-            </template>
+        <!-- 用户管理 -->
+        <ElMenuItem index="users" :route="{ name: 'user_index' }" class="menu-item">
+          <i class="bi bi-person menu-icon"></i>
+          <span v-if="!sidebarCollapsed">用户管理</span>
+        </ElMenuItem>
+
+        <!-- AI审核 -->
+        <ElSubMenu index="text">
+          <template #title><i class="bi bi-check-circle menu-icon"></i><span v-if="!sidebarCollapsed">自动审核</span></template>
+          <ElMenuItem index="text" :route="{ name: 'text' }" class="sub-menu-item">
+            <i class="bi bi-fonts menu-icon"></i>
+            <span v-if="!sidebarCollapsed">文本审核</span>
           </ElMenuItem>
-          <ElMenuItem index="/auto-review/image" class="sub-menu-item">
-            <template #title>
-              <i class="bi bi-image menu-icon"></i>
-              <span>图像审核</span>
-            </template>
+          <ElMenuItem index="image" :route="{ name: 'inage' }" class="sub-menu-item">
+            <i class="bi bi-image menu-icon"></i>
+            <span v-if="!sidebarCollapsed">图像审核</span>
           </ElMenuItem>
-          <ElMenuItem index="/auto-review/video" class="sub-menu-item">
-            <template #title>
-              <i class="bi bi-camera-video menu-icon"></i>
-              <span>视频审核</span>
-            </template>
+          <ElMenuItem index="video" :route="{ name: 'video' }" class="sub-menu-item">
+            <i class="bi bi-camera-video menu-icon"></i>
+            <span v-if="!sidebarCollapsed">视频审核</span>
           </ElMenuItem>
         </ElSubMenu>
 
-        <!-- B. 人工审核 -->
-        <ElSubMenu index="manual-review" class="sub-menu">
-          <template #title>
-            <i class="bi bi-person-check menu-icon"></i>
-            <span class="menu-title">人工审核</span>
-          </template>
-          <ElMenuItem index="/manual-review/queue" class="sub-menu-item">
-            <template #title>
-              <i class="bi bi-list-ul menu-icon"></i>
-              <span>待审核队列</span>
-            </template>
+        <!-- 人工审核 -->
+        <ElSubMenu index="manual-review">
+          <template #title><i class="bi bi-person-check menu-icon"></i><span v-if="!sidebarCollapsed">人工审核</span></template>
+          <ElMenuItem index="queue" :route="{ name: 'queue' }" class="sub-menu-item">
+            <i class="bi bi-list-ul menu-icon"></i>
+            <span v-if="!sidebarCollapsed">待审核队列</span>
           </ElMenuItem>
-          <ElMenuItem index="/manual-review/operation" class="sub-menu-item">
-            <template #title>
-              <i class="bi bi-check-square menu-icon"></i>
-              <span>审核操作</span>
-            </template>
+          <ElMenuItem index="operation" :route="{ name: 'operation' }" class="sub-menu-item">
+            <i class="bi bi-check-square menu-icon"></i>
+            <span v-if="!sidebarCollapsed">审核操作</span>
           </ElMenuItem>
-          <ElMenuItem index="/manual-review/history" class="sub-menu-item">
-            <template #title>
-              <i class="bi bi-clock-history menu-icon"></i>
-              <span>审核记录</span>
-            </template>
+          <ElMenuItem index="history" :route="{ name: 'history' }" class="sub-menu-item">
+            <i class="bi bi-clock-history menu-icon"></i>
+            <span v-if="!sidebarCollapsed">审核记录</span>
           </ElMenuItem>
         </ElSubMenu>
 
-        <!-- C. 规则管理 -->
-        <ElSubMenu index="rule-management" class="sub-menu">
-          <template #title>
-            <i class="bi bi-gear menu-icon"></i>
-            <span class="menu-title">规则管理</span>
-          </template>
-          <ElMenuItem index="/rule-management/sensitive-words" class="sub-menu-item">
-            <template #title>
+        <!-- 规则管理 -->
+        <ElSubMenu index="sensitive">
+          <template #title><i class="bi bi-gear menu-icon"></i><span v-if="!sidebarCollapsed">规则管理</span></template>
+          <ElMenuItem index="sensitive" :route="{ name: 'sensitive_index' }" class="sub-menu-item">
               <i class="bi bi-book menu-icon"></i>
-              <span>敏感词库</span>
-            </template>
+              <span v-if="!sidebarCollapsed">敏感词库</span>
           </ElMenuItem>
-          <ElMenuItem index="/rule-management/threshold" class="sub-menu-item">
-            <template #title>
+          <ElMenuItem index="" class="sub-menu-item">
               <i class="bi bi-bar-chart menu-icon"></i>
-              <span>审核阈值</span>
-            </template>
+              <span v-if="!sidebarCollapsed">审核阈值</span>
           </ElMenuItem>
-          <ElMenuItem index="/rule-management/report" class="sub-menu-item">
-            <template #title>
+          <ElMenuItem index="" class="sub-menu-item">
               <i class="bi bi-file-earmark-text menu-icon"></i>
-              <span>审核报表</span>
-            </template>
+              <span v-if="!sidebarCollapsed">审核报表</span>
           </ElMenuItem>
         </ElSubMenu>
-      </ElMenu>
-
-      <!-- 底部阴影 -->
-      <div
-        class="scrollbar-shadow scrollbar-bottom-shadow"
-        :class="{ 'is-visible': showBottomShadow }"
-      ></div>
-    </ElScrollbar>
+    </ElMenu>
   </aside>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { ElMenu, ElMenuItem, ElSubMenu, ElScrollbar } from 'element-plus'
+import { ElMenu, ElMenuItem, ElSubMenu } from 'element-plus'
 import { useSidebarStore } from '@/stores/sidebar'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
@@ -147,20 +109,6 @@ const sidebarCollapsed = computed(() => sidebarStore.isCollapsed)
 
 // 当前激活的菜单
 const activeMenu = computed(() => route.path)
-
-// 滚动阴影显示状态
-const showTopShadow = ref(false)
-const showBottomShadow = ref(false)
-
-// 处理滚动事件
-const handleScroll = (event) => {
-  const scrollTop = event.scrollTop
-  const scrollHeight = event.scrollHeight
-  const clientHeight = event.clientHeight
-
-  showTopShadow.value = scrollTop > 10
-  showBottomShadow.value = scrollTop + clientHeight < scrollHeight - 10
-}
 </script>
 
 <style scoped lang="scss">
@@ -229,48 +177,11 @@ const handleScroll = (event) => {
   transition: color 0.3s ease;
 }
 
-// 菜单滚动区域
-.menu-scrollbar {
-  height: calc(100vh - 50px);
-  position: relative;
-
-  :deep(.el-scrollbar__wrap) {
-    overflow-x: hidden;
-  }
-
-  :deep(.el-scrollbar__view) {
-    padding: 0.5rem;
-  }
-}
-
-// 滚动阴影
-.scrollbar-shadow {
-  pointer-events: none;
-  position: absolute;
-  z-index: 10;
-  height: 3rem;
-  width: 100%;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
-  left: 0;
-
-  &.is-visible {
-    opacity: 1;
-  }
-}
-
-.scrollbar-top-shadow {
-  top: 0;
-  background: linear-gradient(to bottom, hsl(0 0% 100%), hsl(0 0% 100% / 0.9), transparent);
-}
-
-.scrollbar-bottom-shadow {
-  bottom: 0;
-  background: linear-gradient(to top, hsl(0 0% 100%), hsl(0 0% 100% / 0.9), transparent);
-}
-
 // Element Plus 菜单样式覆盖
 .sidebar-menu {
+  height: calc(100vh - 50px);
+  padding: 0.5rem;
+  overflow-y: auto;
   border: none;
   background-color: transparent;
 
@@ -304,11 +215,6 @@ const handleScroll = (event) => {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-
-  // 菜单标题
-  .menu-title {
-    font-size: 0.875rem;
   }
 
   // 子菜单项

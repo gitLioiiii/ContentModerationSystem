@@ -42,55 +42,12 @@
 
     <!-- 右侧工具栏 -->
     <div class="header-right">
-      <!-- 搜索按钮 -->
-      <ElButton
-        class="header-btn search-btn"
-        text
-        @click="handleSearch"
-      >
-        <div class="search-content">
-          <i class="bi bi-search"></i>
-          <span class="search-text">搜索</span>
-          <span class="search-shortcut">
-            <kbd>Ctrl</kbd> <kbd>K</kbd>
-          </span>
-        </div>
-      </ElButton>
-
-      <!-- 设置按钮 -->
-      <ElButton class="header-btn" circle text @click="handleSettings" >
-        <i class="bi bi-gear"></i>
-      </ElButton>
-
       <!-- 主题切换按钮 -->
       <ElButton class="header-btn theme-toggle" circle text
         :aria-label="isDark ? 'light' : 'dark'" @click="toggleTheme"
       >
         <i v-if="!isDark" class="bi bi-sun"></i>
         <i v-else class="bi bi-moon-stars"></i>
-      </ElButton>
-
-      <!-- 语言切换下拉菜单 -->
-      <ElDropdown trigger="click" @command="handleLanguageChange">
-        <ElButton class="header-btn" circle text>
-          <i class="bi bi-translate"></i>
-        </ElButton>
-        <template #dropdown>
-          <ElDropdownMenu>
-            <ElDropdownItem command="zh-CN">简体中文</ElDropdownItem>
-            <ElDropdownItem command="en-US">English</ElDropdownItem>
-          </ElDropdownMenu>
-        </template>
-      </ElDropdown>
-
-      <!-- 全球化按钮(可选) -->
-      <ElButton
-        class="header-btn"
-        circle
-        text
-        @click="handleGlobalization"
-      >
-        <i class="bi bi-globe"></i>
       </ElButton>
 
       <!-- 全屏按钮 -->
@@ -150,9 +107,9 @@
               <i class="bi bi-person"></i>
               <span>个人信息</span>
             </ElDropdownItem>
-            <ElDropdownItem v-if="userStore.logged" command="settings">
-              <i class="bi bi-gear"></i>
-              <span>账户设置</span>
+            <ElDropdownItem v-if="userStore.logged" command="lock">
+              <i class="bi bi-lock"></i>
+              <span>锁定屏幕</span>
             </ElDropdownItem>
             <ElDropdownItem v-if="userStore.logged" divided command="logout">
               <i class="bi bi-box-arrow-right"></i>
@@ -217,31 +174,11 @@ const handleRefresh = () => {
   location.reload()
 }
 
-// 搜索
-const handleSearch = () => {
-  ElMessage.info('搜索功能开发中...')
-}
-
-// 设置
-const handleSettings = () => {
-  ElMessage.info('设置功能开发中...')
-}
-
 // 主题切换
 const toggleTheme = () => {
   isDark.value = !isDark.value
   document.documentElement.classList.toggle('dark', isDark.value)
   ElMessage.success(`已切换到${isDark.value ? '暗色' : '亮色'}模式`)
-}
-
-// 语言切换
-const handleLanguageChange = (lang) => {
-  ElMessage.success(`语言已切换到 ${lang === 'zh-CN' ? '简体中文' : 'English'}`)
-}
-
-// 全球化设置
-const handleGlobalization = () => {
-  ElMessage.info('时区设置开发中...')
 }
 
 // 全屏切换
@@ -269,9 +206,6 @@ const handleUserCommand = (command) => {
   switch (command) {
     case 'profile':
       router.push({ name: 'Personal' })
-      break
-    case 'settings':
-      ElMessage.info('账户设置页面开发中...')
       break
     case 'logout':
       logout()

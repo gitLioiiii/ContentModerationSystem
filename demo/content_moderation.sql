@@ -53,6 +53,23 @@ db.runCommand({
           maxLength: 100,
           description: "邮箱"
         },
+				location: {
+					bsonType: ["object", "null"],
+					required: ["city"],
+					properties: {
+						city: {
+							bsonType: "string",
+							maxLength: 50,
+							description: "城市"
+						},
+						province: {
+							bsonType: ["string", "null"],
+							maxLength: 50,
+							description: "省份（可选）"
+						}
+					},
+					description: "用户地理位置"
+				},
         status: {
           enum: ["active", "ban"],
           description: "账户状态:active活跃/ban封号"
@@ -69,9 +86,18 @@ db.runCommand({
     }
   }
 })
+// 用户表索引
+db.user.createIndex({ username: 1 }, { unique: true })
+db.user.createIndex({ email: 1 }, { unique: true, sparse: true })
+db.user.createIndex({ phone: 1 }, { unique: true, sparse: true })
+db.user.createIndex({ status: 1 })
+db.user.createIndex({ role: 1 })
+db.user.createIndex({ registeredAt: -1 })
+
 
 // 内容表
-db.createCollection("content", {
+db.runCommand({
+  collMod:"content", 
   validator: {
     $jsonSchema: {
       bsonType: "object",
@@ -108,6 +134,7 @@ db.createCollection("content", {
                 maxLength: 500,
                 description: "媒体文件URL（当type为image或video时必填）"
               },
+// 							做适配
               thumbnailUrl: {
                 bsonType: ["string", "null"],
                 maxLength: 500,
@@ -131,23 +158,6 @@ db.createCollection("content", {
             }
           }
         },
-				location: {
-					bsonType: ["object", "null"],
-					required: ["city"],
-					properties: {
-						city: {
-							bsonType: "string",
-							maxLength: 50,
-							description: "城市"
-						},
-						province: {
-							bsonType: ["string", "null"],
-							maxLength: 50,
-							description: "省份（可选）"
-						}
-					},
-					description: "用户发布地理位置"
-				},
         status: {
           enum: ["pending", "passed", "rejected", "reviewing"],
           description: "审核状态 待审核/已通过/已驳回/人工审核中"
@@ -317,7 +327,7 @@ db.createCollection("manual_review", {
               },
               violationTypes: {
                 bsonType: "array",
-                /* 敏感词，色情，暴力，政治，垃圾邮件 */
+                /* 敏感词，色情，暴力，政治，垃圾邮件 其他*/
                 items: {
                   enum: ["sensitive_words", "porn", "violence", "political", "spam_mail", "other"]
                 },
@@ -363,27 +373,12 @@ db.createCollection("sensitive_words", {
         },
         level: {
           enum: ["low", "medium", "high"],
-          description: "严重等级:低/中/高"
-        },
-        matchType: {
-          enum: ["exact", "fuzzy", "regex"],
-          description: "匹配方式:精确/模糊/正则"
-        },
-        pattern: {
-          bsonType: ["string", "null"],
-          description: "正则表达式(当matchType=regex时)"
+          description: "严重程度:低/中/高"
         },
         category: {
-          enum: ["porn", "violence", "political", "spam"],
-          description: "所属分类"
-        },
-        status: {
-          enum: ["active", "inactive"],
-          description: "启用状态"
-        },
-        createdBy: {
-          bsonType: "objectId",
-          description: "创建者ID"
+				/* 色情，暴力，政治，垃圾邮件 其他*/
+          enum: ["porn", "violence", "political", "spam_mail", "other"],
+          description: "敏感词分类"
         },
         createdAt: {
           bsonType: "date",
