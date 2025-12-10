@@ -53,7 +53,7 @@ public class TextModerationController {
         log.debug("审核文本内容: {}", request.getContent());
 
         // 调用 Spring AI Service 进行文本审核
-        TextAutoResponse response = textAutoService.match_Ai_Text(request);
+        TextAutoResponse response = textAutoService.AiText(request);
 
         // 构建响应结果
         ResultTemplate result = new ResultTemplate();
