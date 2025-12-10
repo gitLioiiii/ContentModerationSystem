@@ -23,6 +23,7 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    // 分页
     @Override
     public List<UserEntity> fetch(Map<String, Object> filter) {
         String keywords = (String) filter.get("keywords");
@@ -38,25 +39,56 @@ public class UserServiceImpl implements UserService {
 
         Page<UserEntity> count;
 
-        // 判断筛选条件组合
+        // 查找
         boolean hasKeywords = keywords != null && !keywords.isEmpty();
         boolean hasRole = role != null && !role.isEmpty();
 
         if (hasKeywords && hasRole) {
             // 关键字和角色
-            count = this.userRepository.searchByKeywordsAndRole(role, keywords, pageable);
+            count = this.userRepository.findByKeywordsAndRole(role, keywords, pageable);
         } else if (hasKeywords) {
             // 关键字
-            count = this.userRepository.searchByKeywords(keywords, pageable);
+            count = this.userRepository.findByKeywords(keywords, pageable);
         } else if (hasRole) {
             // 角色
-            count = this.userRepository.searchByRole(role, pageable);
+            count = this.userRepository.findByRoleAndDeletedAtIsNull(role, pageable);
         } else {
             // 未删除的
-            count = this.userRepository.fetchByNotDeleted(pageable);
+            count = this.userRepository.findByDeletedAtIsNull(pageable);
         }
 
         return count.getContent();
+    }
+    
+    @Override
+    public Integer count(Map<String, Object> filter) {
+        String keywords = (String) filter.get("keywords");
+        String role = (String) filter.get("role");
+
+        // 获取总数
+        Pageable pageable = PageRequest.of(0, 1);
+
+        // 判断筛选条件组合
+        boolean hasKeywords = keywords != null && !keywords.isEmpty();
+        boolean hasRole = role != null && !role.isEmpty();
+
+        Page<UserEntity> page;
+
+        if (hasKeywords && hasRole) {
+            // 关键字和角色
+            page = this.userRepository.findByKeywordsAndRole(role, keywords, pageable);
+        } else if (hasKeywords) {
+            // 关键字
+            page = this.userRepository.findByKeywords(keywords, pageable);
+        } else if (hasRole) {
+            // 角色
+            page = this.userRepository.findByRoleAndDeletedAtIsNull(role, pageable);
+        } else {
+            // 未删除的
+            page = this.userRepository.findByDeletedAtIsNull(pageable);
+        }
+
+        return (int) page.getTotalElements();
     }
 
     @Override
@@ -78,44 +110,15 @@ public class UserServiceImpl implements UserService {
         return savedUser.getId() != null ? 1 : 0;
     }
 
-    @Override
-    public Integer count(Map<String, Object> filter) {
-        String keywords = (String) filter.get("keywords");
-        String role = (String) filter.get("role");
 
-        // 获取总数
-        Pageable pageable = PageRequest.of(0, 1);
-
-        // 判断筛选条件组合
-        boolean hasKeywords = keywords != null && !keywords.isEmpty();
-        boolean hasRole = role != null && !role.isEmpty();
-
-        Page<UserEntity> page;
-
-        if (hasKeywords && hasRole) {
-            // 关键字和角色
-            page = this.userRepository.searchByKeywordsAndRole(role, keywords, pageable);
-        } else if (hasKeywords) {
-            // 关键字
-            page = this.userRepository.searchByKeywords(keywords, pageable);
-        } else if (hasRole) {
-            // 角色
-            page = this.userRepository.searchByRole(role, pageable);
-        } else {
-            // 未删除的
-            page = this.userRepository.fetchByNotDeleted(pageable);
-        }
-
-        return (int) page.getTotalElements();
-    }
 
     @Override
     public Optional<UserEntity> fetchById(String id) {
-        return this.userRepository.fetchById(id);
+        return this.userRepository.findByIdAndDeletedAtIsNull(id);
     }
 
     @Override
     public Optional<UserEntity> fetchByUsername(String username) {
-        return this.userRepository.fetchByUsername(username);
+        return this.userRepository.findByUsernameAndDeletedAtIsNull(username);
     }
 }

@@ -1,8 +1,8 @@
 
 <template>
   <ElForm :model="filterModel" :rules="filterRules" @submit.prevent="fetch" inline>
-      <ElFormItem prop="keywordsName" label="姓名、手机号查询" style="width: 25rem">
-        <ElInput v-model="filterModel.keywords" :prefix-icon="Search" placeholder="关键字 姓名、手机号" clearable />
+      <ElFormItem prop="keywordsName" label="用户名、姓名、手机号查询" style="width: 25rem">
+        <ElInput v-model="filterModel.keywords" :prefix-icon="Search" placeholder="关键字 用户名、姓名、手机号" clearable />
       </ElFormItem>
       <ElFormItem prop="role" label="角色" style="width: 12rem">
         <ElSelect v-model="filterModel.role" placeholder="全部" clearable>
