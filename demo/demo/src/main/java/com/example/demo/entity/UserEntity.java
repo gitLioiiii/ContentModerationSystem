@@ -31,22 +31,20 @@ public class UserEntity {
     })
     @Size(
         min = 2,
-        max = 16, 
+        max = 16,
         groups = {
         UserValidateGroup.Create.class,
         UserValidateGroup.Login.class
     })
     @Indexed(unique = true)
-    @Field("username")
     private String username;
 
     @Size(
-        max = 32, 
+        max = 32,
         groups = {
         UserValidateGroup.Create.class,
         UserValidateGroup.Update.class
     })
-    @Field("name")
     private String name;
 
     @NotBlank(
@@ -62,25 +60,23 @@ public class UserEntity {
 		UserValidateGroup.Login.class
 	})
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Field("password")
     private String password;
 
     //角色
     //用户或者管理员
     @NotBlank(
         groups = {
-        UserValidateGroup.Login.class
+        UserValidateGroup.Login.class    
     })
-    @Field("role")
+    @Indexed
     private String role = "user";
 
-    @Field("avatar")
     private String avatar;
 
-    @Field("themeImage")
+    @Field("backgroundImage")
     private String themeImage;
 
-    @Field("phone")
+    @Indexed(unique = true, sparse = true)
     private String phone;
 
     @Email(
@@ -89,34 +85,27 @@ public class UserEntity {
         UserValidateGroup.Update.class
     })
     @Size(
-        max = 100, 
+        max = 100,
         groups = {
         UserValidateGroup.Create.class,
         UserValidateGroup.Update.class
     })
-    @Field("email")
+    @Indexed(unique = true, sparse = true)
     private String email;
 
-    @Field("birthday")
     private LocalDate birthday;
 
-    @Field("gender")
     private String gender = "none"; // man, woman, none
 
-    @Field("province")
     private String province; // 省份
 
-    @Field("city")
     private String city; // 城市
 
     // 登录状态可登录和不可登录
-    @Field("status")
     private String status = "active"; // active 或 ban
 
-    @Field("deletedAt")
     private LocalDateTime deletedAt;
 
-    @Field("registeredAt")
 	private LocalDateTime registeredAt;
 
 }

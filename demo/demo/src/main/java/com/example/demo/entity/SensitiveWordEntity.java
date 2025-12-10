@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.example.demo.validator.SensitiveWordValidateGroup;
+
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -14,20 +16,28 @@ import lombok.Data;
 public class SensitiveWordEntity {
 
     @Id
+    @NotBlank(message = "ID不能为空", groups = {
+        SensitiveWordValidateGroup.Update.class,
+        SensitiveWordValidateGroup.Remove.class
+    })
     private String id;
 
     @Indexed(unique = true)
-    @Field("word")
+    @NotBlank(message = "敏感词不能为空", groups = {
+        SensitiveWordValidateGroup.Create.class,
+        SensitiveWordValidateGroup.Update.class
+    })
     private String word;
 
-    @Indexed
-    @Field("category")
+    @NotBlank(message = "分类不能为空", groups = {
+        SensitiveWordValidateGroup.Create.class
+    })
     private String category;
 
-    @Indexed
-    @Field("level")
+    @NotBlank(message = "级别不能为空", groups = {
+        SensitiveWordValidateGroup.Create.class
+    })
     private String level;
 
-    @Field("createdAt")
     private LocalDateTime createdAt;
 }

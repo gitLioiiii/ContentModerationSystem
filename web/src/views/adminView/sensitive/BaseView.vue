@@ -1,25 +1,22 @@
 <template>
   <article class="base-article">
     <div class="base-heading">
-      <!-- h1在这里被tailwind的样式覆盖了 -->
       <h1>
-        <span style="color:#14C9C9">用户列表</span>
+        <span style="color:#14C9C9">敏感词管理</span>
       </h1>
       <div>
-
         <ElButton
-          :type="route.name === 'user_index' ? 'primary' : 'default'"
+          :type="route.name === 'sensitive_index' ? 'primary' : 'default'"
           native-type="button"
-          @click.stop="router.push({ name: 'user_index' })"
+          @click.stop="router.push({ name: 'sensitive_index' })"
           >列表</ElButton
         >
         <ElButton
-          :type="route.name === 'user_create' ? 'primary' : 'default'"
+          :type="route.name === 'sensitive_create' ? 'primary' : 'default'"
           native-type="button"
-          @click.stop="router.push({ name: 'user_create' })"
+          @click.stop="router.push({ name: 'sensitive_create' })"
           >新增</ElButton
         >
-
       </div>
     </div>
     <RouterView />

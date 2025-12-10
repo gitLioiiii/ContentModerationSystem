@@ -367,7 +367,7 @@ db.createCollection("sensitive_words", {
       required: ["word", "level", "createdAt"],
       properties: {
         word: {
-          bsonType: "string",
+          bsonType: "string", 
           maxLength: 100,
           description: "敏感词"
         },
@@ -376,7 +376,7 @@ db.createCollection("sensitive_words", {
           description: "严重程度:低/中/高"
         },
         category: {
-				/* 色情，暴力，政治，垃圾邮件 其他*/
+				  /* 色情，暴力，政治，垃圾邮件 其他*/
           enum: ["porn", "violence", "political", "spam_mail", "other"],
           description: "敏感词分类"
         },

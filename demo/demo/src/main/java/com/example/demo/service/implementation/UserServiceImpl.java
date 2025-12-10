@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
         return count.getContent();
     }
     
+    // 统计
     @Override
     public Integer count(Map<String, Object> filter) {
         String keywords = (String) filter.get("keywords");
@@ -109,8 +110,6 @@ public class UserServiceImpl implements UserService {
         UserEntity savedUser = this.userRepository.save(user);
         return savedUser.getId() != null ? 1 : 0;
     }
-
-
 
     @Override
     public Optional<UserEntity> fetchById(String id) {

@@ -58,12 +58,12 @@ public class SecurityController {
             return result;
         }
 
-        // 检查角色是否匹配
-        String Role = fields.getRole(); //前端获取
+        // 检查角色是否匹配（如果前端提供了角色）
+        String requestedRole = fields.getRole(); //前端获取
         String actualRole = user.getRole(); //数据库获取
-        if (!Role.equals(actualRole)) {
+        if (requestedRole != null && !requestedRole.isEmpty() && !requestedRole.equals(actualRole)) {
             result.setStatus(false);
-            if ("admin".equals(Role)) {
+            if ("admin".equals(requestedRole)) {
                 result.putPayload("message", "这是普通用户");
             } else {
                 result.putPayload("message", "这是管理员");

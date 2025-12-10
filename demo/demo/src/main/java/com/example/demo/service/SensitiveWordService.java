@@ -19,4 +19,6 @@ public interface SensitiveWordService {
     Integer count(Map<String, Object> filter);
 
     Optional<SensitiveWordEntity> fetchById(String id);
+
+    Optional<SensitiveWordEntity> fetchByWord(String word);
 }
