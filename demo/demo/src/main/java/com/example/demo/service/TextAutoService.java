@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.dto.TextAutoRequest;
 import com.example.demo.dto.TextAutoResponse;
+import com.example.demo.entity.SensitiveWordEntity;
+import com.example.demo.utils.SensitiveWordUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -10,25 +12,43 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 public class TextAutoService {
 
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
+    private final SensitiveWordService sensitiveWordService;
 
     // 构造法
-    public TextAutoService(ChatClient.Builder chatClientBuilder, ObjectMapper objectMapper) {
+    public TextAutoService(ChatClient.Builder chatClientBuilder,
+                        ObjectMapper objectMapper,
+                        SensitiveWordService sensitiveWordService) {
         this.chatClient = chatClientBuilder.build();
         this.objectMapper = new ObjectMapper();
+        this.sensitiveWordService = sensitiveWordService;
     }
 
     // 接收文本
     public TextAutoResponse AiText(TextAutoRequest request) {
         String content = request.getContent();
-        log.info("开始 AI 文本审核，文本长度: {} 字符", content.length());
+        log.info("开始文本审核，文本长度: {} 字符", content.length());
 
         try {
+            // 第一步：敏感词过滤
+            log.info("执行敏感词过滤检查...");
+            TextAutoResponse sensitiveWordCheckResult = checkSensitiveWords(content);
+            if (sensitiveWordCheckResult != null) {
+                // 发现敏感词，直接返回
+                return sensitiveWordCheckResult;
+            }
+
+            // 第二步：敏感词检查通过，继续 AI 审核
+            log.info("敏感词检查通过，开始 AI 审核...");
             // 调用 Spring AI ChatClient 改成内联式审核
             String aiResponse = this.chatClient.prompt()
                 .system("""
@@ -119,5 +139,147 @@ public class TextAutoService {
                 content
             );
         }
+    }
+
+    // 敏感词检查方法
+    private TextAutoResponse checkSensitiveWords(String content) {
+        try {
+            // 数据库获取所有敏感词
+            List<SensitiveWordEntity> sensitiveWords = sensitiveWordService.fetch(new HashMap<>());
+
+            if (sensitiveWords == null || sensitiveWords.isEmpty()) {
+                log.warn("敏感词库为空，跳过敏感词检查");
+                return null;
+            }
+
+            // 提取敏感词列表
+            List<String> wordList = sensitiveWords.stream()
+                .map(SensitiveWordEntity::getWord)
+                .collect(Collectors.toList());
+
+            log.info("加载敏感词库完成，共 {} 个敏感词", wordList.size());
+
+            // 敏感词过滤工具
+            SensitiveWordUtil sensitiveWordUtil = new SensitiveWordUtil(wordList);
+
+            // 检查是否包含敏感词
+            if (sensitiveWordUtil.containsSensitiveWord(content)) {
+                // 查找所有敏感词
+                List<SensitiveWordUtil.SensitiveWordResult> foundWords =
+                    sensitiveWordUtil.findAllWords(content);
+
+                // 构建敏感词列表字符串
+                String foundWordsStr = foundWords.stream()
+                    .map(SensitiveWordUtil.SensitiveWordResult::getWord)
+                    .distinct()
+                    .collect(Collectors.joining(", "));
+
+                log.warn("文本包含敏感词: {}", foundWordsStr);
+
+                // 获取匹配到的敏感词的最高级别
+                String maxLevel = getMaxSensitiveWordLevel(foundWords, sensitiveWords);
+
+                // 根据敏感词级别决定审核结果
+                String result;
+                String riskLevel;
+                String reason;
+
+                switch (maxLevel) {
+                    case "high":
+                        result = "拒绝";
+                        riskLevel = "高";
+                        reason = "文本包含高风险敏感词: " + foundWordsStr;
+                        break;
+                    case "medium":
+                        result = "需人工审核";
+                        riskLevel = "中";
+                        reason = "文本包含中等风险敏感词: " + foundWordsStr;
+                        break;
+                    case "low":
+                        result = "需人工审核";
+                        riskLevel = "低";
+                        reason = "文本包含低风险敏感词: " + foundWordsStr;
+                        break;
+                    default:
+                        result = "需人工审核";
+                        riskLevel = "中";
+                        reason = "文本包含敏感词: " + foundWordsStr;
+                }
+
+                log.info("敏感词匹配结果 - 最高级别: {}, 审核结果: {}, 风险等级: {}", maxLevel, result, riskLevel);
+
+                return new TextAutoResponse(result, reason, riskLevel, content);
+            }
+
+            log.info("未检测到敏感词");
+            return null; // 未发现敏感词，返回 null 继续 AI 审核
+
+        } catch (Exception e) {
+            log.error("敏感词检查异常", e);
+            // 发生异常时，为了安全起见，返回需要人工审核
+            return new TextAutoResponse(
+                "需人工审核",
+                "敏感词检查异常: " + e.getMessage(),
+                "中",
+                content
+            );
+        }
+    }
+
+    // 获取一段文本匹配到的敏感词中的最高级别
+    private String getMaxSensitiveWordLevel(List<SensitiveWordUtil.SensitiveWordResult> foundWords,
+                                        List<SensitiveWordEntity> sensitiveWords) {
+        // 创建敏感词到级别的映射
+        HashMap<String, String> wordLevelMap = new HashMap<>();
+        for (SensitiveWordEntity entity : sensitiveWords) {
+            wordLevelMap.put(entity.getWord(), entity.getLevel());
+        }
+
+        // 找出所有匹配敏感词的级别
+        boolean hasHigh = false;
+        boolean hasMedium = false;
+        boolean hasLow = false;
+
+        log.info("----- 敏感词级别匹配调试 -------");
+        for (SensitiveWordUtil.SensitiveWordResult result : foundWords) {
+            String word = result.getWord();
+            String level = wordLevelMap.get(word);
+            log.info("匹配到的敏感词: '{}', 风险等级: '{}'", word, level);
+
+            if (level != null) {
+                switch (level) {
+                    case "high":
+                        hasHigh = true;
+                        break;
+                    case "medium":
+                        hasMedium = true;
+                        break;
+                    case "low":
+                        hasLow = true;
+                        break;
+                    default:
+                        log.warn("未识别的级别: '{}'", level);
+                }
+            } else {
+                log.warn("敏感词 '{}' 在数据库中找不到对应的级别", word);
+            }
+        }
+
+        // 返回最高级别
+        String maxLevel;
+        if (hasHigh) {
+            maxLevel = "high";
+        } else if (hasMedium) {
+            maxLevel = "medium";
+        } else if (hasLow) {
+            maxLevel = "low";
+        } else {
+            maxLevel = "medium"; // 默认中等风险
+        }
+
+        log.info("最终判定的最高级别: '{}' (hasHigh={}, hasMedium={}, hasLow={})", maxLevel, hasHigh, hasMedium, hasLow);
+        log.info("------------------------------");
+
+        return maxLevel;
     }
 }
