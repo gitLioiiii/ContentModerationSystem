@@ -43,6 +43,15 @@ const router = createRouter({
         breadcrumbCurrent: '文本审核',
       },
     },
+    {
+      path: '/image',
+      name: 'image',
+      component: () => import('@/views/adminView/ai/ImageReview.vue'),
+      meta: {
+        breadcrumbParent: '自动审核',
+        breadcrumbCurrent: '图像审核',
+      },
+    },
     // 敏感词管理
     {
       path: '/sensitive',

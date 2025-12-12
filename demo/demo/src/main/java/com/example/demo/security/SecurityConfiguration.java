@@ -53,12 +53,14 @@ public class SecurityConfiguration {
                     "/favicon.ico",
                     "/images/**",
                     "/avatars/**",
-                    "/themes/**"
+                    "/themes/**",
+                    "/ai-images/**"
                     // "/public/**",
                     // "/static/**"
                 ).permitAll();
                 // 放行用户匿名注册接口
 				authorize.requestMatchers("/user/create").permitAll();
+                // 其他所有请求都需要JWT认证
                 authorize.anyRequest().authenticated();
             })
             // JwtDecoder，用于解码JWT token

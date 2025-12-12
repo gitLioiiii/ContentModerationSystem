@@ -47,7 +47,7 @@
             <i class="bi bi-fonts menu-icon"></i>
             <span v-if="!sidebarCollapsed">文本审核</span>
           </ElMenuItem>
-          <ElMenuItem index="image" :route="{ name: 'inage' }" class="sub-menu-item">
+          <ElMenuItem index="image" :route="{ name: 'image' }" class="sub-menu-item">
             <i class="bi bi-image menu-icon"></i>
             <span v-if="!sidebarCollapsed">图像审核</span>
           </ElMenuItem>

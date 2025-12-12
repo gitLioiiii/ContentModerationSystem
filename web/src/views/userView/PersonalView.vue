@@ -454,7 +454,7 @@ import {
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import request from '@/utils/request'
-import { buildURL } from '@/utils/helper'
+import { buildURL, buildThemeURL } from '@/utils/helper'
 import { useUserStore } from '@/stores/user'
 import { getProvinceList, getCitiesByProvince } from '@/utils/regions'
 
@@ -574,7 +574,7 @@ const fetchUserInfo = () => {
 // 计算容器背景样式
 const containerBackground = computed(() => {
     if (model.themeImage.length > 0) {
-        const bgUrl = buildURL(model.themeImage[0].filename)
+        const bgUrl = buildThemeURL(model.themeImage[0].filename)
         return {
             backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.50), rgba(255, 255, 255, 0.50)), url('${bgUrl}')`,
             backgroundSize: 'cover',

@@ -1,49 +1,82 @@
 <template>
-    <div class="text-review-container">
+    <div class="image-review-container">
         <!-- 页面标题 -->
         <div class="page-header">
-            <h1 class="page-title">文本内容审核</h1>
-            <p class="page-desc">使用AI进行文本内容审核，快速识别违规内容</p>
+            <h1 class="page-title">图像内容审核</h1>
+            <p class="page-desc">使用AI进行图像内容审核，快速识别违规图片</p>
         </div>
 
         <!-- 上方：左右分栏区域 -->
         <div class="top-section">
-            <!-- 左侧：文本输入区 -->
-            <ElCard class="input-card" shadow="hover">
+            <!-- 左侧：图片上传区 -->
+            <ElCard class="upload-card" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <i class="bi bi-file-text" style="font-size: 20px;"></i>
-                        <span>输入文本内容</span>
+                        <i class="bi bi-image" style="font-size: 20px;"></i>
+                        <span>上传图片</span>
                     </div>
                 </template>
-                <div class="input-section">
-                    <ElInput
-                        v-model="textContent"
-                        type="textarea"
-                        placeholder="请输入需要审核的文本内容..."
-                        maxlength="5000"
-                        show-word-limit
-                        :disabled="loading"
-                        class="textarea-full"
+                <div class="upload-section">
+                    <!-- 图片预览区 -->
+                    <div
+                        v-if="imageUrl"
+                        class="image-preview"
+                    >
+                        <img :src="imageUrl" alt="预览图片" />
+                        <div class="image-overlay">
+                            <ElButton
+                                type="danger"
+                                circle
+                                @click="removeImage"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </ElButton>
+                        </div>
+                    </div>
+
+                    <!-- 上传区域 -->
+                    <div
+                        v-else
+                        class="upload-area"
+                        :class="{ 'is-dragover': isDragover }"
+                        @drop.prevent="handleDrop"
+                        @dragover.prevent="isDragover = true"
+                        @dragleave.prevent="isDragover = false"
+                        @click="triggerFileInput"
+                    >
+                        <img src="@/assets/img/图片上传.png" alt="上传图片" style="width: 80px; height: 80px;" />
+                        <p class="upload-text">点击或拖拽图片到此处上传</p>
+                        <p class="upload-desc">支持 JPG、PNG、GIF 格式，大小不超过 10MB</p>
+                    </div>
+
+                    <!-- 隐藏的文件输入 -->
+                    <input
+                        ref="fileInput"
+                        type="file"
+                        accept="image/*"
+                        style="display: none"
+                        @change="handleFileChange"
                     />
+
+                    <!-- 操作按钮 -->
                     <div class="action-buttons">
                         <ElButton
                             type="primary"
                             size="large"
                             :loading="loading"
-                            :disabled="!textContent.trim()"
+                            :disabled="!imageFile"
                             @click="handleModerate"
                         >
                             <i class="bi bi-check-lg"></i>
-                            {{ loading ? 'AI审核中...' : '开始AI审核' }}
+                            {{ loading ? '测试中...' : '开始测试' }}
                         </ElButton>
                         <ElButton
                             size="large"
-                            :disabled="loading"
-                            @click="handleClear"
+                            :disabled="loading || !imageFile"
+                            @click="removeImage"
                         >
                             <i class="bi bi-trash"></i>
-                            清空内容
+                            清空图片
                         </ElButton>
                     </div>
                 </div>
@@ -72,15 +105,15 @@
                         </div>
                     </div>
 
-                    <!-- 风险等级 -->
+                    <!-- 匹配分数 -->
                     <div class="result-item">
-                        <div class="result-label">风险等级</div>
+                        <div class="result-label">匹配分数</div>
                         <div class="result-value">
                             <ElTag
-                                :type="getRiskType(result.riskLevel)"
+                                :type="getMatchScoreType(result.matchScore)"
                                 size="large"
                             >
-                                {{ result.riskLevel }}
+                                {{ (result.matchScore * 100).toFixed(1) }}%
                             </ElTag>
                         </div>
                     </div>
@@ -93,11 +126,16 @@
                         </div>
                     </div>
 
-                    <!-- 原始内容 -->
+                    <!-- 原始图片 -->
                     <div class="result-item">
-                        <div class="result-label">原始内容</div>
-                        <div class="result-value original-text">
-                            {{ result.originalText }}
+                        <div class="result-label">原始图片</div>
+                        <div class="result-value">
+                            <img
+                                v-if="result.imageUrl"
+                                :src="result.imageUrl"
+                                alt="审核图片"
+                                class="result-image"
+                            />
                         </div>
                     </div>
                 </div>
@@ -106,8 +144,8 @@
             <!-- 空状态提示 -->
             <ElCard v-else class="empty-card" shadow="hover">
                 <div class="empty-state">
-                    <i class="bi bi-file-text" style="font-size: 80px; color: #909399;"></i>
-                    <p class="empty-text">请在左侧输入文本并点击"开始AI审核"</p>
+                    <i class="bi bi-image" style="font-size: 80px; color: #909399;"></i>
+                    <p class="empty-text">请在左侧上传图片并点击"开始检测"</p>
                     <p class="empty-desc">审核结果将在这里显示</p>
                 </div>
             </ElCard>
@@ -137,16 +175,21 @@
                     class="history-item"
                     @click="loadHistoryItem(item)"
                 >
-                    <div class="history-header">
-                        <ElTag
-                            :type="getResultType(item.result)"
-                            size="small"
-                        >
-                            {{ item.result }}
-                        </ElTag>
-                        <span class="history-time">{{ item.time }}</span>
+                    <div class="history-image">
+                        <img :src="item.imageUrl" alt="历史图片" />
                     </div>
-                    <div class="history-text">{{ truncateText(item.originalText) }}</div>
+                    <div class="history-info">
+                        <div class="history-header">
+                            <ElTag
+                                :type="getResultType(item.result)"
+                                size="small"
+                            >
+                                {{ item.result }}
+                            </ElTag>
+                            <span class="history-time">{{ item.time }}</span>
+                        </div>
+                        <div class="history-reason">{{ truncateText(item.reason) }}</div>
+                    </div>
                 </div>
             </div>
         </ElCard>
@@ -155,25 +198,82 @@
 
 <script setup>
 import { ref } from 'vue'
-import {
-    ElCard,
-    ElInput,
-    ElButton,
-    ElMessage,
-    ElTag
-} from 'element-plus'
+import { ElCard, ElButton, ElMessage, ElTag } from 'element-plus'
 import request from '@/utils/request'
+import { buildImageURL } from '@/utils/helper'
 
 // 响应式数据
-const textContent = ref('')
+const imageFile = ref(null)
+const imageUrl = ref('')
 const loading = ref(false)
 const result = ref(null)
 const historyList = ref([])
+const isDragover = ref(false)
+const fileInput = ref(null)
+
+// 触发文件选择
+const triggerFileInput = () => {
+    fileInput.value.click()
+}
+
+// 处理文件选择
+const handleFileChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        processFile(file)
+    }
+}
+
+// 处理拖拽上传
+const handleDrop = (event) => {
+    isDragover.value = false
+    const file = event.dataTransfer.files[0]
+    if (file) {
+        processFile(file)
+    }
+}
+
+// 处理文件
+const processFile = (file) => {
+    // 验证文件类型
+    if (!file.type.startsWith('image/')) {
+        ElMessage.warning('请上传图片文件')
+        return
+    }
+
+    // 验证文件大小（10MB）
+    if (file.size > 10 * 1024 * 1024) {
+        ElMessage.warning('图片大小不能超过 10MB')
+        return
+    }
+
+    imageFile.value = file
+
+    // 生成预览URL
+    const reader = new FileReader()
+    reader.onload = (e) => {
+        imageUrl.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+
+    // 清空之前的结果
+    result.value = null
+}
+
+// 移除图片
+const removeImage = () => {
+    imageFile.value = null
+    imageUrl.value = ''
+    result.value = null
+    if (fileInput.value) {
+        fileInput.value.value = ''
+    }
+}
 
 // AI审核
 const handleModerate = async () => {
-    if (!textContent.value.trim()) {
-        ElMessage.warning('请输入需要审核的文本内容')
+    if (!imageFile.value) {
+        ElMessage.warning('请先上传图片')
         return
     }
 
@@ -181,16 +281,31 @@ const handleModerate = async () => {
     result.value = null
 
     try {
-        const response = await request.post('/moderation/text', {
-            content: textContent.value
+        // 创建 FormData
+        const formData = new FormData()
+        formData.append('file', imageFile.value)
+
+        const response = await request.post('/moderation/image', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
         })
 
         if (response.data.status === true) {
-            result.value = response.data.payload.moderation
+            // 使用服务器返回的图片URL
+            const serverImageUrl = buildImageURL(response.data.payload.filename)
+
+            result.value = {
+                ...response.data.payload.moderation,
+                imageUrl: serverImageUrl,
+                originalFilename: response.data.payload.originalFilename
+            }
 
             // 添加到历史记录
             historyList.value.unshift({
                 ...response.data.payload.moderation,
+                imageUrl: serverImageUrl,
+                originalFilename: response.data.payload.originalFilename,
                 time: new Date().toLocaleString()
             })
 
@@ -199,22 +314,16 @@ const handleModerate = async () => {
                 historyList.value.pop()
             }
 
-            ElMessage.success('审核完成')
+            ElMessage.success('检测完成')
         } else {
-            ElMessage.error(response.data.message || '审核失败')
+            ElMessage.error(response.data.message || '检测失败')
         }
     } catch (error) {
-        console.error('文本审核失败:', error)
-        ElMessage.error('审核失败，请重试')
+        console.error('图像审核失败:', error)
+        ElMessage.error('检测失败，请重试')
     } finally {
         loading.value = false
     }
-}
-
-// 清空内容
-const handleClear = () => {
-    textContent.value = ''
-    result.value = null
 }
 
 // 清空历史记录
@@ -225,7 +334,7 @@ const clearHistory = () => {
 
 // 加载历史项目
 const loadHistoryItem = (item) => {
-    textContent.value = item.originalText
+    imageUrl.value = item.imageUrl
     result.value = item
     // 滚动到顶部
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -247,19 +356,20 @@ const getResultType = (result) => {
     return typeMap[result] || 'info'
 }
 
-// 获取风险等级标签类型
-const getRiskType = (level) => {
-    const typeMap = {
-        '低': 'success',
-        '中': 'warning',
-        '高': 'danger'
+// 获取匹配分数标签类型
+const getMatchScoreType = (score) => {
+    if (score < 0.3) {
+        return 'success'  // 低风险（0-30%）
+    } else if (score < 0.7) {
+        return 'warning'  // 中等风险（30-70%）
+    } else {
+        return 'danger'   // 高风险（70-100%）
     }
-    return typeMap[level] || 'info'
 }
 </script>
 
 <style scoped>
-.text-review-container {
+.image-review-container {
     padding: 2rem;
     min-height: 100vh;
     background-color: #f5f5f5;
@@ -295,15 +405,15 @@ const getRiskType = (level) => {
     align-items: start;
 }
 
-/* 左侧输入卡片 */
-.input-card {
-    height: 25rem;
+/* 左侧上传卡片 */
+.upload-card {
+    height: 35rem;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
 }
 
-.input-card :deep(.el-card__body) {
+.upload-card :deep(.el-card__body) {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -313,7 +423,7 @@ const getRiskType = (level) => {
 /* 右侧审核结果卡片 */
 .result-card,
 .empty-card {
-    height: 25rem;
+    height: 35rem;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -335,25 +445,85 @@ const getRiskType = (level) => {
     color: #303133;
 }
 
-/* 输入区域 */
-.input-section {
+/* 上传区域 */
+.upload-section {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
     height: 100%;
 }
 
-.textarea-full {
+.upload-area {
     flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #dcdfe6;
+    border-radius: 8px;
+    background-color: #fafafa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 2rem;
 }
 
-:deep(.textarea-full .el-textarea__inner) {
-    font-size: 15px;
-    line-height: 1.6;
-    height: 100% !important;
-    resize: none;
+.upload-area:hover {
+    border-color: #409eff;
+    background-color: #f0f9ff;
+}
+
+.upload-area.is-dragover {
+    border-color: #409eff;
+    background-color: #e6f7ff;
+}
+
+.upload-text {
+    font-size: 1rem;
+    color: #606266;
+    margin: 1rem 0 0.5rem;
+    font-weight: 500;
+}
+
+.upload-desc {
+    font-size: 0.875rem;
+    color: #909399;
+    margin: 0;
+}
+
+/* 图片预览区 */
+.image-preview {
+    flex: 1;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-preview:hover .image-overlay {
+    opacity: 1;
 }
 
 .action-buttons {
@@ -433,14 +603,10 @@ const getRiskType = (level) => {
     line-height: 1.6;
 }
 
-.original-text {
-    padding: 1rem;
-    background-color: #f5f7fa;
+.result-image {
+    max-width: 100%;
     border-radius: 8px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    max-height: 200px;
-    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* 下方审核历史区域 */
@@ -454,11 +620,13 @@ const getRiskType = (level) => {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1rem;
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
 .history-item {
+    display: flex;
+    gap: 1rem;
     padding: 1rem;
     background-color: #f5f7fa;
     border-radius: 8px;
@@ -472,11 +640,32 @@ const getRiskType = (level) => {
     border-color: #409eff;
 }
 
+.history-image {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #000;
+}
+
+.history-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.history-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 .history-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
 }
 
 .history-time {
@@ -484,13 +673,14 @@ const getRiskType = (level) => {
     color: #909399;
 }
 
-.history-text {
+.history-reason {
     font-size: 14px;
     color: #606266;
     line-height: 1.5;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
 }
 
 /* 响应式设计 */
@@ -499,7 +689,7 @@ const getRiskType = (level) => {
         grid-template-columns: 1fr;
     }
 
-    .input-card,
+    .upload-card,
     .result-card,
     .empty-card {
         height: auto;
@@ -508,7 +698,7 @@ const getRiskType = (level) => {
 }
 
 @media (max-width: 768px) {
-    .text-review-container {
+    .image-review-container {
         padding: 1rem;
     }
 
@@ -547,7 +737,16 @@ const getRiskType = (level) => {
 
     .history-list {
         grid-template-columns: 1fr;
-        max-height: 250px;
+        max-height: 300px;
+    }
+
+    .history-item {
+        flex-direction: column;
+    }
+
+    .history-image {
+        width: 100%;
+        height: 200px;
     }
 }
 </style>
