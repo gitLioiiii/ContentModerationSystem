@@ -126,6 +126,11 @@ public class SensitiveWordController {
             existingWord.setLevel(sensitiveWord.getLevel());
         }
 
+        // 更新生效启用状态
+        if (sensitiveWord.getEffective() != null) {
+            existingWord.setEffective(sensitiveWord.getEffective());
+        }
+
         this.sensitiveWordService.update(existingWord);
 
         return result;

@@ -39,5 +39,7 @@ public class SensitiveWordEntity {
     })
     private String level;
 
+    private Boolean effective;
+
     private LocalDateTime createdAt;
 }

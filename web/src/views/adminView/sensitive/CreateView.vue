@@ -20,6 +20,9 @@
                 <ElOption label="高风险" value="high" />
             </ElSelect>
         </ElFormItem>
+        <ElFormItem prop="effective" label="启用状态">
+            <ElSwitch v-model="model.effective" active-text="已启用" />
+        </ElFormItem>
         <ElFormItem>
             <ElButton native-type="submit" type="primary">保存</ElButton>
             <ElButton @click="router.back()">取消</ElButton>
@@ -30,7 +33,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElForm, ElFormItem, ElInput, ElButton, ElMessage, ElSelect, ElOption} from 'element-plus'
+import { ElForm, ElFormItem, ElInput, ElButton, ElMessage, ElSelect, ElOption, ElSwitch} from 'element-plus'
 import request from '@/utils/request'
 
 const router = useRouter()
@@ -40,7 +43,8 @@ const form = ref(null)
 const model = reactive({
     word: '',
     category: 'other',
-    level: 'low'
+    level: 'low',
+    effective: true
 })
 
 const rules = reactive({
@@ -64,7 +68,8 @@ const save = () => {
                 const sensitiveWordData = {
                     word: model.word,
                     category: model.category,
-                    level: model.level
+                    level: model.level,
+                    effective: model.effective
                 }
 
                 request

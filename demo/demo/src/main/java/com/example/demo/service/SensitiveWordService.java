@@ -7,7 +7,7 @@ import java.util.Optional;
 import com.example.demo.entity.SensitiveWordEntity;
 
 public interface SensitiveWordService {
-    
+
     List<SensitiveWordEntity> fetch(Map<String, Object> filter);
 
     Integer create(SensitiveWordEntity sensitiveword);

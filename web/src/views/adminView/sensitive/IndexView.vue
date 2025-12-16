@@ -45,6 +45,12 @@
           <ElTag v-else type="success">低风险</ElTag>
         </template>
       </ElTableColumn>
+      <ElTableColumn prop="effective" label="启用状态" width="120">
+        <template #default="{ row }">
+          <ElTag v-if="row.effective" type="success">已启用</ElTag>
+          <ElTag v-else type="info">已禁用</ElTag>
+        </template>
+      </ElTableColumn>
       <ElTableColumn prop="createdAt" label="创建时间" min-width="200" />
       <ElTableColumn label="设置" width="200" header-align="center">
         <template #default = "{ row }">
@@ -105,6 +111,9 @@
           <ElOption label="高风险" value="high" />
         </ElSelect>
       </ElFormItem>
+      <ElFormItem prop="effective" label="启用状态">
+        <ElSwitch v-model="editModel.effective" active-text="已启用" />
+      </ElFormItem>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
@@ -120,7 +129,7 @@
 import { ref, reactive, watch } from 'vue'
 import { ElTable, ElTableColumn, ElPopconfirm, ElButton,
         ElMessage, ElForm, ElFormItem, ElPagination, ElInput,
-        ElSelect, ElOption, ElTag, ElDialog } from 'element-plus'
+        ElSelect, ElOption, ElTag, ElDialog, ElSwitch } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 
@@ -195,7 +204,8 @@ const editModel = reactive({
   id: null,
   word: '',
   category: '',
-  level: ''
+  level: '',
+  effective: true
 })
 
 const editRules = reactive({
@@ -216,6 +226,7 @@ const openEdit = (row) => {
   editModel.word = row.word
   editModel.category = row.category
   editModel.level = row.level
+  editModel.effective = row.effective !== undefined ? row.effective : true
   dialogVisible.value = true
 }
 
@@ -228,7 +239,8 @@ const save = () => {
           id: editModel.id,
           word: editModel.word,
           category: editModel.category,
-          level: editModel.level
+          level: editModel.level,
+          effective: editModel.effective
         }
 
         request

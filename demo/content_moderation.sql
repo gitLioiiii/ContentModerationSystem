@@ -376,9 +376,13 @@ db.createCollection("sensitive_words", {
           description: "严重程度:低/中/高"
         },
         category: {
-				  /* 色情，暴力，政治，垃圾邮件 其他*/
+        /* 色情，暴力，政治，垃圾邮件 其他*/
           enum: ["porn", "violence", "political", "spam_mail", "other"],
           description: "敏感词分类"
+        },
+        Effective: {
+          bsonType: "bool",
+          description: "是否生效(true生效/false未生效)"
         },
         createdAt: {
           bsonType: "date",
@@ -390,7 +394,7 @@ db.createCollection("sensitive_words", {
 })
 
 db.sensitive_words.createIndex({ word: 1 }, { unique: true })
-db.sensitive_words.createIndex({ status: 1, level: 1 })
+db.sensitive_words.createIndex({ Effective: 1, level: 1 })
 db.sensitive_words.createIndex({ category: 1 })
 
 
