@@ -360,43 +360,41 @@ db.manual_review.createIndex({ reviewerId: 1, reviewedAt: -1 })
 db.manual_review.createIndex({ decision: 1 })
 
 // 敏感词库表
-db.createCollection("sensitive_words", {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["word", "level", "createdAt"],
-      properties: {
-        word: {
-          bsonType: "string", 
-          maxLength: 100,
-          description: "敏感词"
-        },
-        level: {
-          enum: ["low", "medium", "high"],
-          description: "严重程度:低/中/高"
-        },
-        category: {
-        /* 色情，暴力，政治，垃圾邮件 其他*/
-          enum: ["porn", "violence", "political", "spam_mail", "other"],
-          description: "敏感词分类"
-        },
-        Effective: {
-          bsonType: "bool",
-          description: "是否生效(true生效/false未生效)"
-        },
-        createdAt: {
-          bsonType: "date",
-          description: "创建时间"
+db.runCommand({
+    collMod: "sensitive_words",
+    validator: {
+      $jsonSchema: {
+        bsonType: "object",
+        required: ["word", "level", "createdAt"],
+        properties: {
+          word: {
+            bsonType: "string",
+            maxLength: 100,
+            description: "敏感词"
+          },
+          level: {
+            enum: ["low", "medium", "high"],
+            description: "严重程度:低/中/高"
+          },
+          category: {
+            /* 色情，暴力，政治，垃圾邮件，广告营销，其他*/     
+            enum: ["porn", "violence", "political",
+  "spam_mail", "advertising", "other"],
+            description: "敏感词分类"
+          },
+          effective: {
+            bsonType: "bool",
+            description:
+  "是否生效(true生效/false未生效)"
+          },
+          createdAt: {
+            bsonType: "date",
+            description: "创建时间"
+          }
         }
       }
     }
-  }
-})
-
-db.sensitive_words.createIndex({ word: 1 }, { unique: true })
-db.sensitive_words.createIndex({ Effective: 1, level: 1 })
-db.sensitive_words.createIndex({ category: 1 })
-
+  })
 
 // 审核规则设置
 db.createCollection("review_rules", {
