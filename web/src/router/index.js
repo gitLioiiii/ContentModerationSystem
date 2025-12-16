@@ -52,6 +52,15 @@ const router = createRouter({
         breadcrumbCurrent: '图像审核',
       },
     },
+    {
+      path: '/video',
+      name: 'video',
+      component: () => import('@/views/adminView/ai/VideoReview.vue'),
+      meta: {
+        breadcrumbParent: '自动审核',
+        breadcrumbCurrent: '视频抽帧审核',
+      },
+    },
     // 敏感词管理
     {
       path: '/sensitive',

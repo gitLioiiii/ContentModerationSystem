@@ -35,7 +35,7 @@
 			<dependency>
 				<groupId>org.springframework.ai</groupId>
 				<artifactId>spring-ai-bom</artifactId>
-				<version>1.0.0</version>
+				<version>1.1.2</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -99,6 +99,12 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<!-- 视频处理和抽帧 -->
+		<dependency>
+			<groupId>org.bytedeco</groupId>
+			<artifactId>javacv-platform</artifactId>
+			<version>1.5.12</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

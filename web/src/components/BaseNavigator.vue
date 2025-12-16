@@ -53,7 +53,7 @@
           </ElMenuItem>
           <ElMenuItem index="video" :route="{ name: 'video' }" class="sub-menu-item">
             <i class="bi bi-camera-video menu-icon"></i>
-            <span v-if="!sidebarCollapsed">视频审核</span>
+            <span v-if="!sidebarCollapsed">视频抽帧审核</span>
           </ElMenuItem>
         </ElSubMenu>
 
