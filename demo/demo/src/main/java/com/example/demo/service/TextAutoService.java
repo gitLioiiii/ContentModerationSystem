@@ -152,12 +152,23 @@ public class TextAutoService {
                 return null;
             }
 
+            // 只使用生效的敏感词
+            List<SensitiveWordEntity> effectiveSensitiveWords = sensitiveWords.stream()
+                .filter(word -> word.getEffective())
+                .collect(Collectors.toList());
+
+            if (effectiveSensitiveWords.isEmpty()) {
+                log.warn("没有生效的敏感词，跳过敏感词检查");
+                return null;
+            }
+
             // 提取敏感词列表
-            List<String> wordList = sensitiveWords.stream()
+            List<String> wordList = effectiveSensitiveWords.stream()
                 .map(SensitiveWordEntity::getWord)
                 .collect(Collectors.toList());
 
-            log.info("加载敏感词库完成，共 {} 个敏感词", wordList.size());
+            log.info("加载敏感词库完成，共 {} 个生效敏感词（数据库总数: {}）",
+                wordList.size(), sensitiveWords.size());
 
             // 敏感词过滤工具
             SensitiveWordUtil sensitiveWordUtil = new SensitiveWordUtil(wordList);
@@ -176,8 +187,8 @@ public class TextAutoService {
 
                 log.warn("文本包含敏感词: {}", foundWordsStr);
 
-                // 获取匹配到的敏感词的最高级别
-                String maxLevel = getMaxSensitiveWordLevel(foundWords, sensitiveWords);
+                // 获取匹配到的敏感词的最高级别（只考虑生效的敏感词）
+                String maxLevel = getMaxSensitiveWordLevel(foundWords, effectiveSensitiveWords);
 
                 // 根据敏感词级别决定审核结果
                 String result;
