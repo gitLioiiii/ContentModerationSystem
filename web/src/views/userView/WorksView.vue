@@ -28,7 +28,15 @@
         <ElButton native-type="submit" type="primary">筛选</ElButton>
       </ElFormItem>
       <ElFormItem class="ml-auto">
-        <ElButton @click="viewAuditResults">
+        <ElButton
+          v-if="pendingWorksCount > 0"
+          type="success"
+          @click="viewAuditResults"
+        >
+          <i class="bi bi-hourglass-split"></i>
+          审核中 ({{ pendingWorksCount }})
+        </ElButton>
+        <ElButton>
           <i class="bi bi-robot"></i>
           AI审核结果
         </ElButton>
@@ -55,6 +63,7 @@
         :publish-date="work.publishDate"
         :show-delete="editMode"
         @delete="handleDeleteWork(work)"
+        @click="handlePlayVideo(work)"
       />
     </div>
 
@@ -144,6 +153,13 @@
         </div>
       </template>
     </ElDialog>
+
+    <!-- 视频播放器 -->
+    <PlayVideo
+      v-model:visible="videoPlayerVisible"
+      :video-url="currentVideoUrl"
+      :video-title="currentVideoTitle"
+    />
   </div>
 </template>
 
@@ -160,8 +176,10 @@ import {
   ElDialog,
   ElMessage,
   ElMessageBox,
+  ElNotification,
 } from 'element-plus'
 import MediaCard from '@/components/MediaCard.vue'
+import PlayVideo from '@/components/PlayVideo.vue'
 import request from '@/utils/request'
 import { buildCoverURL, buildVideoURL, buildAvatarURL } from '@/utils/helper'
 import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -171,6 +189,14 @@ const works = ref([])
 
 // 编辑模式
 const editMode = ref(false)
+
+// 正在审核的作品数量
+const pendingWorksCount = ref(0)
+
+// 视频播放器状态
+const videoPlayerVisible = ref(false)
+const currentVideoUrl = ref('')
+const currentVideoTitle = ref('')
 
 // 用户信息
 const userInfo = reactive({
@@ -216,9 +242,29 @@ const fetchWorks = () => {
         publishDate: work.createdAt // 使用 createdAt 作为发布日期
       }))
       Object.assign(pagination, response.data.payload.pagination)
+
+      // 获取正在审核的作品数量
+      fetchPendingWorksCount()
     }
   }).catch(() => {
     ElMessage.error('获取作品列表失败')
+  })
+}
+
+// 获取正在审核的作品数量
+const fetchPendingWorksCount = () => {
+  const params = new URLSearchParams()
+  params.append('status', 'pending')
+  params.append('page', 1)
+  params.append('pageSize', 1) // 只需要获取总数
+
+  request.get('/works', { params }).then((response) => {
+    if (response.data.status === true) {
+      const total = response.data.payload.pagination.total
+      pendingWorksCount.value = Math.min(total, 3) // 最大显示3
+    }
+  }).catch(() => {
+    // 忽略错误，保持原值
   })
 }
 
@@ -400,8 +446,91 @@ const submitWork = () => {
 
 // 查看AI审核结果
 const viewAuditResults = () => {
-  ElMessage.info('AI审核结果功能开发中...')
-  // TODO: 实现跳转到AI审核结果页面或打开对话框的逻辑
+  // 筛选出审核中的作品
+  const pendingWorks = works.value.filter(work => work.status === 'pending')
+
+  if (pendingWorks.length === 0) {
+    ElMessage.info('暂无审核中的作品')
+    return
+  }
+
+  // 显示审核中作品的信息
+  const workTitles = pendingWorks.map(work => work.title).join('、')
+  ElMessageBox.confirm(
+    `以下作品正在审核中：${workTitles}。是否立即触发AI审核？`,
+    '审核中的作品',
+    {
+      confirmButtonText: '立即审核',
+      cancelButtonText: '取消',
+      type: 'info',
+    }
+  ).then(() => {
+    // 触发审核
+    triggerModerationForPendingWorks(pendingWorks)
+  }).catch(() => {
+    // 用户取消
+  })
+}
+
+// 触发审核
+const triggerModerationForPendingWorks = async (pendingWorks) => {
+  ElNotification.info({
+    title: '开始审核',
+    message: `正在审核 ${pendingWorks.length} 个作品，请稍候...`,
+    offset: 100,
+    duration: 18000
+  })
+
+  let successCount = 0
+  let failCount = 0
+
+  for (const work of pendingWorks) {
+    try {
+      const params = new URLSearchParams()
+      params.append('contentId', work.id)
+
+      const response = await request.post('/moderation/work', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+
+      if (response.data.status === true) {
+        successCount++
+        const overallStatus = response.data.payload.overallStatus
+        const statusText = overallStatus === 'approved' ? '通过' :
+                          overallStatus === 'rejected' ? '未通过' : '需人工审核'
+        ElMessage.success(`作品"${work.title}"审核完成 - ${statusText}`)
+      } else {
+        failCount++
+        ElMessage.error(`作品"${work.title}"审核失败`)
+      }
+    } catch (error) {
+      failCount++
+      console.error('审核失败:', error)
+      ElMessage.error(`作品"${work.title}"审核失败`)
+    }
+  }
+
+  // 刷新列表
+  fetchWorks()
+
+  // 显示总体结果
+  if (failCount === 0) {
+    ElNotification.success({
+      title: '审核完成',
+      message: `全部审核完成！成功: ${successCount}`,
+      offset: 100,
+      duration: 18000
+    })
+  } else {
+    ElNotification.warning({
+      title: '审核完成',
+      message: `审核完成！成功: ${successCount}，失败: ${failCount}`,
+      offset: 100,
+      duration: 18000
+    })
+  }
 }
 
 // 进入编辑模式
@@ -440,6 +569,13 @@ const handleDeleteWork = (work) => {
   }).catch(() => {
     // 用户取消删除
   })
+}
+
+// 点击视频卡片播放视频
+const handlePlayVideo = (work) => {
+  currentVideoUrl.value = work.videoUrl
+  currentVideoTitle.value = work.title
+  videoPlayerVisible.value = true
 }
 </script>
 

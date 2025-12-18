@@ -4,6 +4,7 @@
     class="media-card"
     :body-style="{ padding: '0px' }"
     shadow="hover"
+    @click="handleClick"
   >
     <!-- 删除按钮显示 -->
     <div v-if="showDelete" class="delete-btn" @click.stop="handleDelete">
@@ -109,11 +110,16 @@ defineProps({
 })
 
 // 定义事件
-const emit = defineEmits(['delete'])
+const clickCard = defineEmits(['delete', 'click'])
 
 // 删除处理
 const handleDelete = () => {
-  emit('delete')
+  clickCard('delete')
+}
+
+// 点击卡片处理
+const handleClick = () => {
+  clickCard('click')
 }
 </script>
 
