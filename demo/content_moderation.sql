@@ -97,87 +97,79 @@ db.user.createIndex({ registeredAt: -1 })
 
 // 内容表
 db.runCommand({
-  collMod:"content", 
+  collMod:"content",
   validator: {
     $jsonSchema: {
       bsonType: "object",
-      required: ["userId", "contentItems", "status", "createdAt"],
+      required: ["userId", "status", "createdAt"],
       properties: {
         userId: {
-          bsonType: "objectId",
+          bsonType: "string",
           description: "发布者的用户ID"
         },
-        contentItems: {
-          bsonType: "array",
-          minItems: 1,
-          description: "内容项数组，支持5种场景：1.纯文本 2.纯图片 3.纯视频 4.文本+图片 5.文本+视频",
-          items: {
-            bsonType: "object",
-            required: ["type", "order"],
-            properties: {
-              type: {
-                enum: ["text", "image", "video"],
-                description: "内容项类型：text文本/image图片/video视频"
-              },
-              order: {
-                bsonType: "int",
-                minimum: 0,
-                description: "内容项的显示顺序"
-              },
-              textContent: {
-                bsonType: ["string", "null"],
-                maxLength: 5000,
-                description: "文本内容（当type为text时必填）"
-              },
-              mediaUrl: {
-                bsonType: ["string", "null"],
-                maxLength: 500,
-                description: "媒体文件URL（当type为image或video时必填）"
-              },
-// 							做适配
-              thumbnailUrl: {
-                bsonType: ["string", "null"],
-                maxLength: 500,
-                description: "缩略图URL（视频时可选）"
-              },
-              duration: {
-                bsonType: ["int", "null"],
-                minimum: 0,
-                description: "视频时长（秒，视频时可选）"
-              },
-              width: {
-                bsonType: ["int", "null"],
-                minimum: 0,
-                description: "媒体宽度（像素，图片/视频时可选）"
-              },
-              height: {
-                bsonType: ["int", "null"],
-                minimum: 0,
-                description: "媒体高度（像素，图片/视频时可选）"
-              }
+        // 作品信息（用于视频作品发布场景）
+        title: {
+          bsonType: ["string", "null"],
+          maxLength: 100,
+          description: "作品标题"
+        },
+        description: {
+          bsonType: ["string", "null"],
+          maxLength: 500,
+          description: "作品描述"
+        },
+        coverUrl: {
+          bsonType: ["string", "null"],
+          maxLength: 500,
+          description: "作品封面图片URL"
+        },
+        videoUrl: {
+          bsonType: ["string", "null"],
+          maxLength: 500,
+          description: "视频文件URL"
+        },
+        author: {
+          bsonType: ["string", "null"],
+          maxLength: 50,
+          description: "作者名称"
+        },
+        authorAvatar: {
+          bsonType: ["string", "null"],
+          maxLength: 255,
+          description: "发布作品时的作者头像"
+        },
+        location: {
+          bsonType: ["object", "null"],
+          properties: {
+            province: {
+              bsonType: ["string", "null"],
+              maxLength: 50,
+              description: "省份"
+            },
+            city: {
+              bsonType: ["string", "null"],
+              maxLength: 50,
+              description: "城市"
             }
-          }
+          },
+          description: "作品发布地理位置"
         },
         status: {
-          enum: ["pending", "passed", "rejected", "reviewing"],
+          enum: ["pending", "approved", "rejected", "reviewing"],
           description: "审核状态 待审核/已通过/已驳回/人工审核中"
         },
         appealStatus: {
           enum: ["none", "appealing", "approved", "rejected"],
           description: "申诉状态 未申诉/申诉中/申诉通过/申诉驳回"
         },
-				violationCount: {
-					bsonType: "int",
-					minimum: 0,
-					description: "累计违规次数"
-				},
+        violationCount: {
+          bsonType: "int",
+          minimum: 0,
+          description: "累计违规次数"
+        },
         createdAt: {
           bsonType: "date",
           description: "创建时间"
-        },
-        publishedAt: {
-          bsonType: ["date", "null"],
-          description: "发布时间"
         },
         deletedAt: {
           bsonType: ["date", "null"],

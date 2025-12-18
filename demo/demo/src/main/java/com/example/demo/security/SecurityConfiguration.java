@@ -55,7 +55,9 @@ public class SecurityConfiguration {
                     "/avatars/**",
                     "/themes/**",
                     "/ai-images/**",
-                    "/ai-videos/**"
+                    "/ai-videos/**",
+                    "/covers/**",
+                    "/videos/**"
                     // "/public/**",
                     // "/static/**"
                 ).permitAll();

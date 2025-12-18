@@ -8,3 +8,9 @@ export const buildThemeURL = (filename) => buildURL(filename)
 
 // AI审核图片：/ai-images/.png
 export const buildImageURL = (filename) => buildURL(filename)
+
+// 作品封面图片：/covers/.png
+export const buildCoverURL = (filename) => buildURL(filename)
+
+// 作品视频：/videos/.mp4
+export const buildVideoURL = (filename) => buildURL(filename)

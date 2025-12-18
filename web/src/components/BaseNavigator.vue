@@ -28,10 +28,16 @@
         class="sidebar-menu"
         router
       >
-        <!-- 用户发布 -->
+        <!-- 发现 -->
         <ElMenuItem index="/" :route="{ name: 'index' }" class="menu-item">
-          <i class="bi bi-send menu-icon"></i>
-          <span v-if="!sidebarCollapsed">内容发布</span>
+          <i class="bi bi-camera menu-icon"></i>
+          <span v-if="!sidebarCollapsed">发现</span>
+        </ElMenuItem>
+
+        <!-- 用户作品 -->
+        <ElMenuItem index="work" :route="{ name: 'work' }" class="menu-item">
+          <i class="bi bi-brush menu-icon"></i>
+          <span v-if="!sidebarCollapsed">用户作品</span>
         </ElMenuItem>
 
         <!-- 用户管理 -->

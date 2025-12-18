@@ -10,11 +10,20 @@ const router = createRouter({
       component: () => import('@/views/userView/IndexView.vue'),
       // 处理面包屑
       meta: {
-        breadcrumbParent: '内容发布',
-        breadcrumbCurrent: '发布新内容',
+        breadcrumbParent: '发现',
+        breadcrumbCurrent: '发现新内容',
       },
     },
-
+    // 用户作品
+    {
+      path: '/work',
+      name: 'work',
+      component: () => import('@/views/userView/WorksView.vue'),
+      meta: {
+        breadcrumbParent: '作品',
+        breadcrumbCurrent: '用户的作品页面',
+      },
+    },
     //用户管理
     {
       path: '/users',
@@ -59,6 +68,16 @@ const router = createRouter({
       meta: {
         breadcrumbParent: '自动审核',
         breadcrumbCurrent: '视频抽帧审核',
+      },
+    },
+    //人工审核
+    {
+      path: '/queue',
+      name: 'queue',
+      component: () => import('@/views/adminView/manual/ContentQueue.vue'),
+      meta: {
+        breadcrumbParent: '人工审核',
+        breadcrumbCurrent: '待审核队列审核',
       },
     },
     // 敏感词管理
