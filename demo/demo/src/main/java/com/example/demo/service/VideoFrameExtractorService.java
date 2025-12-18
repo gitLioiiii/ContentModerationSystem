@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -20,37 +19,23 @@ import java.util.UUID;
 @Service
 public class VideoFrameExtractorService {
 
-    @Value("${application.upload-root}")
-    private String uploadRoot;
-
     // 从视频文件中提取关键帧
-    public List<FrameExtractionResult> extractFrames(String videoPath, int frameIntervalSeconds) throws Exception {
+    // frameOutputDir: 帧图片保存目录的绝对路径
+    public List<FrameExtractionResult> extractFrames(String videoPath, int frameIntervalSeconds, String frameOutputDir) throws Exception {
         log.info("----- 开始视频抽帧 -----");
         log.info("视频路径: {}", videoPath);
         log.info("抽帧间隔: {}秒", frameIntervalSeconds);
 
-        // 验证视频文件是否存在
-        File videoFile = new File(videoPath);
-        if (!videoFile.exists()) {
-            log.error("视频文件不存在: {}", videoPath);
-            throw new Exception("视频文件不存在: " + videoPath);
-        }
-        log.info("视频文件大小: {} MB", videoFile.length() / (1024.0 * 1024.0));
-
         List<FrameExtractionResult> results = new ArrayList<>();
 
-        // 创建存储目录
-        File frameDir = new File(uploadRoot + File.separator + "ai-videos");
-        if (!frameDir.exists()) {
-            boolean created = frameDir.mkdirs();
-            log.info("创建帧存储目录: {}, 结果: {}", frameDir.getAbsolutePath(), created);
-        }
+        // 使用传入的帧保存目录
+        File frameDir = new File(frameOutputDir);
 
         log.info("初始化FFmpegFrameGrabber...");
         try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoPath);
             Java2DFrameConverter converter = new Java2DFrameConverter()) {
 
-            // 设置超时时间为5秒（避免卡死）
+            // 审核超时时间为5秒（避免卡死）
             grabber.setOption("timeout", "5000000");
 
             log.info("启动FFmpegFrameGrabber...");

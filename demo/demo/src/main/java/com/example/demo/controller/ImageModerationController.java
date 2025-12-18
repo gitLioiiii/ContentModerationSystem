@@ -66,6 +66,12 @@ public class ImageModerationController {
         multipartFile.transferTo(savedFile);
         log.info("图片已保存到: {}", savedFile.getAbsolutePath());
 
+        // 验证文件是否成功保存
+        if (!savedFile.exists()) {
+            log.error("图片文件保存失败: {}", savedFile.getAbsolutePath());
+            throw new IOException("图片文件保存失败");
+        }
+        log.info("图片文件大小: {} MB", savedFile.length() / (1024.0 * 1024.0));
 
         //调用ai审核
 

@@ -68,10 +68,26 @@ public class VideoModerationController {
             multipartFile.transferTo(savedVideoFile);
             log.info("视频已保存到: {}", savedVideoFile.getAbsolutePath());
 
+            // 验证视频文件
+            if (!savedVideoFile.exists()) {
+                log.error("视频文件不存在: {}", savedVideoFile.getAbsolutePath());
+                throw new Exception("视频文件不存在: " + savedVideoFile.getAbsolutePath());
+            }
+            log.info("视频文件大小: {} MB", savedVideoFile.length() / (1024.0 * 1024.0));
+
             // ==== 第二步：从视频中提取关键帧 ====
             log.info("开始抽取视频帧...");
+
+            // 准备帧存储目录（统一由控制器管理路径）
+            File frameDir = new File(uploadRoot + File.separator + "ai-videos");
+
+            // 调用服务层进行视频抽帧，传入帧保存目录
             List<FrameExtractionResult> extractedFrames =
-                    frameExtractorService.extractFrames(savedVideoFile.getAbsolutePath(), frameInterval);
+                    frameExtractorService.extractFrames(
+                        savedVideoFile.getAbsolutePath(),
+                        frameInterval,
+                        frameDir.getAbsolutePath()
+                    );
 
             int totalFrames = extractedFrames.size();
             log.info("共提取 {} 帧图片", totalFrames);

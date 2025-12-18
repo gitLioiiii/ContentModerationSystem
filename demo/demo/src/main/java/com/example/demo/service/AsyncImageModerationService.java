@@ -22,13 +22,8 @@ public class AsyncImageModerationService {
         this.imageAutoService = imageAutoService;
     }
 
-    /**
-     * 异步审核单张图片
-     * 使用 @Async 注解，该方法会在线程池中异步执行
-     *
-     * @param imageRequest 图片审核请求
-     * @return CompletableFuture 包装的审核结果
-     */
+    //  异步审核单张图片
+    //  使用 @Async 注解，该方法会在线程池中异步执行
     @Async
     public CompletableFuture<ImageAutoResponse> moderateImageAsync(ImageAutoRequest imageRequest) {
         try {

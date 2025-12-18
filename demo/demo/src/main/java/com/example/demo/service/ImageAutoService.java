@@ -38,14 +38,6 @@ public class ImageAutoService {
         try {
             // 直接使用本地文件路径，转换为 Spring Resource
             File imageFile = new File(filePath);
-            if (!imageFile.exists()) {
-                log.error("图片文件不存在: {}", filePath);
-                return new ImageAutoResponse(
-                    "人工审核",
-                    "图片文件不存在",
-                    0.5
-                );
-            }
 
             // 使用 FileSystemResource 包装文件（Spring AI 需要 Resource 对象）
             Resource imageResource = new FileSystemResource(imageFile);
