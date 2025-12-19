@@ -112,7 +112,7 @@ public class ImageAutoService {
     private ImageAutoResponse parseAiResponse(String aiResponse) {
         log.info("----- 后台打印 - AI 响应内容 ------");
         log.info("AI响应: {}", aiResponse);
-        log.info("---------------------------------");
+        log.info("***********************************");
 
         try {
             // 使用 Jackson 解析 JSON

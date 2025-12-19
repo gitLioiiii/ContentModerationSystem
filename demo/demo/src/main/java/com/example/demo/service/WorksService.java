@@ -22,4 +22,10 @@ public interface WorksService {
 
     // 删除作品
     Integer remove(ContentEntity content);
+
+    // 获取所有用户的审核通过作品列表（发现页面）
+    List<ContentEntity> fetchDiscoverWorks(Map<String, Object> filter);
+
+    // 统计所有用户的审核通过作品数量（发现页面）
+    Integer countDiscoverWorks(Map<String, Object> filter);
 }

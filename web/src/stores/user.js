@@ -40,7 +40,10 @@ export const useUserStore = defineStore('user', () => {
     // 更新当前用户信息
     const updateUser = (userData) => {
         if (user.value && user.value.user) {
-            user.value.user = { ...user.value.user, ...userData }
+            user.value = {
+                ...user.value,
+                user: { ...user.value.user, ...userData }
+            }
             cache('user', user.value)
         }
     }

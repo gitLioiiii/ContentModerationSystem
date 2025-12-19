@@ -113,4 +113,63 @@ public class WorksServiceImpl implements WorksService {
         ContentEntity savedContent = this.contentRepository.save(content);
         return savedContent.getId() != null ? 1 : 0;
     }
+
+    // (发现页面)
+    @Override
+    public List<ContentEntity> fetchDiscoverWorks(Map<String, Object> filter) {
+        String keywords = (String) filter.get("keywords");
+        Integer offset = (Integer) filter.get("offset");
+        Integer limit = (Integer) filter.get("limit");
+
+        // 按创建时间倒序分页
+        Pageable pageable = PageRequest.of(
+            offset != null && limit != null ? offset / limit : 0,
+            limit != null ? limit : 10,
+            Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<ContentEntity> page;
+
+        // 只获取审核通过的作品
+        String status = "approved";
+
+        // 是否有关键字搜索
+        boolean hasKeywords = keywords != null && !keywords.isEmpty();
+
+        if (hasKeywords) {
+            // 根据关键字搜索审核通过的作品
+            page = this.contentRepository.findByStatusAndKeywords(status, keywords, pageable);
+        } else {
+            // 获取所有审核通过的作品
+            page = this.contentRepository.findByStatusAndDeletedAtIsNull(status, pageable);
+        }
+
+        return page.getContent();
+    }
+
+    @Override
+    public Integer countDiscoverWorks(Map<String, Object> filter) {
+        String keywords = (String) filter.get("keywords");
+
+        // 只获取审核通过的作品
+        String status = "approved";
+
+        // 获取总数
+        Pageable pageable = PageRequest.of(0, 1);
+
+        Page<ContentEntity> count;
+
+        // 是否有关键字搜索
+        boolean hasKeywords = keywords != null && !keywords.isEmpty();
+
+        if (hasKeywords) {
+            // 根据关键字统计审核通过的作品
+            count = this.contentRepository.findByStatusAndKeywords(status, keywords, pageable);
+        } else {
+            // 统计所有审核通过的作品
+            count = this.contentRepository.findByStatusAndDeletedAtIsNull(status, pageable);
+        }
+
+        return (int) count.getTotalElements();
+    }
 }

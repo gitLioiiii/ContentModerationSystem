@@ -204,6 +204,9 @@ public class UserController {
 
         this.userService.update(User);
 
+        // 返回更新后的用户信息
+        result.putPayload("user", User);
+
         return result;
     }
 

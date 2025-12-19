@@ -29,4 +29,11 @@ public interface ContentRepository extends MongoRepository<ContentEntity, String
 
     // 根据ID和删除状态查询单个作品
     Optional<ContentEntity> findByIdAndDeletedAtIsNull(String id);
+
+    // 查询所有审核通过且未删除的作品(发现页面）
+    Page<ContentEntity> findByStatusAndDeletedAtIsNull(String status, Pageable pageable);
+
+    // 根据关键字查询所有审核通过且未删除的作品（发现页面）
+    @Query("{ 'status': ?0, 'deletedAt': null, 'title': {$regex: ?1, $options: 'i'} }")
+    Page<ContentEntity> findByStatusAndKeywords(String status, String keywords, Pageable pageable);
 }
