@@ -40,6 +40,12 @@
           <span v-if="!sidebarCollapsed">用户作品</span>
         </ElMenuItem>
 
+        <!-- 关于我们 -->
+        <ElMenuItem index="about_us" :route="{ name: 'about_us' }" class="menu-item">
+          <i class="bi bi-lightning-charge menu-icon"></i>
+          <span v-if="!sidebarCollapsed">关于我们</span>
+        </ElMenuItem>
+
         <!-- 用户管理 -->
         <ElMenuItem index="users" :route="{ name: 'user_index' }" class="menu-item">
           <i class="bi bi-person menu-icon"></i>

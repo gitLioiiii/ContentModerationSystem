@@ -186,166 +186,167 @@ db.content.createIndex({ type: 1 })
 
 
 // 对作品AI自动审核（已使用）
-db.runCommand({
-  collMod: "auto_review_forworks",
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["contentId", "reviewResults", "overallStatus", "reviewedAt"],
-      properties: {
-        contentId: {
-          bsonType: "objectId",
-          description: "关联作品的ID（content集合中的_id）"
-        },
-        reviewResults: {
-          bsonType: "object",
-          required: ["textReview"],
-          description: "各项审核结果",
-          properties: {
-            // 文本审核（标题+描述）
-            textReview: {
-              bsonType: "object",
-              required: ["result", "reason", "riskLevel"],
-              description: "文本内容审核结果（标题和描述）",
-              properties: {
-                result: {
-                  enum: ["通过", "拒绝", "需人工审核"],
-                  description: "文本审核结果"
-                },
-                reason: {
-                  bsonType: "string",
-                  description: "审核理由说明"
-                },
-                riskLevel: {
-                  enum: ["低", "中", "高"],
-                  description: "风险等级"
-                },
-                sensitiveWords: {
-                  bsonType: ["array", "null"],
-                  items: { bsonType: "string" },
-                  description: "命中的敏感词列表"
-                },
-                processingTime: {
-                  bsonType: ["int", "null"],
-                  minimum: 0,
-                  description: "处理耗时(毫秒)"
+  db.createCollection("auto_review_forworks", {
+    validator: {
+      $jsonSchema: {
+        bsonType: "object",
+        required: ["contentId", "reviewResults", "Status","reviewedAt"],
+        properties: {
+          contentId: {
+            bsonType: "objectId",
+            description: "关联作品的ID（content集合中的_id）"        
+          },
+          reviewResults: {
+            bsonType: "object",
+            required: ["textReview"],
+            description: "各项审核结果",
+            properties: {
+              // 文本审核（标题+描述）
+              textReview: {
+                bsonType: "object",
+                required: ["result", "reason", "riskLevel"],
+                description: "文本内容审核结果（标题和描述）",       
+                properties: {
+                  result: {
+                    enum: ["通过", "拒绝", "需人工审核"],
+                    description: "文本审核结果"
+                  },
+                  reason: {
+                    bsonType: "string",
+                    description: "审核理由说明"
+                  },
+                  riskLevel: {
+                    enum: ["低", "中", "高"],
+                    description: "风险等级"
+                  },
+                  sensitiveWords: {
+                    bsonType: ["array", "null"],
+                    items: { bsonType: "string" },
+                    description: "命中的敏感词列表"
+                  },
+                  processingTime: {
+                    bsonType: ["int", "null"],
+                    minimum: 0,
+                    description: "处理耗时"
+                  }
                 }
-              }
-            },
-            // 图片审核（封面）
-            imageReview: {
-              bsonType: ["object", "null"],
-              description: "封面图片审核结果（如果有封面）",
-              properties: {
-                result: {
-                  enum: ["通过", "不通过", "人工审核"],
-                  description: "图片审核结果"
-                },
-                reason: {
-                  bsonType: "string",
-                  description: "审核理由说明"
-                },
-                matchScore: {
-                  bsonType: "double",
-                  minimum: 0.0,
-                  maximum: 1.0,
-                  description: "违规匹配分数(0-1，越高越危险)"
-                },
-                processingTime: {
-                  bsonType: ["int", "null"],
-                  minimum: 0,
-                  description: "处理耗时(毫秒)"
+              },
+              // 图片审核（封面）
+              imageReview: {
+                bsonType: ["object", "null"],
+                description: "封面图片审核结果（如果有封面）",       
+                properties: {
+                  result: {
+                    enum: ["通过", "不通过", "人工审核"],
+                    description: "图片审核结果"
+                  },
+                  reason: {
+                    bsonType: "string",
+                    description: "审核理由说明"
+                  },
+                  matchScore: {
+                    bsonType: "double",
+                    minimum: 0,
+                    maximum: 100,
+                    description: "违规匹配分数(0-100，越高越危险)"
+                  },
+                  processingTime: {
+                    bsonType: ["int", "null"],
+                    minimum: 0,
+                    description: "处理耗时(毫秒)"
+                  }
                 }
-              }
-            },
-            // 视频审核
-            videoReview: {
-              bsonType: ["object", "null"],
-              description: "视频内容审核结果（如果有视频）",
-              properties: {
-                result: {
-                  enum: ["通过", "不通过", "人工审核"],
-                  description: "视频审核结果"
-                },
-                reason: {
-                  bsonType: "string",
-                  description: "审核理由说明"
-                },
-                Count: {
-                  bsonType: ["int", "null"],
-                  minimum: 0,
-                  description: "视频抽帧总数"
-                },
-                riskyCount: {
-                  bsonType: ["int", "null"],
-                  minimum: 0,
-                  description: "检测到的风险帧数量"
-                },
-                maxScore: {
-                  bsonType: ["double", "null"],
-                  minimum: 0.0,
-                  maximum: 1.0,
-                  description: "所有帧中的最高风险分数"
-                },
-                riskyList: {
-                  bsonType: ["array", "null"],
-                  description: "风险帧详情列表",
-                  items: {
-                    bsonType: "object",
-                    properties: {
-                      frameIndex: {
-                        bsonType: "int",
-                        description: "帧索引"
-                      },
-                      timestamp: {
-                        bsonType: "double",
-                        description: "时间戳(秒)"
-                      },
-                      score: {
-                        bsonType: "double",
-                        minimum: 0.0,
-                        maximum: 1.0,
-                        description: "该帧的风险分数"
-                      },
-                      reason: {
-                        bsonType: ["string", "null"],
-                        description: "该帧的风险原因"
+              },
+              // 视频审核
+              videoReview: {
+                bsonType: ["object", "null"],
+                description: "视频内容审核结果（如果有视频）",       
+                properties: {
+                  result: {
+                    enum: ["通过", "不通过", "人工审核"],
+                    description: "视频审核结果"
+                  },
+                  reason: {
+                    bsonType: "string",
+                    description: "审核理由说明"
+                  },
+                  Count: {
+                    bsonType: ["int", "null"],
+                    minimum: 0,
+                    description: "视频抽帧总数"
+                  },
+                  riskyCount: {
+                    bsonType: ["int", "null"],
+                    minimum: 0,
+                    description: "检测到的风险帧数量"
+                  },
+                  maxScore: {
+                    bsonType: ["double", "null"],
+                    minimum: 0,
+                    maximum: 100,
+                    description: "所有帧中的最高风险分数"
+                  },
+                  riskyList: {
+                    bsonType: ["array", "null"],
+                    description: "风险帧详情列表",
+                    items: {
+                      bsonType: "object",
+                      properties: {
+                        frameIndex: {
+                          bsonType: "int",
+                          description: "帧索引"
+                        },
+                        timestamp: {
+                          bsonType: "double",
+                          description: "时间戳(秒)"
+                        },
+                        score: {
+                          bsonType: "double",
+                          minimum: 0,
+                          maximum: 100,
+                          description: "该帧的风险分数"
+                        },
+                        reason: {
+                          bsonType: ["string", "null"],
+                          description: "该帧的风险原因"
+                        }
                       }
                     }
+                  },
+                  processingTime: {
+                    bsonType: ["int", "null"],
+                    minimum: 0,
+                    description: "处理耗时"
                   }
-                },
-                processingTime: {
-                  bsonType: ["int", "null"],
-                  minimum: 0,
-                  description: "处理耗时(秒)"
                 }
               }
             }
+          },
+          Status: {
+            enum: ["approved", "rejected", "reviewing"],
+            description:
+  "审核状态：approved通过/rejected驳回/reviewing需人工审核"
+          },
+          finalProcessingTime: {
+            bsonType: ["int", "null"],
+            minimum: 0,
+            description: "作品审核处理耗时"
+          },
+          reviewedAt: {
+            bsonType: "date",
+            description: "审核完成时间"
           }
-        },
-        Status: {
-          enum: ["approved", "rejected", "reviewing"],
-          description: "审核状态：approved通过/rejected驳回/reviewing需人工审核"
-        },
-        finalProcessingTime: {
-          bsonType: ["int", "null"],
-          minimum: 0,
-          description: "作品审核处理耗时(秒)"
-        },
-        reviewedAt: {
-          bsonType: "date",
-          description: "审核完成时间"
         }
       }
-    }
-  },
-  validationLevel: "moderate",
-  validationAction: "warn"
-})
-// 索引
-db.auto_review_forworks.createIndex({ contentId: 1 }, { unique: true })
-db.auto_review_forworks.createIndex({ Status: 1, reviewedAt: -1 })
-db.auto_review_forworks.createIndex({ reviewedAt: -1 })
+    },
+    validationLevel: "moderate",
+    validationAction: "warn"
+  });
+
+  // 创建索引
+  db.auto_review_forworks.createIndex({ contentId: 1 }, { unique:true });
+  db.auto_review_forworks.createIndex({ Status: 1, reviewedAt: -1 });
+  db.auto_review_forworks.createIndex({ reviewedAt: -1 });
 
 
 // 人工审核（未使用）

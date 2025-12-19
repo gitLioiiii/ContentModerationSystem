@@ -67,19 +67,19 @@ public class ImageAutoService {
                     {
                         "result": "通过" 或 "不通过" 或 "人工审核",
                         "reason": "简要说明审核理由，描述图片中发现的问题",
-                        "matchScore": 0.0到1.0之间的数值
+                        "matchScore": 0到100之间的数值
                     }
 
                     判断标准：
-                    - "通过"：图片内容健康，无违规内容，matchScore < 0.3
-                    - "不通过"：明确存在违规内容，matchScore >= 0.7
-                    - "人工审核"：存在可疑内容但不确定，0.3 <= matchScore < 0.7
+                    - "通过"：图片内容健康，无违规内容，matchScore < 30
+                    - "不通过"：明确存在违规内容，matchScore >= 70
+                    - "人工审核"：存在可疑内容但不确定，30 <= matchScore < 70
 
                     matchScore 匹配分数说明：
-                    - 0.0-0.3：内容安全，风险低
-                    - 0.3-0.5：存在轻微敏感内容，建议人工复审
-                    - 0.5-0.7：存在明显敏感内容，需要人工确认
-                    - 0.7-1.0：明确违规，必须拒绝
+                    - 0-30：内容安全，风险低
+                    - 30-50：存在轻微敏感内容，建议人工复审
+                    - 50-70：存在明显敏感内容，需要人工确认
+                    - 70-100：明确违规，必须拒绝
 
                     注意：分数越高表示越危险，越不能通过审核。
                     """)
@@ -103,7 +103,7 @@ public class ImageAutoService {
             return new ImageAutoResponse(
                 "人工审核",
                 "AI 审核异常: " + e.getMessage(),
-                0.5
+                50.0
             );
         }
     }
@@ -120,11 +120,11 @@ public class ImageAutoService {
 
             String result = jsonNode.has("result") ? jsonNode.get("result").asText("未知") : "人工审核";
             String reason = jsonNode.has("reason") ? jsonNode.get("reason").asText("未知原因") : "未知原因";
-            Double matchScore = jsonNode.has("matchScore") ? jsonNode.get("matchScore").asDouble(0.5) : 0.5;
+            Double matchScore = jsonNode.has("matchScore") ? jsonNode.get("matchScore").asDouble(50.0) : 50.0;
 
-            // 验证匹配分数范围
+            // 验证匹配分数范围（0-100）
             if (matchScore < 0.0) matchScore = 0.0;
-            if (matchScore > 1.0) matchScore = 1.0;
+            if (matchScore > 100.0) matchScore = 100.0;
 
             return new ImageAutoResponse(result, reason, matchScore);
 
@@ -134,7 +134,7 @@ public class ImageAutoService {
             return new ImageAutoResponse(
                 "人工审核",
                 "AI 响应解析失败，建议人工审核",
-                0.5
+                50.0
             );
         }
     }

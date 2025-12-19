@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores/user'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // 发现
     {
       path: '/',
       name: 'index',
@@ -22,6 +23,16 @@ const router = createRouter({
       meta: {
         breadcrumbParent: '作品',
         breadcrumbCurrent: '用户的作品页面',
+      },
+    },
+    // 关于我们
+    {
+      path: '/about_us',
+      name: 'about_us',
+      component: () => import('@/views/DeniedView.vue'),
+      meta: {
+        breadcrumbParent: '关于我们',
+        breadcrumbCurrent: '关于我们页面',
       },
     },
     //用户管理
@@ -106,7 +117,6 @@ const router = createRouter({
         },
       ],
     },
-
     // 用户
     // 个人信息路由
     {
@@ -129,12 +139,6 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: () => import('@/views/RegisterView.vue'),
-      meta: { HideChrome: true },
-    },
-    {
-      path: '/denied',
-      name: 'denied',
-      component: () => import('@/views/DeniedView.vue'),
       meta: { HideChrome: true },
     },
   ]

@@ -207,14 +207,14 @@ public class WorkModerationController {
                         String videoResult;
                         String videoReason;
 
-                        if (violationRate >= 30.0 || maxScore >= 0.7) {
+                        if (violationRate >= 30.0 || maxScore >= 70.0) {
                             videoResult = "不通过";
-                            videoReason = String.format("视频包含违规内容。违规帧数: %d/%d，违规率: %.2f%%",
-                                    riskyFrameCount, totalFrames, violationRate);
-                        } else if (violationRate >= 10.0 || maxScore >= 0.3) {
+                            videoReason = String.format("视频包含违规内容。违规帧数: %d/%d，违规率: %.2f%%，最高风险分数: %.2f",
+                                    riskyFrameCount, totalFrames, violationRate, maxScore);
+                        } else if (violationRate >= 10.0 || maxScore >= 30.0) {
                             videoResult = "人工审核";
-                            videoReason = String.format("视频存在疑似违规内容，建议人工复审。违规帧数: %d/%d，违规率: %.2f%%",
-                                    riskyFrameCount, totalFrames, violationRate);
+                            videoReason = String.format("视频存在疑似违规内容，建议人工复审。违规帧数: %d/%d，违规率: %.2f%%，最高风险分数: %.2f",
+                                    riskyFrameCount, totalFrames, violationRate, maxScore);
                         } else {
                             videoResult = "通过";
                             videoReason = String.format("视频内容健康，无明显违规。违规帧数: %d/%d，违规率: %.2f%%",

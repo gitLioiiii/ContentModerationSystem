@@ -131,7 +131,7 @@ const passwordStrength = computed(() => {
   if (!pwd) return 0
 
   let strength = 0
-  if (pwd.length >= 8) strength++
+  if (pwd.length >= 6) strength++
   if (/[a-z]/.test(pwd)) strength++
   if (/[A-Z]/.test(pwd)) strength++
   if (/[0-9]/.test(pwd)) strength++
