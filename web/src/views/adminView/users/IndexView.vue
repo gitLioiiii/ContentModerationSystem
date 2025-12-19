@@ -41,7 +41,13 @@
       <ElTableColumn prop="username" label="用户名"/>
       <ElTableColumn prop="name" label="姓名"/>
       <ElTableColumn prop="role" label="角色"/>
-      <ElTableColumn prop="gender" label="性别"/>
+      <ElTableColumn prop="gender" label="性别">
+        <template #default="{ row }">
+          <span v-if="row.gender === 'man'">男</span>
+          <span v-else-if="row.gender === 'woman'">女</span>
+          <span v-else>保密</span>
+        </template>
+      </ElTableColumn>
       <ElTableColumn prop="birthday" label="生日"/>
       <ElTableColumn prop="phone" label="手机号"/>
       <ElTableColumn prop="email" label="邮箱"/>

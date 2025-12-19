@@ -75,23 +75,6 @@
             </ElInput>
           </ElFormItem>
 
-          <ElFormItem prop="captcha">
-            <div class="slider-captcha" :class="{ verified: isVerified }">
-              <div class="slider-fill" :style="{ width: sliderWidth + 'px' }"></div>
-              <div class="slider-text-box">
-                <div class="slider-text">{{ sliderText }}</div>
-              </div>
-              <div
-                class="slider-button"
-                :style="{ left: sliderLeft + 'px' }"
-                @mousedown="handleMouseDown"
-              >
-                <i v-if="!isVerified" class="bi bi-chevron-double-right"></i>
-                <i v-else class="bi bi-check2"></i>
-              </div>
-            </div>
-          </ElFormItem>
-
           <!-- 记住账号和忘记密码 -->
           <div class="remember-forgot-box">
             <div class="remember-checkbox">
@@ -145,15 +128,6 @@ const router = useRouter()
 const isDark = ref(false)
 const rememberAccount = ref(false)
 
-// 滑块验证相关
-const isVerified = ref(false)
-const sliderLeft = ref(0)
-const sliderWidth = ref(0)
-const sliderText = ref('按住滑块,拖动验证')
-const startX = ref(0)
-const isDragging = ref(false)
-const trackWidth = ref(0)
-
 const model = reactive({
   role: '',
   username: '',
@@ -172,18 +146,6 @@ const rules = reactive({
     { required: true, message: '请输入密码。', trigger: 'blur' },
     { min: 2, max: 32, message: '名称仅限2~32个字符', trigger: 'change' },
   ],
-  captcha: [
-    {
-      validator: (rule, value, callback) => {
-        if (!isVerified.value) {
-          callback(new Error('请完成滑块验证'))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur',
-    },
-  ],
 })
 
 // 切换主题
@@ -197,69 +159,6 @@ const changeTheme = () => {
     document.body.classList.remove('dark-theme')
     console.log('暗黑主题已关闭,body 类名:', document.body.className)
   }
-}
-
-// 滑块验证处理
-const handleMouseDown = (e) => {
-  if (isVerified.value) return
-  isDragging.value = true
-  startX.value = e.clientX - sliderLeft.value
-
-  // 获取轨道宽度
-  const captcha = e.target.closest('.slider-captcha')
-  trackWidth.value = captcha.offsetWidth - 42
-
-  // console.log('开始拖动,轨道宽度:', trackWidth.value)
-
-  document.addEventListener('mousemove', handleMouseMove)
-  document.addEventListener('mouseup', handleMouseUp)
-  e.preventDefault()
-}
-
-const handleMouseMove = (e) => {
-  if (!isDragging.value) return
-  e.preventDefault()
-  const newLeft = e.clientX - startX.value
-  updateSliderPosition(newLeft)
-}
-
-const updateSliderPosition = (newLeft) => {
-  if (newLeft < 0) newLeft = 0
-  if (newLeft > trackWidth.value) newLeft = trackWidth.value
-
-  sliderLeft.value = newLeft
-  sliderWidth.value = newLeft + 25 // 25是按钮宽度的一半
-
-  // console.log(
-  //   '当前位置:',
-  //   newLeft,
-  //   '/',
-  //   trackWidth.value,
-  //   '进度:',
-  //   ((newLeft / trackWidth.value) * 100).toFixed(1) + '%',
-  // )
-
-  // 检查是否拖到终点
-  if (newLeft >= trackWidth.value * 0.95) {
-    isVerified.value = true
-    sliderText.value = '验证成功'
-    sliderLeft.value = trackWidth.value
-    sliderWidth.value = trackWidth.value + 50
-    console.log('验证成功!')
-    form.value?.validateField('captcha')
-  }
-}
-
-const handleMouseUp = () => {
-  if (!isDragging.value) return
-  if (!isVerified.value) {
-    // 如果没有验证成功,滑块回到起点
-    sliderLeft.value = 0
-    sliderWidth.value = 0
-  }
-  isDragging.value = false
-  document.removeEventListener('mousemove', handleMouseMove)
-  document.removeEventListener('mouseup', handleMouseUp)
 }
 
 const login = () => {
@@ -290,7 +189,7 @@ const login = () => {
 
             // 根据角色跳转到不同首页（暂时都跳转到用户首页）
             if (model.role === 'admin') {
-              router.replace({ name: 'index' }) // TODO: 后续改为管理员首页
+              router.replace({ name: 'user_index' }) // 管理员首页
             } else {
               router.replace({ name: 'index' }) // 用户首页
             }
@@ -545,100 +444,6 @@ const login = () => {
   border-radius: 6px;
   font-size: 1rem;
   font-weight: 500;
-}
-
-// 滑块验证码
-.slider-captcha {
-  position: relative;
-  width: 100%;
-  height: 40px;
-  background: #f2f3f5;
-  border: 1px solid #e5e6eb;
-  border-radius: 6px;
-  overflow: hidden;
-  user-select: none;
-}
-
-// 填充
-.slider-fill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 0;
-  background: #37d4cf;
-  transition: width 0.1s ease;
-}
-
-.slider-text-box {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-// 按住滑块拖动认证文字
-.slider-text {
-  font-size: 0.75rem;
-  color: transparent; //文字透明
-  background: linear-gradient(90deg, #c9cdd4 0%, #ffffff 50%, #c9cdd4 100%);
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  animation: shine 3s linear infinite; //流光
-  user-select: none;
-}
-
-@keyframes shine {
-  0% {
-    background-position: 200% center;
-  }
-  100% {
-    background-position: -200% center;
-  }
-}
-
-// slider-captcha和verified
-.slider-captcha.verified .slider-text {
-  color: transparent; //验证成功文字透明
-  background: linear-gradient(90deg, #c9cdd4 0%, #ffffff 50%, #c9cdd4 100%); //文字渐变
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  animation: shine 2s linear infinite;
-  font-weight: 400;
-}
-
-// 滑块按钮
-.slider-button {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  padding: 0 14px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  cursor: move; //移动光标
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.3s ease;
-  z-index: 2;
-
-  // 按钮焦点样式
-  &:hover {
-    background: #fafafa;
-  }
-}
-
-// 验证成功
-.slider-captcha.verified .slider-button {
-  cursor: default;
 }
 
 // 记住账号和忘记密码
@@ -927,49 +732,6 @@ const login = () => {
   .login-footer {
     color: #a0a0a0;
     border-top-color: #3a3a3a;
-  }
-
-  /* 滑块验证暗黑主题 */
-  .slider-captcha {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-  }
-
-  .slider-text {
-    color: transparent;
-    background: linear-gradient(90deg, #a0a0a0 0%, #ffffff 50%, #a0a0a0 100%);
-    background-size: 200% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-  }
-
-  .slider-captcha.verified .slider-text {
-    color: transparent;
-    background: linear-gradient(90deg, #a0a0a0 0%, #ffffff 50%, #a0a0a0 100%);
-    background-size: 200% 100%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    animation: shine 2s linear infinite;
-  }
-
-  .slider-button {
-    background: #3a3a3a;
-
-    svg {
-      color: #e5e5e5;
-    }
-
-    &:hover {
-      background: #4a4a4a;
-    }
-  }
-
-  .slider-captcha.verified .slider-button {
-    background: #3a3a3a;
-
-    svg {
-      color: #67c23a;
-    }
   }
 }
 </style>

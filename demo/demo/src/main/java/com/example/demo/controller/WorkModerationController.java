@@ -113,6 +113,7 @@ public class WorkModerationController {
                     imageReview.setResult(imageResponse.getResult());
                     imageReview.setReason(imageResponse.getReason());
                     imageReview.setMatchScore(imageResponse.getMatchScore());
+                    imageReview.setProcessingTime((int) imageProcessingTime);
                 } else {
                     log.warn("封面文件不存在: {}", coverPath);
                 }
@@ -165,6 +166,7 @@ public class WorkModerationController {
                         CompletableFuture<Void> allTasks = CompletableFuture.allOf(
                                 asyncTasks.toArray(new CompletableFuture[0])
                         );
+                        // 等待任务结束5分钟超时
                         allTasks.get(5, java.util.concurrent.TimeUnit.MINUTES);
 
                         // 审核结果
@@ -226,18 +228,18 @@ public class WorkModerationController {
                         videoReview = new WorkAutoReviewEntity.VideoReview();
                         videoReview.setResult(videoResult);
                         videoReview.setReason(videoReason);
-                        videoReview.setFrameCount(totalFrames);
-                        videoReview.setRiskyFrameCount(riskyFrameCount);
+                        videoReview.setCount(totalFrames);
+                        videoReview.setRiskyCount(riskyFrameCount);
                         videoReview.setMaxScore(maxScore);
-                        videoReview.setRiskyFrames(riskyFrames);
-                        videoReview.setProcessingTime((int) videoProcessingTime);
+                        videoReview.setRiskyList(riskyFrames);
+                        videoReview.setProcessingTime((int) (videoProcessingTime / 1000)); // 转换为秒
                     }
                 } else {
                     log.warn("视频文件不存在: {}", videoPath);
                 }
             }
 
-            // ----- 第五步：聚合审核结果 ------
+            // --- 第五步：聚合审核结果 ----
             log.info("开始聚合审核结果...");
 
             // 构建文本审核结果
@@ -271,43 +273,47 @@ public class WorkModerationController {
             String overallStatus = determineOverallStatus(textReview, imageReview, videoReview);
             log.info("总体审核状态: {}", overallStatus);
 
-            // 计算总耗时
+            // 计算总耗时（秒）
             long totalProcessingTime = System.currentTimeMillis() - startTime;
 
             // 构建审核实体
             WorkAutoReviewEntity workAutoReview = new WorkAutoReviewEntity();
             workAutoReview.setContentId(contentId);
             workAutoReview.setReviewResults(reviewResults);
-            workAutoReview.setOverallStatus(overallStatus);
-            workAutoReview.setTotalProcessingTime((int) totalProcessingTime);
+            workAutoReview.setStatus(overallStatus);
+            workAutoReview.setFinalProcessingTime((int) (totalProcessingTime / 1000)); // 转换为秒
             workAutoReview.setReviewedAt(LocalDateTime.now());
 
-            // ==== 第六步：保存审核结果到数据库 ====
+            // ---- 第六步：保存审核结果到数据库 ----
             log.info("保存审核结果到数据库...");
             workAutoReviewService.save(workAutoReview);
 
-            // ==== 第七步：更新作品状态 ====
+            // ---- 第七步：更新作品状态 ----
             String contentStatus;
             if ("approved".equals(overallStatus)) {
                 contentStatus = "approved";
             } else if ("rejected".equals(overallStatus)) {
                 contentStatus = "rejected";
+            } else if ("reviewing".equals(overallStatus)) {
+                contentStatus = "reviewing"; // 需要人工审核
             } else {
-                contentStatus = "pending"; // 需要人工审核
+                contentStatus = "pending"; // 等待AI审核
             }
             content.setStatus(contentStatus);
             contentRepository.save(content);
 
-            log.info("作品审核完成 - 作品ID: {}, 总体状态: {}, 总耗时: {}ms",
-                    contentId, overallStatus, totalProcessingTime);
+            log.info("作品状态已更新 - 作品ID: {}, 审核状态: {} -> {}, 内容状态: {}",
+                    contentId, overallStatus, contentStatus, contentStatus);
+            log.info("-------- 作品审核完成 - 作品ID: {}, 标题: {}, 总体状态: {}, 总耗时: {}ms --------",
+                    contentId, content.getTitle(), overallStatus, totalProcessingTime);
 
-            // ==== 第八步：返回结果 ====
+            //  第八步：返回结果 
             ResultTemplate result = new ResultTemplate();
             result.putPayload("reviewId", workAutoReview.getId());
-            result.putPayload("overallStatus", overallStatus);
+            result.putPayload("Status", overallStatus);
             result.putPayload("contentStatus", contentStatus);
             result.putPayload("reviewResults", reviewResults);
-            result.putPayload("totalProcessingTime", totalProcessingTime);
+            result.putPayload("finalProcessingTime", totalProcessingTime / 1000); // 转换为秒
 
             return result;
 

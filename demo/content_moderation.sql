@@ -271,12 +271,12 @@ db.runCommand({
                   bsonType: "string",
                   description: "审核理由说明"
                 },
-                frameCount: {
+                Count: {
                   bsonType: ["int", "null"],
                   minimum: 0,
                   description: "视频抽帧总数"
                 },
-                riskyFrameCount: {
+                riskyCount: {
                   bsonType: ["int", "null"],
                   minimum: 0,
                   description: "检测到的风险帧数量"
@@ -287,7 +287,7 @@ db.runCommand({
                   maximum: 1.0,
                   description: "所有帧中的最高风险分数"
                 },
-                riskyFrames: {
+                riskyList: {
                   bsonType: ["array", "null"],
                   description: "风险帧详情列表",
                   items: {
@@ -344,8 +344,9 @@ db.runCommand({
 })
 // 索引
 db.auto_review_forworks.createIndex({ contentId: 1 }, { unique: true })
-db.auto_review_forworks.createIndex({ overallStatus: 1, reviewedAt: -1 })
+db.auto_review_forworks.createIndex({ Status: 1, reviewedAt: -1 })
 db.auto_review_forworks.createIndex({ reviewedAt: -1 })
+
 
 // 人工审核（未使用）
 db.createCollection("manual_review", {

@@ -23,9 +23,9 @@ public class WorkAutoReviewEntity {
     private ReviewResults reviewResults; // 各个审核结果
 
     @Indexed
-    private String overallStatus; // 整体审核状态: 通过/拒绝/人工审核
+    private String Status; // 整体审核状态: approved通过/rejected驳回/reviewing需人工审核
 
-    private Integer totalProcessingTime; // 总处理耗时(毫秒)
+    private Integer finalProcessingTime; // 作品审核处理耗时(秒)
 
     @Indexed
     private LocalDateTime reviewedAt; // 审核完成时间
@@ -53,6 +53,7 @@ public class WorkAutoReviewEntity {
         private String result; // 通过/不通过/人工审核
         private String reason; // 审核理由
         private Double matchScore; // 违规匹配分数
+        private Integer processingTime; // 处理耗时(毫秒)
     }
 
     // 视频审核
@@ -60,11 +61,11 @@ public class WorkAutoReviewEntity {
     public static class VideoReview {
         private String result; // 通过/不通过/人工审核
         private String reason; // 审核理由
-        private Integer frameCount; // 视频抽帧总数
-        private Integer riskyFrameCount; // 检测到的风险帧数量
+        private Integer Count; // 视频抽帧总数
+        private Integer riskyCount; // 检测到的风险帧数量
         private Double maxScore; // 所有帧中的最高风险分数
-        private List<RiskyFrame> riskyFrames; // 风险帧详情列表
-        private Integer processingTime; // 处理耗时(毫秒)
+        private List<RiskyFrame> riskyList; // 风险帧详情列表
+        private Integer processingTime; // 处理耗时(秒)
     }
 
     // 抽出来的风险帧

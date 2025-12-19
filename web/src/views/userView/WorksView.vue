@@ -19,7 +19,8 @@
       </ElFormItem>
       <ElFormItem label="状态">
         <ElSelect v-model="filterModel.status" placeholder="全部" clearable style="width: 150px">
-          <ElOption label="审核中" value="pending" />
+          <ElOption label="AI审核中" value="pending" />
+          <ElOption label="人工审核中" value="reviewing" />
           <ElOption label="已通过" value="approved" />
           <ElOption label="未通过" value="rejected" />
         </ElSelect>
@@ -29,12 +30,12 @@
       </ElFormItem>
       <ElFormItem class="ml-auto">
         <ElButton
-          v-if="pendingWorksCount > 0"
+          v-if="reviewingWorksCount > 0"
           type="success"
           @click="viewAuditResults"
         >
           <i class="bi bi-hourglass-split"></i>
-          审核中 ({{ pendingWorksCount }})
+          开启AI审核 ({{ reviewingWorksCount }})
         </ElButton>
         <ElButton>
           <i class="bi bi-robot"></i>
@@ -190,8 +191,8 @@ const works = ref([])
 // 编辑模式
 const editMode = ref(false)
 
-// 正在审核的作品数量
-const pendingWorksCount = ref(0)
+// 正在AI审核的作品数量 (status="pending")
+const reviewingWorksCount = ref(0)
 
 // 视频播放器状态
 const videoPlayerVisible = ref(false)
@@ -244,7 +245,7 @@ const fetchWorks = () => {
       Object.assign(pagination, response.data.payload.pagination)
 
       // 获取正在审核的作品数量
-      fetchPendingWorksCount()
+      fetchreviewingWorksCount()
     }
   }).catch(() => {
     ElMessage.error('获取作品列表失败')
@@ -252,7 +253,7 @@ const fetchWorks = () => {
 }
 
 // 获取正在审核的作品数量
-const fetchPendingWorksCount = () => {
+const fetchreviewingWorksCount = () => {
   const params = new URLSearchParams()
   params.append('status', 'pending')
   params.append('page', 1)
@@ -261,7 +262,7 @@ const fetchPendingWorksCount = () => {
   request.get('/works', { params }).then((response) => {
     if (response.data.status === true) {
       const total = response.data.payload.pagination.total
-      pendingWorksCount.value = Math.min(total, 3) // 最大显示3
+      reviewingWorksCount.value = Math.min(total, 3) // 最大显示3
     }
   }).catch(() => {
     // 忽略错误，保持原值
@@ -476,13 +477,14 @@ const viewAuditResults = () => {
 const triggerModerationForPendingWorks = async (pendingWorks) => {
   ElNotification.info({
     title: '开始审核',
-    message: `正在审核 ${pendingWorks.length} 个作品，请稍候...`,
+    message: `正在审核 ${pendingWorks.length} 个作品`,
     offset: 100,
     duration: 18000
   })
 
   let successCount = 0
   let failCount = 0
+  let reviewingCount = 0  // 需要人工审核的数量
 
   for (const work of pendingWorks) {
     try {
@@ -496,11 +498,17 @@ const triggerModerationForPendingWorks = async (pendingWorks) => {
       })
 
       if (response.data.status === true) {
-        successCount++
-        const overallStatus = response.data.payload.overallStatus
-        const statusText = overallStatus === 'approved' ? '通过' :
-                          overallStatus === 'rejected' ? '未通过' : '需人工审核'
-        ElMessage.success(`作品"${work.title}"审核完成 - ${statusText}`)
+        const Status = response.data.payload.Status
+        const statusText = Status === 'approved' ? '通过' :
+                          Status === 'rejected' ? '未通过' : '需人工审核'
+
+        if (Status === 'reviewing') {
+          reviewingCount++
+          ElMessage.warning(`作品"${work.title}"需要人工审核`)
+        } else {
+          successCount++
+          ElMessage.success(`作品"${work.title}"审核完成 - ${statusText}`)
+        }
       } else {
         failCount++
         ElMessage.error(`作品"${work.title}"审核失败`)
@@ -516,7 +524,14 @@ const triggerModerationForPendingWorks = async (pendingWorks) => {
   fetchWorks()
 
   // 显示总体结果
-  if (failCount === 0) {
+  if (reviewingCount > 0) {
+    ElNotification.warning({
+      title: '审核完成',
+      message: `AI审核完成！通过: ${successCount}，需人工审核: ${reviewingCount}${failCount > 0 ? `，失败: ${failCount}` : ''}`,
+      offset: 100,
+      duration: 20000
+    })
+  } else if (failCount === 0) {
     ElNotification.success({
       title: '审核完成',
       message: `全部审核完成！成功: ${successCount}`,

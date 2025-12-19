@@ -60,32 +60,6 @@
         <i class="bi bi-fullscreen"></i>
       </ElButton>
 
-      <!-- 通知按钮 -->
-      <ElDropdown trigger="click" @command="handleNotificationCommand">
-        <ElButton class="header-btn notification-btn" circle text >
-          <span v-if="hasUnreadNotifications" class="notification-dot"></span>
-          <i class="bi bi-bell"></i>
-        </ElButton>
-        <template #dropdown>
-          <ElDropdownMenu class="notification-panel">
-            <div class="notification-header">
-              <span class="notification-title">通知</span>
-              <button
-                class="notification-clear-btn"
-                @click="handleClearNotifications"
-              >
-                清空
-              </button>
-            </div>
-            <div class="notification-list">
-              <div class="notification-item">
-                <p>暂无通知</p>
-              </div>
-            </div>
-          </ElDropdownMenu>
-        </template>
-      </ElDropdown>
-
       <!-- 用户菜单 -->
       <ElDropdown trigger="click" @command="handleUserCommand">
         <div class="user-avatar-wrapper">
@@ -145,9 +119,6 @@ const sidebarStore = useSidebarStore()
 // 主题状态
 const isDark = ref(false)
 
-// 通知状态
-const hasUnreadNotifications = ref(true)
-
 // 用户头像
 const userAvatar = computed(() => {
   // 从 userStore 中获取用户头像路径
@@ -188,17 +159,6 @@ const toggleFullscreen = () => {
   } else {
     document.exitFullscreen()
   }
-}
-
-// 清空通知
-const handleClearNotifications = () => {
-  hasUnreadNotifications.value = false
-  ElMessage.success('已清空所有通知')
-}
-
-// 通知命令处理
-const handleNotificationCommand = (command) => {
-  ElMessage.info(`处理通知命令: ${command}`)
 }
 
 // 用户菜单命令处理
@@ -395,89 +355,7 @@ const logout = () => {
   }
 }
 
-// 通知按钮
-.notification-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 2rem;
-  width: 2rem;
-  padding: 0.25rem;
-  font-size: 1rem;
-  color: hsl(222.2 84% 4.9% / 0.8);
-  background: transparent;
-  border: none;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 150ms;
-
-  &:hover {
-    background-color: hsl(210 40% 96.1%);
-    color: hsl(222.2 47.4% 11.2%);
-  }
-
-  .notification-dot {
-    position: absolute;
-    top: 0.125rem;
-    right: 0.125rem;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 9999px;
-    background-color: hsl(221.2 83.2% 53.3%);
-  }
-}
-
-// 通知面板
-.notification-panel {
-  .notification-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid hsl(214.3 31.8% 91.4%);
-    margin-bottom: 0.5rem;
-
-    .notification-title {
-      font-weight: 500;
-      font-size: 0.875rem;
-    }
-
-    .notification-clear-btn {
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-      color: hsl(215.4 16.3% 46.9%);
-      background: transparent;
-      border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      transition: all 150ms;
-
-      &:hover {
-        color: hsl(222.2 84% 4.9%);
-        background-color: hsl(210 40% 96.1%);
-      }
-    }
-  }
-
-  .notification-list {
-    max-height: 300px;
-    overflow-y: auto;
-
-    .notification-item {
-      padding: 0.5rem 0;
-      font-size: 0.875rem;
-      color: hsl(215.4 16.3% 46.9%);
-
-      p {
-        margin: 0;
-        text-align: center;
-      }
-    }
-  }
-}
-
-// 用户头像包装器
+// 用户头像
 .user-avatar-wrapper {
   position: relative;
   display: flex;
