@@ -111,8 +111,8 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { ElForm, ElFormItem, ElInput, ElButton, ElMessage, ElSelect, ElOption } from 'element-plus'
+import { ref, reactive, h } from 'vue'
+import { ElForm, ElFormItem, ElInput, ElButton, ElMessage, ElSelect, ElOption, ElNotification } from 'element-plus'
 import { useRouter, RouterLink } from 'vue-router'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
@@ -185,7 +185,11 @@ const login = () => {
             userStore.login(userData)
             userStore.cache('user', userData)
 
-            ElMessage.success('登录成功。')
+            ElNotification({
+              title: '登录成功',
+              message: h('span', { style: 'color: #5EDFD6' }, `欢迎回来：${model.username}`),
+              duration: 3000
+            })
 
             // 根据角色跳转到不同首页（暂时都跳转到用户首页）
             if (model.role === 'admin') {

@@ -63,6 +63,10 @@
       <!-- 用户菜单 -->
       <ElDropdown trigger="click" @command="handleUserCommand">
         <div class="user-avatar-wrapper">
+          <ElTag v-if="userStore.logged" size="default">
+            {{ userStore.isAdmin ? '管理员:' : '用户:' }}
+          </ElTag>
+          <div style="margin-right: 1rem;">{{ userStore.name }}</div>
           <ElAvatar
             :size="32"
             :src="userAvatar"
@@ -80,10 +84,6 @@
             <ElDropdownItem v-if="userStore.logged" command="profile">
               <i class="bi bi-person"></i>
               <span>个人信息</span>
-            </ElDropdownItem>
-            <ElDropdownItem v-if="userStore.logged" command="lock">
-              <i class="bi bi-lock"></i>
-              <span>锁定屏幕</span>
             </ElDropdownItem>
             <ElDropdownItem v-if="userStore.logged" divided command="logout">
               <i class="bi bi-box-arrow-right"></i>
@@ -103,7 +103,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElButton, ElBreadcrumb, ElBreadcrumbItem, ElDropdown, ElDropdownMenu, ElDropdownItem, ElAvatar, ElMessage } from 'element-plus'
+import { ElButton, ElBreadcrumb, ElBreadcrumbItem, ElDropdown, ElDropdownMenu, ElDropdownItem, ElAvatar, ElMessage, ElTag } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useSidebarStore } from '@/stores/sidebar'

@@ -27,10 +27,4 @@ public class WorkAutoReviewServiceImpl implements WorkAutoReviewService {
     public Optional<WorkAutoReviewEntity> findByContentId(String contentId) {
         return this.workAutoReviewRepository.findByContentId(contentId);
     }
-
-// 删除审核结果
-    // @Override
-    // public void deleteByContentId(String contentId) {
-    //     this.workAutoReviewRepository.deleteByContentId(contentId);
-    // }
 }

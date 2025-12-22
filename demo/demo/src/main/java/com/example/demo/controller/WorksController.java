@@ -181,4 +181,29 @@ public class WorksController {
         return result;
     }
 
+    // 获取作品详情
+    @GetMapping("/detail")
+    public ResultTemplate detail(@RequestParam String contentId) {
+        ResultTemplate result = new ResultTemplate();
+
+        try {
+            // 获取作品信息
+            ContentEntity content = this.worksService.fetchById(contentId).orElseThrow(
+                () -> new NotFoundException()
+            );
+
+            result.putPayload("work", content);
+            return result;
+
+        } catch (NotFoundException e) {
+            result.setStatus(false);
+            result.setMessage("作品不存在");
+            return result;
+        } catch (Exception e) {
+            result.setStatus(false);
+            result.setMessage("获取作品详情失败: " + e.getMessage());
+            return result;
+        }
+    }
+
 }

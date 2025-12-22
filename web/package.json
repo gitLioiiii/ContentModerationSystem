@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.1.17",
     "axios": "^1.13.2",
     "bootstrap-icons": "^1.13.1",
+    "echarts": "^6.0.0",
     "element-plus": "^2.11.8",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.17",

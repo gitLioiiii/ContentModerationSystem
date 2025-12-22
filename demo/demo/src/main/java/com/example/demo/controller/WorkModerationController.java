@@ -113,7 +113,7 @@ public class WorkModerationController {
                     imageReview.setResult(imageResponse.getResult());
                     imageReview.setReason(imageResponse.getReason());
                     imageReview.setMatchScore(imageResponse.getMatchScore());
-                    imageReview.setProcessingTime((int) imageProcessingTime);
+                    imageReview.setProcessingTime((int) (imageProcessingTime / 1000)); // 转换为秒
                 } else {
                     log.warn("封面文件不存在: {}", coverPath);
                 }
@@ -261,7 +261,7 @@ public class WorkModerationController {
                 }
             }
             textReview.setSensitiveWords(sensitiveWords);
-            textReview.setProcessingTime((int) textProcessingTime);
+            textReview.setProcessingTime((int) (textProcessingTime / 1000)); // 转换为秒
 
             // 构建审核结果对象
             WorkAutoReviewEntity.ReviewResults reviewResults = new WorkAutoReviewEntity.ReviewResults();

@@ -24,15 +24,15 @@ public interface UserRepository extends MongoRepository<UserEntity, String> {
     // 根据角色筛选用户
     Page<UserEntity> findByRoleAndDeletedAtIsNull(String role, Pageable pageable);
 
+    // 根据角色筛选用户（返回列表）
+    List<UserEntity> findByRoleAndDeletedAtIsNull(String role);
+
     // 根据关键字用户名、姓名、手机号和角色同时筛选用户
     @Query("{ 'deletedAt': null, 'role': ?0, $or: [ {'username': {$regex: ?1, $options: 'i'}}, {'name': {$regex: ?1, $options: 'i'}}, {'phone': {$regex: ?1, $options: 'i'}} ] }")
     Page<UserEntity> findByKeywordsAndRole(String role, String keywords, Pageable pageable);
 
     // 登录时根据用户名查找用户
     Optional<UserEntity> findByUsernameAndDeletedAtIsNull(String username);
-
-    // 状态异常的用户
-    List<UserEntity> findByStatusAndDeletedAtIsNull(String status);
 
     // 利用id更新用户
     Optional<UserEntity> findByIdAndDeletedAtIsNull(String id);

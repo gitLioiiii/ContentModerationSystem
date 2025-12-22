@@ -11,7 +11,4 @@ public interface WorkAutoReviewService {
 
     // 通过id查询审核结果
     Optional<WorkAutoReviewEntity> findByContentId(String contentId);
-
-    // 通过id删除审核结果
-    // void deleteByContentId(String contentId);
 }

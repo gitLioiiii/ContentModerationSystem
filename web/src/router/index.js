@@ -52,6 +52,10 @@ const router = createRouter({
           component: () => import('@/views/adminView/users/CreateView.vue'),
         },
       ],
+      meta: {
+        breadcrumbParent: '用户管理',
+        breadcrumbCurrent: '用户管理页面',
+      },
     },
     // AI审核
     {
@@ -91,6 +95,15 @@ const router = createRouter({
         breadcrumbCurrent: '待审核队列审核',
       },
     },
+    {
+      path: '/record',
+      name: 'record',
+      component: () => import('@/views/adminView/manual/RecordView.vue'),
+      meta: {
+        breadcrumbParent: '审核记录',
+        breadcrumbCurrent: '审核记录页面',
+      },
+    },
     // 敏感词管理
     {
       path: '/sensitive',
@@ -116,6 +129,15 @@ const router = createRouter({
           },
         },
       ],
+    },
+    {
+      path: '/list',
+      name: 'list',
+      component: () => import('@/views/adminView/sensitive/ReviewList.vue'),
+      meta: {
+        breadcrumbParent: '审核记录',
+        breadcrumbCurrent: '审核记录页面',
+      },
     },
     // 用户
     // 个人信息路由

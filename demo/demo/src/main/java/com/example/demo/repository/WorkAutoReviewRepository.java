@@ -13,7 +13,4 @@ public interface WorkAutoReviewRepository extends MongoRepository<WorkAutoReview
 
     // 根据作品ID查询审核结果
     Optional<WorkAutoReviewEntity> findByContentId(String contentId);
-
-    // 根据作品ID删除审核结果
-    void deleteByContentId(String contentId);
 }

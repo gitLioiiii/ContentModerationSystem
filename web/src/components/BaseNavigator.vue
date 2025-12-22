@@ -72,35 +72,35 @@
         <!-- 人工审核 -->
         <ElSubMenu index="manual-review">
           <template #title><i class="bi bi-person-check menu-icon"></i><span v-if="!sidebarCollapsed">人工审核</span></template>
+          <ElMenuItem index="record" :route="{ name: 'record' }" class="sub-menu-item">
+            <i class="bi bi-clock-history menu-icon"></i>
+            <span v-if="!sidebarCollapsed">审核记录</span>
+          </ElMenuItem>
           <ElMenuItem index="queue" :route="{ name: 'queue' }" class="sub-menu-item">
             <i class="bi bi-list-ul menu-icon"></i>
             <span v-if="!sidebarCollapsed">待审核队列</span>
           </ElMenuItem>
-          <ElMenuItem index="operation" :route="{ name: 'operation' }" class="sub-menu-item">
+          <!-- <ElMenuItem index="operation" :route="{ name: 'operation' }" class="sub-menu-item">
             <i class="bi bi-check-square menu-icon"></i>
             <span v-if="!sidebarCollapsed">审核操作</span>
-          </ElMenuItem>
-          <ElMenuItem index="history" :route="{ name: 'history' }" class="sub-menu-item">
-            <i class="bi bi-clock-history menu-icon"></i>
-            <span v-if="!sidebarCollapsed">审核记录</span>
-          </ElMenuItem>
+          </ElMenuItem> -->
         </ElSubMenu>
 
         <!-- 规则管理 -->
         <ElSubMenu index="sensitive">
           <template #title><i class="bi bi-gear menu-icon"></i><span v-if="!sidebarCollapsed">规则管理</span></template>
+          <ElMenuItem index="list" :route="{ name: 'list' }" class="sub-menu-item">
+              <i class="bi bi-file-earmark-text menu-icon"></i>
+              <span v-if="!sidebarCollapsed">审核报表</span>
+          </ElMenuItem>
           <ElMenuItem index="sensitive" :route="{ name: 'sensitive_index' }" class="sub-menu-item">
               <i class="bi bi-book menu-icon"></i>
               <span v-if="!sidebarCollapsed">敏感词库</span>
           </ElMenuItem>
-          <ElMenuItem index="" class="sub-menu-item">
+          <!-- <ElMenuItem index="" class="sub-menu-item">
               <i class="bi bi-bar-chart menu-icon"></i>
               <span v-if="!sidebarCollapsed">审核阈值</span>
-          </ElMenuItem>
-          <ElMenuItem index="" class="sub-menu-item">
-              <i class="bi bi-file-earmark-text menu-icon"></i>
-              <span v-if="!sidebarCollapsed">审核报表</span>
-          </ElMenuItem>
+          </ElMenuItem> -->
         </ElSubMenu>
     </ElMenu>
   </aside>

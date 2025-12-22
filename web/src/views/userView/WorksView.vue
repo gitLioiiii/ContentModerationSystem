@@ -2,10 +2,16 @@
   <div class="works-view">
     <div class="header-section">
       <h2 class="page-title">我的作品</h2>
-      <ElButton type="primary" @click="openUploadDialog">
-        <i class="bi bi-brush menu-icon"></i>
-        发布作品
-      </ElButton>
+      <div class="header-buttons">
+        <ElButton type="primary" @click="openNotifications">
+          <i class="bi bi-reply menu-icon"></i>
+          通知
+        </ElButton>
+        <ElButton type="primary" @click="openUploadDialog">
+          <i class="bi bi-brush menu-icon"></i>
+          发布作品
+        </ElButton>
+      </div>
     </div>
 
     <ElForm :model="filterModel" @submit.prevent="fetchWorks" inline class="filter-form">
@@ -19,10 +25,13 @@
       </ElFormItem>
       <ElFormItem label="状态">
         <ElSelect v-model="filterModel.status" placeholder="全部" clearable style="width: 150px">
-          <ElOption label="AI审核中" value="pending" />
+          <ElOption label="全部" value="" />
+          <ElOption label="审核通过" value="approved" />
           <ElOption label="人工审核中" value="reviewing" />
-          <ElOption label="已通过" value="approved" />
-          <ElOption label="未通过" value="rejected" />
+          <ElOption label="AI审核不通过" value="rejected" />
+          <ElOption label="人工审核不通过" value="manual_rejected" />
+          <ElOption label="申诉中" value="appealing" />
+          <ElOption label="申诉驳回" value="appeal_rejected" />
         </ElSelect>
       </ElFormItem>
       <ElFormItem>
@@ -37,9 +46,21 @@
           <i class="bi bi-hourglass-split"></i>
           开启AI审核 ({{ reviewingWorksCount }})
         </ElButton>
-        <ElButton>
+        <ElButton v-if="!viewReviewMode" @click="enterReviewMode">
           <i class="bi bi-robot"></i>
           AI审核结果
+        </ElButton>
+        <ElButton v-else @click="exitReviewMode">
+          <i class="bi bi-x-lg"></i>
+          退出查看
+        </ElButton>
+        <ElButton v-if="!viewAppealMode" @click="enterAppealMode">
+          <i class="bi bi-pen"></i>
+          申诉
+        </ElButton>
+        <ElButton v-else @click="exitAppealMode">
+          <i class="bi bi-x-lg"></i>
+          退出申诉
         </ElButton>
         <ElButton v-if="!editMode" type="warning" @click="enterEditMode">
           <i class="bi bi-pencil"></i>
@@ -54,16 +75,22 @@
 
     <!-- 作品卡片列表 -->
     <div v-if="works.length > 0" class="works-grid">
-      <MediaCard
+      <WorkCard
         v-for="work in works"
         :key="work.id"
         :cover-url="work.coverUrl"
         :title="work.title"
+        :description="work.description"
         :author="work.author"
         :author-avatar="work.authorAvatar"
         :publish-date="work.publishDate"
+        :review-status="work.status"
         :show-delete="editMode"
+        :show-review="viewReviewMode && isWorkReviewed(work.status)"
+        :show-appeal="viewAppealMode && canAppeal(work.status)"
         @delete="handleDeleteWork(work)"
+        @review="handleViewReview(work)"
+        @appeal="handleAppeal(work)"
         @click="handlePlayVideo(work)"
       />
     </div>
@@ -160,7 +187,167 @@
       v-model:visible="videoPlayerVisible"
       :video-url="currentVideoUrl"
       :video-title="currentVideoTitle"
+      :description="currentVideoDescription"
     />
+
+<!-- AI审核结果抽屉 -->
+    <ElDrawer
+      v-model="reviewDrawerVisible"
+      :with-header="true"
+      :z-index="100"
+      direction="rtl"
+      size="40%"
+    >
+      <div v-if="currentReview" class="review-content">
+        <ElSpace direction="vertical" alignment="normal" :fill="true" style="width: 100%">
+          <!-- 总体审核结果 -->
+          <ElCard class="review-card review-card-summary" shadow="hover" :body-style="{ backgroundColor: '#e3f2fd' }">
+            <h3 class="section-title">你的作品《{{ currentWorkTitle }}》审核结果为
+              <ElTag :type="getStatusType(currentReview.status)" size="large">
+                {{ getStatusText(currentReview.status) }}
+              </ElTag>
+            </h3>
+            <div class="processing-time">
+              <img src="@/assets/img/时间.png" alt="时间" class="time-icon" />
+              审核时长: {{ currentReview.finalProcessingTime }}秒
+            </div>
+          </ElCard>
+
+          <!-- 文本审核 -->
+          <ElCard v-if="currentReview.reviewResults?.textReview" class="review-card review-card-text" shadow="hover" :body-style="{ backgroundColor: '#f3e5f5' }">
+            <h3 class="section-title">
+              <i class="bi bi-file-text"></i>
+              文本审核（标题 + 描述）
+            </h3>
+            <div class="review-item">
+              <span class="label">审核结果:</span>
+              <ElTag :type="getResultType(currentReview.reviewResults.textReview.result)">
+                {{ currentReview.reviewResults.textReview.result }}
+              </ElTag>
+            </div>
+            <div class="review-item">
+              <span class="label">审核理由:</span>
+              <span>{{ currentReview.reviewResults.textReview.reason }}</span>
+            </div>
+            <div class="review-item">
+              <span class="label">风险等级:</span>
+              <ElTag :type="getRiskType(currentReview.reviewResults.textReview.riskLevel)">
+                {{ currentReview.reviewResults.textReview.riskLevel }}
+              </ElTag>
+            </div>
+            <div v-if="currentReview.reviewResults.textReview.sensitiveWords?.length > 0" class="review-item">
+              <span class="label">敏感词:</span>
+              <div class="sensitive-words">
+                <ElTag
+                  v-for="(word, index) in currentReview.reviewResults.textReview.sensitiveWords"
+                  :key="index"
+                  type="danger"
+                  size="small"
+                >
+                  {{ word }}
+                </ElTag>
+              </div>
+            </div>
+            <div class="review-item">
+              <span class="label">处理耗时:</span>
+              <span>{{ currentReview.reviewResults.textReview.processingTime }}秒</span>
+            </div>
+          </ElCard>
+
+          <!-- 封面审核 -->
+          <ElCard v-if="currentReview.reviewResults?.imageReview" class="review-card review-card-image" shadow="hover" :body-style="{ backgroundColor: '#e8f5e9' }">
+            <h3 class="section-title">
+              <i class="bi bi-image"></i>
+              封面审核
+            </h3>
+            <div class="review-item">
+              <span class="label">审核结果:</span>
+              <ElTag :type="getResultType(currentReview.reviewResults.imageReview.result)">
+                {{ currentReview.reviewResults.imageReview.result }}
+              </ElTag>
+            </div>
+            <div class="review-item">
+              <span class="label">审核理由:</span>
+              <span>{{ currentReview.reviewResults.imageReview.reason }}</span>
+            </div>
+            <div class="review-item">
+              <span class="label">违规匹配分数:</span>
+              <span>{{ currentReview.reviewResults.imageReview.matchScore.toFixed(1) }}/100</span>
+            </div>
+            <div class="review-item">
+              <span class="label">处理耗时:</span>
+              <span>{{ currentReview.reviewResults.imageReview.processingTime }}秒</span>
+            </div>
+          </ElCard>
+
+          <!-- 视频审核 -->
+          <ElCard v-if="currentReview.reviewResults?.videoReview" class="review-card review-card-video" shadow="hover" :body-style="{ backgroundColor: '#fff3e0' }">
+            <h3 class="section-title">
+              <i class="bi bi-camera-video"></i>
+              视频审核
+            </h3>
+            <div class="review-item">
+              <span class="label">审核结果:</span>
+              <ElTag :type="getResultType(currentReview.reviewResults.videoReview.result)">
+                {{ currentReview.reviewResults.videoReview.result }}
+              </ElTag>
+            </div>
+            <div class="review-item">
+              <span class="label">审核理由:</span>
+              <span>{{ currentReview.reviewResults.videoReview.reason }}</span>
+            </div>
+            <div class="review-item">
+              <span class="label">抽帧统计:</span>
+              <span>
+                总帧数: {{ currentReview.reviewResults.videoReview.Count }} /
+                风险帧数: {{ currentReview.reviewResults.videoReview.riskyCount }}
+              </span>
+            </div>
+            <div class="review-item">
+              <span class="label">最高风险分数:</span>
+              <span>{{ currentReview.reviewResults.videoReview.maxScore.toFixed(1) }}/100</span>
+            </div>
+            <div v-if="currentReview.reviewResults.videoReview.riskyList?.length > 0" class="review-item">
+              <span class="label">风险帧详情:</span>
+              <div class="risky-frames">
+                <div
+                  v-for="(frame, index) in currentReview.reviewResults.videoReview.riskyList"
+                  :key="index"
+                  class="risky-frame-item"
+                >
+                  <div class="frame-info">
+                    <span class="frame-index">风险帧 #{{ index + 1 }}</span>
+                    <span class="frame-time">时间: {{ frame.timestamp.toFixed(2) }}秒</span>
+                    <ElTag type="danger" size="small">分数: {{ frame.score.toFixed(1) }}/100</ElTag>
+                  </div>
+                  <div class="frame-reason">{{ frame.reason }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="review-item">
+              <span class="label">处理耗时:</span>
+              <span>{{ currentReview.reviewResults.videoReview.processingTime }}秒</span>
+            </div>
+          </ElCard>
+
+          <!-- 审核时间 -->
+          <ElCard class="review-card review-card-time" shadow="hover" :body-style="{ backgroundColor: '#f5f5f5' }">
+            <h3 class="section-title">
+              <i class="bi bi-calendar"></i>
+              审核时间
+            </h3>
+            <div class="review-item">
+              <span>{{ formatDateTime(currentReview.reviewedAt) }}</span>
+            </div>
+          </ElCard>
+        </ElSpace>
+      </div>
+<!-- 如果没有审核过 -->
+      <div v-else class="no-review">
+        <i class="bi bi-exclamation-circle"></i>
+        <p>暂无审核结果</p>
+      </div>
+    </ElDrawer>
   </div>
 </template>
 
@@ -178,8 +365,12 @@ import {
   ElMessage,
   ElMessageBox,
   ElNotification,
+  ElDrawer,
+  ElTag,
+  ElSpace,
+  ElCard,
 } from 'element-plus'
-import MediaCard from '@/components/MediaCard.vue'
+import WorkCard from '@/components/WorkCard.vue'
 import PlayVideo from '@/components/PlayVideo.vue'
 import request from '@/utils/request'
 import { buildCoverURL, buildVideoURL, buildAvatarURL } from '@/utils/helper'
@@ -191,6 +382,12 @@ const works = ref([])
 // 编辑模式
 const editMode = ref(false)
 
+// 查看审核结果模式
+const viewReviewMode = ref(false)
+
+// 申诉模式
+const viewAppealMode = ref(false)
+
 // 正在AI审核的作品数量 (status="pending")
 const reviewingWorksCount = ref(0)
 
@@ -198,6 +395,7 @@ const reviewingWorksCount = ref(0)
 const videoPlayerVisible = ref(false)
 const currentVideoUrl = ref('')
 const currentVideoTitle = ref('')
+const currentVideoDescription = ref('')
 
 // 用户信息
 const userInfo = reactive({
@@ -331,6 +529,11 @@ const openUploadDialog = () => {
   uploadModel.description = ''
 
   uploadDialogVisible.value = true
+}
+
+// 打开通知
+const openNotifications = () => {
+  ElMessage.info('通知功能开发中...')
 }
 
 // 上传封面
@@ -551,11 +754,37 @@ const triggerModerationForPendingWorks = async (pendingWorks) => {
 // 进入编辑模式
 const enterEditMode = () => {
   editMode.value = true
+  viewReviewMode.value = false  // 退出查看模式
+  viewAppealMode.value = false  // 退出申诉模式
 }
 
 // 退出编辑模式
 const cancelEditMode = () => {
   editMode.value = false
+}
+
+// 进入查看审核结果模式
+const enterReviewMode = () => {
+  viewReviewMode.value = true
+  editMode.value = false  // 退出编辑模式
+  viewAppealMode.value = false  // 退出申诉模式
+}
+
+// 退出查看审核结果模式
+const exitReviewMode = () => {
+  viewReviewMode.value = false
+}
+
+// 进入申诉模式
+const enterAppealMode = () => {
+  viewAppealMode.value = true
+  editMode.value = false  // 退出编辑模式
+  viewReviewMode.value = false  // 退出查看模式
+}
+
+// 退出申诉模式
+const exitAppealMode = () => {
+  viewAppealMode.value = false
 }
 
 // 删除单个作品
@@ -590,7 +819,145 @@ const handleDeleteWork = (work) => {
 const handlePlayVideo = (work) => {
   currentVideoUrl.value = work.videoUrl
   currentVideoTitle.value = work.title
+  currentVideoDescription.value = work.description || ''
   videoPlayerVisible.value = true
+}
+
+// AI审核结果抽屉
+const reviewDrawerVisible = ref(false)
+const currentReview = ref(null)
+const currentWorkTitle = ref('')  // 当前查看的作品标题
+
+// 判断作品是否已审核（可以查看审核结果）
+const isWorkReviewed = (status) => {
+  return status === 'approved' || status === 'rejected' || status === 'reviewing'
+}
+
+// 判断作品是否可以申诉（被拒绝的作品可以申诉）
+const canAppeal = (status) => {
+  return status === 'rejected' || status === 'manual_rejected'
+}
+
+// 处理查看审核结果
+const handleViewReview = (work) => {
+  fetchReviewResult(work.id, work.title)
+}
+
+// 处理申诉
+const handleAppeal = (work) => {
+  ElMessageBox.prompt(
+    `请输入申诉理由`,
+    `申诉作品"${work.title}"`,
+    {
+      confirmButtonText: '提交申诉',
+      cancelButtonText: '取消',
+      inputType: 'textarea',
+      inputPlaceholder: '请详细说明您的申诉理由...',
+      inputValidator: (value) => {
+        if (!value || value.trim().length === 0) {
+          return '申诉理由不能为空'
+        }
+        if (value.trim().length < 10) {
+          return '申诉理由至少需要10个字符'
+        }
+        return true
+      }
+    }
+  ).then(({ value }) => {
+    // 发送申诉请求
+    request.post('/works/appeal', {
+      workId: work.id,
+      reason: value.trim()
+    }).then((response) => {
+      if (response.data.status === true) {
+        ElMessage.success('申诉提交成功，等待审核')
+        fetchWorks() // 刷新列表
+      } else {
+        ElMessage.error(response.data.message || '申诉提交失败')
+      }
+    }).catch(() => {
+      ElMessage.error('申诉提交失败')
+    })
+  }).catch(() => {
+    // 用户取消申诉
+  })
+}
+
+// 获取审核结果
+const fetchReviewResult = (workId, workTitle) => {
+  const params = new URLSearchParams()
+  params.append('contentId', workId)
+
+  request.get('/moderation/work/result', { params }).then((response) => {
+    if (response.data.status === true) {
+      currentReview.value = response.data.payload.review
+      currentWorkTitle.value = workTitle  // 保存作品标题
+      reviewDrawerVisible.value = true
+    } else {
+      ElMessage.error(response.data.message || '该作品暂无审核结果')
+    }
+  }).catch((error) => {
+    console.error('获取审核结果失败:', error)
+    ElMessage.error('获取审核结果失败')
+  })
+}
+
+// 获取状态类型
+const getStatusType = (status) => {
+  switch (status) {
+    case 'approved':
+      return 'success'
+    case 'rejected':
+      return 'danger'
+    case 'reviewing':
+      return 'warning'
+    default:
+      return 'info'
+  }
+}
+
+// 获取状态文本
+const getStatusText = (status) => {
+  switch (status) {
+    case 'approved':
+      return '通过'
+    case 'rejected':
+      return '拒绝'
+    case 'reviewing':
+      return '人工审核'
+    default:
+      return '未知'
+  }
+}
+
+// 获取审核结果类型
+const getResultType = (result) => {
+  if (result === '通过') return 'success'
+  if (result === '拒绝' || result === '不通过') return 'danger'
+  if (result === '人工审核' || result === '需人工审核') return 'warning'
+  return 'info'
+}
+
+// 获取风险等级类型
+const getRiskType = (riskLevel) => {
+  if (riskLevel === '低') return 'success'
+  if (riskLevel === '中') return 'warning'
+  if (riskLevel === '高') return 'danger'
+  return 'info'
+}
+
+// 格式化日期时间
+const formatDateTime = (dateTime) => {
+  if (!dateTime) return '未知'
+  const date = new Date(dateTime)
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  })
 }
 </script>
 
@@ -613,6 +980,11 @@ const handlePlayVideo = (work) => {
     font-weight: 600;
     color: #303133;
     margin: 0;
+  }
+
+  .header-buttons {
+    display: flex;
+    gap: 0.2rem;
   }
 }
 
@@ -778,5 +1150,16 @@ const handlePlayVideo = (work) => {
 
 .text-success {
   color: #67c23a;
+}
+
+.processing-time {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.time-icon {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 </style>

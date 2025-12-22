@@ -20,11 +20,12 @@
 
     <!-- 作品卡片列表 -->
     <div v-if="works.length > 0" class="works-grid">
-      <MediaCard
+      <WorkCard
         v-for="work in works"
         :key="work.id"
         :cover-url="work.coverUrl"
         :title="work.title"
+        :description="work.description"
         :author="work.author"
         :author-avatar="work.authorAvatar"
         :publish-date="work.publishDate"
@@ -56,6 +57,7 @@
       v-model:visible="videoPlayerVisible"
       :video-url="currentVideoUrl"
       :video-title="currentVideoTitle"
+      :description="currentVideoDescription"
     />
   </div>
 </template>
@@ -70,7 +72,7 @@ import {
   ElPagination,
   ElMessage,
 } from 'element-plus'
-import MediaCard from '@/components/MediaCard.vue'
+import WorkCard from '@/components/WorkCard.vue'
 import PlayVideo from '@/components/PlayVideo.vue'
 import request from '@/utils/request'
 import { buildCoverURL, buildVideoURL, buildAvatarURL } from '@/utils/helper'
@@ -83,6 +85,7 @@ const works = ref([])
 const videoPlayerVisible = ref(false)
 const currentVideoUrl = ref('')
 const currentVideoTitle = ref('')
+const currentVideoDescription = ref('')
 
 // 筛选表单
 const filterModel = reactive({
@@ -136,6 +139,7 @@ watch(
 const handlePlayVideo = (work) => {
   currentVideoUrl.value = work.videoUrl
   currentVideoTitle.value = work.title
+  currentVideoDescription.value = work.description || ''
   videoPlayerVisible.value = true
 }
 </script>

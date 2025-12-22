@@ -1,7 +1,6 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="videoTitle"
     width="70%"
     align-center
     :close-on-click-modal="true"
@@ -9,6 +8,14 @@
     @close="handleClose"
     class="video-dialog"
   >
+    <!-- 自定义标题和描述 -->
+    <template #header>
+      <div class="custom-header">
+        <h3 class="video-title">{{ videoTitle }}</h3>
+        <div v-if="description" class="video-description">{{ description }}</div>
+      </div>
+    </template>
+
     <div class="video-container">
       <video
         v-if="dialogVisible && videoUrl"
@@ -49,6 +56,11 @@ const props = defineProps({
   videoTitle: {
     type: String,
     default: '视频播放'
+  },
+  // 作品描述
+  description: {
+    type: String,
+    default: ''
   }
 })
 
@@ -99,12 +111,51 @@ const handleVideoError = () => {
   }
 
   :deep(.el-dialog__header) {
-    padding: 16px 20px;
+    padding: 20px 24px;
     border-bottom: 1px solid #e4e7ed;
   }
 
   :deep(.el-dialog__body) {
     padding: 0;
+  }
+}
+
+.custom-header {
+  .video-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #303133;
+    line-height: 1.4;
+  }
+
+  .video-description {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #606266;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 120px;
+    overflow-y: auto;
+    padding-right: 8px;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #dcdfe6;
+      border-radius: 2px;
+
+      &:hover {
+        background-color: #c0c4cc;
+      }
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
   }
 }
 
@@ -151,6 +202,22 @@ const handleVideoError = () => {
       width: 95% !important;
       margin: 0 auto;
     }
+
+    :deep(.el-dialog__header) {
+      padding: 16px 20px;
+    }
+  }
+
+  .custom-header {
+    .video-title {
+      font-size: 18px;
+    }
+
+    .video-description {
+      font-size: 13px;
+      margin-top: 10px;
+      max-height: 100px;
+    }
   }
 
   .video-container {
@@ -163,6 +230,24 @@ const handleVideoError = () => {
 }
 
 @media (max-width: 480px) {
+  .video-dialog {
+    :deep(.el-dialog__header) {
+      padding: 14px 16px;
+    }
+  }
+
+  .custom-header {
+    .video-title {
+      font-size: 16px;
+    }
+
+    .video-description {
+      font-size: 12px;
+      margin-top: 8px;
+      max-height: 80px;
+    }
+  }
+
   .video-container {
     min-height: 200px;
 
