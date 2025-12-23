@@ -13,13 +13,10 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * 审核统计报表控制器
- * 提供敏感词审核相关的统计数据接口
- */
+// 审核报表
 @Slf4j
 @RestController
-@RequestMapping("/review-stats")
+@RequestMapping("/reviewlist")
 public class ReviewListController {
 
     private final ContentRepository contentRepository;
@@ -35,10 +32,7 @@ public class ReviewListController {
         this.sensitiveWordRepository = sensitiveWordRepository;
     }
 
-    /**
-     * 获取统计概览数据
-     * 包括：AI共处理违规条数、今日违规未通过条数、待人工审核条数、待处理申诉量、敏感词条数
-     */
+    // 包括：AI共处理违规条数、今日违规未通过条数、待人工审核条数、待处理申诉量、敏感词条数
     @GetMapping("/overview")
     public ResultTemplate getOverview() {
         log.info("获取审核统计概览数据");
@@ -46,14 +40,14 @@ public class ReviewListController {
         try {
             Map<String, Object> overview = new HashMap<>();
 
-            // 1. AI共处理违规条数（auto_review_forworks表中Status为rejected的记录数）
+            // AI共处理违规条数（auto_review_forworks表中Status为rejected的记录数）
             long totalAiViolations = workAutoReviewRepository.findAll().stream()
                     .filter(review -> "rejected".equals(review.getStatus()))
                     .count();
             overview.put("totalViolations", totalAiViolations);
             log.info("AI共处理违规条数: {}", totalAiViolations);
 
-            // 2. 今日违规未通过条数（今天rejected的记录数）
+            // 今日违规未通过条数（今天rejected的记录数）
             LocalDateTime todayStart = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
             LocalDateTime todayEnd = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
 
@@ -62,14 +56,14 @@ public class ReviewListController {
                     .filter(review -> {
                         LocalDateTime reviewedAt = review.getReviewedAt();
                         return reviewedAt != null &&
-                               reviewedAt.isAfter(todayStart) &&
-                               reviewedAt.isBefore(todayEnd);
+                            reviewedAt.isAfter(todayStart) &&
+                            reviewedAt.isBefore(todayEnd);
                     })
                     .count();
             overview.put("todayViolations", todayViolations);
             log.info("今日违规未通过条数: {}", todayViolations);
 
-            // 3. 待人工审核条数（content表中status为reviewing的记录数）
+            // 待人工审核条数（content表中status为reviewing的记录数）
             long pendingReview = contentRepository.findAll().stream()
                     .filter(content -> content.getDeletedAt() == null)
                     .filter(content -> "reviewing".equals(content.getStatus()))
@@ -77,7 +71,7 @@ public class ReviewListController {
             overview.put("pendingReview", pendingReview);
             log.info("待人工审核条数: {}", pendingReview);
 
-            // 4. 待处理申诉量（content表中appealStatus为appealing的记录数）
+            // 待处理申诉量（content表中appealStatus为appealing的记录数）
             long appealCount = contentRepository.findAll().stream()
                     .filter(content -> content.getDeletedAt() == null)
                     .filter(content -> "appealing".equals(content.getAppealStatus()))
@@ -85,7 +79,7 @@ public class ReviewListController {
             overview.put("appealCount", appealCount);
             log.info("待处理申诉量: {}", appealCount);
 
-            // 5. 敏感词条数（sensitive_words表中effective为true的记录数）
+            // 敏感词条数（sensitive_words表中effective为true的记录数）
             long violationTypesCount = sensitiveWordRepository.findAll().stream()
                     .filter(word -> word.getEffective() != null && word.getEffective())
                     .count();
@@ -104,72 +98,74 @@ public class ReviewListController {
         }
     }
 
-    /**
-     * 获取今日违规趋势数据（按小时统计）
-     * 用于柱状图展示
-     */
+// 柱状图展示 - 一周每日违规量
     @GetMapping("/daily-trend")
     public ResultTemplate getDailyTrend() {
-        log.info("获取今日违规趋势数据");
+        log.info("获取一周违规趋势数据");
 
         try {
-            // 初始化24小时数据
-            Map<Integer, Long> hourlyCount = new HashMap<>();
-            for (int i = 0; i < 24; i++) {
-                hourlyCount.put(i, 0L);
+            // 初始化最近7天的数据
+            Map<LocalDate, Long> dailyCount = new LinkedHashMap<>();
+            LocalDate today = LocalDate.now();
+
+            // 从6天前到今天，共7天
+            for (int i = 6; i >= 0; i--) {
+                LocalDate date = today.minusDays(i);
+                dailyCount.put(date, 0L);
             }
 
-            // 获取今天的时间范围
-            LocalDateTime todayStart = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
-            LocalDateTime todayEnd = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+            // 统计最近7天每天的违规数据
+            LocalDateTime weekStart = LocalDateTime.of(today.minusDays(6), LocalTime.MIN);
+            LocalDateTime weekEnd = LocalDateTime.of(today, LocalTime.MAX);
 
-            // 统计今天各小时的违规数据
             workAutoReviewRepository.findAll().stream()
                     .filter(review -> "rejected".equals(review.getStatus()))
                     .filter(review -> {
                         LocalDateTime reviewedAt = review.getReviewedAt();
                         return reviewedAt != null &&
-                               reviewedAt.isAfter(todayStart) &&
-                               reviewedAt.isBefore(todayEnd);
+                                !reviewedAt.isBefore(weekStart) &&
+                                !reviewedAt.isAfter(weekEnd);
                     })
                     .forEach(review -> {
-                        int hour = review.getReviewedAt().getHour();
-                        hourlyCount.put(hour, hourlyCount.get(hour) + 1);
+                        LocalDate date = review.getReviewedAt().toLocalDate();
+                        if (dailyCount.containsKey(date)) {
+                            dailyCount.put(date, dailyCount.get(date) + 1);
+                        }
                     });
 
             // 准备图表数据
-            List<String> hours = new ArrayList<>();
+            List<String> dates = new ArrayList<>();
             List<Long> counts = new ArrayList<>();
-            for (int i = 0; i < 24; i++) {
-                hours.add(String.format("%02d:00", i));
-                counts.add(hourlyCount.get(i));
+
+            for (Map.Entry<LocalDate, Long> entry : dailyCount.entrySet()) {
+                // 格式化日期为 "MM-DD"
+                dates.add(String.format("%02d-%02d",
+                    entry.getKey().getMonthValue(),
+                    entry.getKey().getDayOfMonth()));
+                counts.add(entry.getValue());
             }
 
             Map<String, Object> trendData = new HashMap<>();
-            trendData.put("hours", hours);
+            trendData.put("dates", dates);
             trendData.put("counts", counts);
-            trendData.put("date", LocalDate.now().toString());
 
             ResultTemplate result = new ResultTemplate();
             result.putPayload("dailyTrend", trendData);
 
-            log.info("今日违规趋势数据获取成功 - 总违规数: {}",
+            log.info("一周违规趋势数据获取成功 - 总违规数: {}",
                     counts.stream().mapToLong(Long::longValue).sum());
 
             return result;
 
         } catch (Exception e) {
-            log.error("获取今日违规趋势数据失败", e);
+            log.error("获取一周违规趋势数据失败", e);
             return new ResultTemplate()
                     .setStatus(false)
                     .setMessage("获取趋势数据失败: " + e.getMessage());
         }
     }
 
-    /**
-     * 获取敏感词分类分布数据
-     * 用于饼图展示
-     */
+// 饼图展示
     @GetMapping("/sensitive-words-distribution")
     public ResultTemplate getSensitiveWordsDistribution() {
         log.info("获取敏感词分类分布数据");
@@ -226,10 +222,7 @@ public class ReviewListController {
         }
     }
 
-    /**
-     * 获取所有统计数据（综合接口）
-     * 包括概览、趋势图、分布图的所有数据
-     */
+// 获取所有统计数据
     @GetMapping("/all")
     public ResultTemplate getAllStats() {
         log.info("获取所有审核统计数据");

@@ -13,12 +13,6 @@
           <ElOption label="已拒绝" value="reject" />
         </ElSelect>
       </ElFormItem>
-      <ElFormItem label="审核类型">
-        <ElSelect v-model="filterModel.reviewType" placeholder="请选择" clearable style="width: 150px">
-          <ElOption label="需人工审核" value="first_review" />
-          <ElOption label="申诉中" value="appeal_review" />
-        </ElSelect>
-      </ElFormItem>
       <ElFormItem label="审核人">
         <ElSelect
           v-model="filterModel.reviewerName"
@@ -47,7 +41,6 @@
       </ElFormItem>
       <ElFormItem>
         <ElButton native-type="submit" type="primary">搜索</ElButton>
-        <ElButton @click="handleReset">重置</ElButton>
       </ElFormItem>
     </ElForm>
 
@@ -84,15 +77,8 @@
           <span v-else style="color: #999;">无</span>
         </template>
       </ElTableColumn>
-      <ElTableColumn prop="reviewType" label="审核类型" width="120">
-        <template #default="{ row }">
-          <ElTag v-if="row.reviewType === 'first_review'" type="info">初次审核</ElTag>
-          <ElTag v-else-if="row.reviewType === 'appeal_review'" type="warning">申诉审核</ElTag>
-          <ElTag v-else>未知</ElTag>
-        </template>
-      </ElTableColumn>
       <ElTableColumn prop="reviewedAt" label="审核时间" width="180" />
-      <ElTableColumn label="操作" width="200" header-align="center">
+      <ElTableColumn label="操作" width="260" header-align="center">
         <template #default="{ row }">
           <ElButton
             type="primary"
@@ -104,6 +90,16 @@
             size="small"
             @click="viewAIReview(row)"
           >查看AI审核</ElButton>
+          <ElPopconfirm
+            title="确认删除该审核记录吗？"
+            confirm-button-text="确定"
+            cancel-button-text="取消"
+            @confirm="handleDelete(row)"
+          >
+            <template #reference>
+              <ElButton type="danger" size="small">删除</ElButton>
+            </template>
+          </ElPopconfirm>
         </template>
       </ElTableColumn>
     </ElTable>
@@ -131,6 +127,7 @@
       v-model:visible="videoPlayerVisible"
       :video-url="currentVideoUrl"
       :video-title="currentVideoTitle"
+      :description="currentVideoDescription"
     />
   </div>
 </template>
@@ -148,7 +145,8 @@ import {
   ElTableColumn,
   ElTag,
   ElPagination,
-  ElMessage
+  ElMessage,
+  ElPopconfirm
 } from 'element-plus'
 import AIreviewCard from '@/components/AIreviewCard.vue'
 import PlayVideo from '@/components/PlayVideo.vue'
@@ -165,7 +163,6 @@ const adminList = ref([])
 // 筛选表单
 const filterModel = reactive({
   decision: '',
-  reviewType: '',
   reviewerName: '',
   reviewDate: null
 })
@@ -185,10 +182,6 @@ const fetch = () => {
 
   if (filterModel.decision) {
     params.append('decision', filterModel.decision)
-  }
-
-  if (filterModel.reviewType) {
-    params.append('reviewType', filterModel.reviewType)
   }
 
   if (filterModel.reviewerName) {
@@ -238,16 +231,6 @@ const handleSearch = () => {
   fetch()
 }
 
-// 重置事件
-const handleReset = () => {
-  filterModel.decision = ''
-  filterModel.reviewType = ''
-  filterModel.reviewerName = ''
-  filterModel.reviewDate = null
-  pagination.currentPage = 1
-  fetch()
-}
-
 // AI审核详情抽屉
 const reviewDrawerVisible = ref(false)
 const currentReview = ref(null)
@@ -257,6 +240,7 @@ const currentWorkTitle = ref('')
 const videoPlayerVisible = ref(false)
 const currentVideoUrl = ref('')
 const currentVideoTitle = ref('')
+const currentVideoDescription = ref('')
 
 // 查看AI审核详情
 const viewAIReview = (row) => {
@@ -293,6 +277,7 @@ const viewWork = (row) => {
       if (work.videoUrl) {
         currentVideoUrl.value = buildVideoURL(work.videoUrl)
         currentVideoTitle.value = work.title
+        currentVideoDescription.value = work.description || ''
         videoPlayerVisible.value = true
       } else {
         ElMessage.warning('查看该作品视频不存在')
@@ -302,6 +287,20 @@ const viewWork = (row) => {
     }
   }).catch(() => {
     ElMessage.error('获取查看作品详情失败')
+  })
+}
+
+// 删除审核记录
+const handleDelete = (row) => {
+  request.post('/manual-review/records/remove', { id: row.id }).then((response) => {
+    if (response.data.status === true) {
+      fetch()
+      ElMessage.success('删除成功！')
+    } else {
+      ElMessage.error(response.data.message || '删除失败！')
+    }
+  }).catch(() => {
+    ElMessage.error('删除失败！')
   })
 }
 </script>

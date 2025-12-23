@@ -7,9 +7,9 @@
       <ElFormItem prop="category" label="分类" style="width: 12rem">
         <ElSelect v-model="filterModel.category" placeholder="全部" clearable>
           <ElOption label="政治敏感" value="political" />
-          <ElOption label="色情低俗" value="pornographic" />
-          <ElOption label="暴力恐怖" value="violent" />
-          <ElOption label="违法犯罪" value="illegal" />
+          <ElOption label="色情低俗" value="porn" />
+          <ElOption label="暴力恐怖" value="violence" />
+          <ElOption label="垃圾邮件" value="spam_mail" />
           <ElOption label="广告营销" value="advertising" />
           <ElOption label="其他" value="other" />
         </ElSelect>
@@ -31,9 +31,9 @@
       <ElTableColumn prop="category" label="分类" width="150">
         <template #default="{ row }">
           <ElTag v-if="row.category === 'political'" type="danger">政治敏感</ElTag>
-          <ElTag v-else-if="row.category === 'pornographic'" type="warning">色情低俗</ElTag>
-          <ElTag v-else-if="row.category === 'violent'" type="danger">暴力恐怖</ElTag>
-          <ElTag v-else-if="row.category === 'illegal'" type="danger">违法犯罪</ElTag>
+          <ElTag v-else-if="row.category === 'porn'" type="warning">色情低俗</ElTag>
+          <ElTag v-else-if="row.category === 'violence'" type="danger">暴力恐怖</ElTag>
+          <ElTag v-else-if="row.category === 'spam_mail'" type="danger">垃圾邮件</ElTag>
           <ElTag v-else-if="row.category === 'advertising'" type="info">广告营销</ElTag>
           <ElTag v-else>其他</ElTag>
         </template>
@@ -97,9 +97,9 @@
       <ElFormItem prop="category" label="分类">
         <ElSelect v-model="editModel.category" placeholder="请选择分类" style="width: 100%;">
           <ElOption label="政治敏感" value="political" />
-          <ElOption label="色情低俗" value="pornographic" />
-          <ElOption label="暴力恐怖" value="violent" />
-          <ElOption label="违法犯罪" value="illegal" />
+          <ElOption label="色情低俗" value="porn" />
+          <ElOption label="暴力恐怖" value="violence" />
+          <ElOption label="垃圾邮件" value="spam_mail" />
           <ElOption label="广告营销" value="advertising" />
           <ElOption label="其他" value="other" />
         </ElSelect>

@@ -29,7 +29,7 @@ public class ContentEntity {
     private Location location; // 用户地理位置
 
     @Indexed
-    private String status; // 审核状态: pending(待审核)/approved(已通过)/rejected(已驳回)
+    private String status; // 审核状态: pending(待审核)/approved(已通过)/rejected(已驳回)/appealing(申诉中)
     private String appealStatus = "none"; // 申诉状态: none(未申诉)/appealing(申诉中)/approved(申诉通过)/rejected(申诉驳回)
     private Integer violationCount = 0; // 累计违规次数
     private LocalDateTime createdAt;

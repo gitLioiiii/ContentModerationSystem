@@ -23,6 +23,9 @@ public interface WorksService {
     // 删除作品
     Integer remove(ContentEntity content);
 
+    // 更新作品
+    Integer update(ContentEntity content);
+
     // 获取所有用户的审核通过作品列表（发现页面）
     List<ContentEntity> fetchDiscoverWorks(Map<String, Object> filter);
 

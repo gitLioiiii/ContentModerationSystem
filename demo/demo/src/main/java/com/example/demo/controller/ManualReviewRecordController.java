@@ -67,6 +67,7 @@ public class ManualReviewRecordController {
             // 转换为前端所需的格式
             List<Map<String, Object>> recordList = recordPage.getContent().stream().map(record -> {
                 Map<String, Object> item = new HashMap<>();
+                item.put("id", record.getId()); // 添加ID字段用于删除
                 item.put("contentId", record.getContentId());
                 item.put("workTitle", record.getWorkTitle());
                 item.put("username", record.getUsername());
@@ -130,6 +131,38 @@ public class ManualReviewRecordController {
             return new ResultTemplate()
                     .setStatus(false)
                     .setMessage("获取管理员列表失败: " + e.getMessage());
+        }
+    }
+
+    // 删除审核记录（硬删除）
+    @PostMapping("/records/remove")
+    public ResultTemplate deleteRecord(@RequestBody Map<String, String> request) {
+        String id = request.get("id");
+        log.info("删除审核记录 - ID: {}", id);
+
+        try {
+            // 查询审核记录是否存在
+            Optional<ManualReviewEntity> recordOpt = manualReviewService.findById(id);
+            if (!recordOpt.isPresent()) {
+                log.warn("审核记录不存在 - ID: {}", id);
+                return new ResultTemplate()
+                        .setStatus(false)
+                        .setMessage("审核记录不存在");
+            }
+
+            // 硬删除审核记录
+            manualReviewService.deleteById(id);
+
+            log.info("成功删除审核记录 - ID: {}", id);
+            return new ResultTemplate()
+                    .setStatus(true)
+                    .setMessage("删除成功");
+
+        } catch (Exception e) {
+            log.error("删除审核记录失败 - ID: {}", id, e);
+            return new ResultTemplate()
+                    .setStatus(false)
+                    .setMessage("删除失败: " + e.getMessage());
         }
     }
 }

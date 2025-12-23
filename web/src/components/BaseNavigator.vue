@@ -54,7 +54,7 @@
 
         <!-- AI审核 -->
         <ElSubMenu index="text">
-          <template #title><i class="bi bi-check-circle menu-icon"></i><span v-if="!sidebarCollapsed">自动审核</span></template>
+          <template #title><i class="bi bi-anthropic menu-icon"></i><span v-if="!sidebarCollapsed">自动审核</span></template>
           <ElMenuItem index="text" :route="{ name: 'text' }" class="sub-menu-item">
             <i class="bi bi-fonts menu-icon"></i>
             <span v-if="!sidebarCollapsed">文本审核</span>
@@ -80,15 +80,11 @@
             <i class="bi bi-list-ul menu-icon"></i>
             <span v-if="!sidebarCollapsed">待审核队列</span>
           </ElMenuItem>
-          <!-- <ElMenuItem index="operation" :route="{ name: 'operation' }" class="sub-menu-item">
-            <i class="bi bi-check-square menu-icon"></i>
-            <span v-if="!sidebarCollapsed">审核操作</span>
-          </ElMenuItem> -->
         </ElSubMenu>
 
         <!-- 规则管理 -->
         <ElSubMenu index="sensitive">
-          <template #title><i class="bi bi-gear menu-icon"></i><span v-if="!sidebarCollapsed">规则管理</span></template>
+          <template #title><i class="bi bi-bookmark menu-icon"></i><span v-if="!sidebarCollapsed">规则管理</span></template>
           <ElMenuItem index="list" :route="{ name: 'list' }" class="sub-menu-item">
               <i class="bi bi-file-earmark-text menu-icon"></i>
               <span v-if="!sidebarCollapsed">审核报表</span>

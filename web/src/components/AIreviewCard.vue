@@ -16,14 +16,14 @@
       <ElSpace direction="vertical" alignment="normal" :fill="true" style="width: 100%">
         <!-- 总体审核结果 -->
         <ElCard class="review-card review-card-summary" shadow="hover" :body-style="{ backgroundColor: '#e3f2fd' }">
-          <h3 class="section-title">作品《{{ workTitle }}》审核结果为
+          <h3 class="section-title">作品《{{ workTitle }}》的AI审核结果为
             <ElTag :type="getStatusType(reviewData.Status)" size="large">
               {{ getStatusText(reviewData.Status) }}
             </ElTag>
           </h3>
           <div class="processing-time">
             <img src="@/assets/img/时间.png" alt="时间" class="time-icon" />
-            审核时长: {{ reviewData.finalProcessingTime }}秒
+            AI审核时长: {{ reviewData.finalProcessingTime }}秒
           </div>
         </ElCard>
 
@@ -205,7 +205,7 @@ const handleClose = () => {
   emit('update:visible', false)
 }
 
-// 获取状态类型
+// 获取状态类型（包含所有状态）
 const getStatusType = (status) => {
   switch (status) {
     case 'approved':
@@ -223,13 +223,13 @@ const getStatusType = (status) => {
 const getStatusText = (status) => {
   switch (status) {
     case 'approved':
-      return '通过'
+      return '已通过'
     case 'rejected':
-      return '拒绝'
+      return '已拒绝'
     case 'reviewing':
-      return '人工审核'
+      return '待审核'
     default:
-      return '未知'
+      return '未知状态'
   }
 }
 

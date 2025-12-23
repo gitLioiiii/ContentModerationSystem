@@ -157,6 +157,10 @@ db.runCommand({
           enum: ["pending", "approved", "rejected", "reviewing", "manual_rejected", "appealing", "appeal_rejected"],
           description: "审核状态 pending:待AI审核/approved:审核通过/rejected:AI审核不通过/reviewing:人工审核中/manual_rejected:人工审核不通过/appealing:申诉中/appeal_rejected:申诉驳回"
         },
+        appealStatus: {
+          enum: ["none", "appealing", "approved", "rejected"],
+          description: "申诉状态 none:未申诉/appealing:申诉中/approved:申诉通过/rejected:申诉驳回"
+        },
         violationCount: {
           bsonType: "int",
           minimum: 0,

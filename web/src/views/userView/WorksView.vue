@@ -3,10 +3,6 @@
     <div class="header-section">
       <h2 class="page-title">我的作品</h2>
       <div class="header-buttons">
-        <ElButton type="primary" @click="openNotifications">
-          <i class="bi bi-reply menu-icon"></i>
-          通知
-        </ElButton>
         <ElButton type="primary" @click="openUploadDialog">
           <i class="bi bi-brush menu-icon"></i>
           发布作品
@@ -28,7 +24,7 @@
           <ElOption label="全部" value="" />
           <ElOption label="审核通过" value="approved" />
           <ElOption label="人工审核中" value="reviewing" />
-          <ElOption label="AI审核不通过" value="rejected" />
+          <ElOption label="审核不通过" value="rejected" />
           <ElOption label="人工审核不通过" value="manual_rejected" />
           <ElOption label="申诉中" value="appealing" />
           <ElOption label="申诉驳回" value="appeal_rejected" />
@@ -364,11 +360,11 @@ import {
   ElDialog,
   ElMessage,
   ElMessageBox,
-  ElNotification,
   ElDrawer,
   ElTag,
   ElSpace,
   ElCard,
+  ElNotification
 } from 'element-plus'
 import WorkCard from '@/components/WorkCard.vue'
 import PlayVideo from '@/components/PlayVideo.vue'
@@ -531,10 +527,6 @@ const openUploadDialog = () => {
   uploadDialogVisible.value = true
 }
 
-// 打开通知
-const openNotifications = () => {
-  ElMessage.info('通知功能开发中...')
-}
 
 // 上传封面
 const uploadCover = () => {
@@ -835,7 +827,7 @@ const isWorkReviewed = (status) => {
 
 // 判断作品是否可以申诉（被拒绝的作品可以申诉）
 const canAppeal = (status) => {
-  return status === 'rejected' || status === 'manual_rejected'
+  return status === 'rejected' || status === 'manual_rejected' || status === 'appeal_rejected'
 }
 
 // 处理查看审核结果
@@ -857,26 +849,29 @@ const handleAppeal = (work) => {
         if (!value || value.trim().length === 0) {
           return '申诉理由不能为空'
         }
-        if (value.trim().length < 10) {
-          return '申诉理由至少需要10个字符'
-        }
         return true
       }
     }
   ).then(({ value }) => {
     // 发送申诉请求
-    request.post('/works/appeal', {
+    const appealData = {
       workId: work.id,
       reason: value.trim()
-    }).then((response) => {
+    }
+
+    console.log('提交申诉数据:', appealData)
+
+    request.post('/works/appeal', appealData).then((response) => {
+      console.log('申诉响应:', response.data)
       if (response.data.status === true) {
         ElMessage.success('申诉提交成功，等待审核')
         fetchWorks() // 刷新列表
       } else {
         ElMessage.error(response.data.message || '申诉提交失败')
       }
-    }).catch(() => {
-      ElMessage.error('申诉提交失败')
+    }).catch((error) => {
+      console.error('申诉提交错误:', error)
+      ElMessage.error('申诉提交失败: ' + (error.response?.data?.message || error.message || '网络错误'))
     })
   }).catch(() => {
     // 用户取消申诉

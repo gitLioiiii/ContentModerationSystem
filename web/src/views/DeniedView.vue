@@ -12,6 +12,7 @@
                 <li><strong>数据库：</strong>MogonDB</li>
             </ul>
             <p class="italic text-sm mt-2">头像，图片，视频抽帧保存目录：D:\Project\upload</p>
+            <p class="italic text-sm mt-2">qwen3-vl:235b-cloud云端token显示 https://ollama.com/settings</p>
         </div>
         <time class="mt-2 block text-indigo-500 " datetime="9:37" >2025年12月20日</time>
     </div>

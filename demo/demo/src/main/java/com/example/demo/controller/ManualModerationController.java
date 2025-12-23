@@ -61,12 +61,17 @@ public class ManualModerationController {
 
             // 根据状态筛选
             if (status != null && !status.isEmpty()) {
-                // 如果前端传的是"pending"，则查询"reviewing"状态
-                String dbStatus = "pending".equals(status) ? "reviewing" : status;
-                contentPage = contentRepository.findByStatusAndDeletedAtIsNull(dbStatus, pageable);
+                // 如果前端传的是"pending"，则查询"reviewing"和"appealing"状态（待审核和申诉中）
+                if ("pending".equals(status)) {
+                    List<String> statuses = Arrays.asList("reviewing", "appealing");
+                    contentPage = contentRepository.findByStatusInAndDeletedAtIsNull(statuses, pageable);
+                } else {
+                    contentPage = contentRepository.findByStatusAndDeletedAtIsNull(status, pageable);
+                }
             } else {
-                // 默认查询状态为"reviewing"的作品（需要人工审核）
-                contentPage = contentRepository.findByStatusAndDeletedAtIsNull("reviewing", pageable);
+                // 默认查询状态为"reviewing"和"appealing"的作品（需要人工审核和申诉中）
+                List<String> statuses = Arrays.asList("reviewing", "appealing");
+                contentPage = contentRepository.findByStatusInAndDeletedAtIsNull(statuses, pageable);
             }
 
             // 转换为前端所需的格式
@@ -87,19 +92,29 @@ public class ManualModerationController {
                     item.put("manualReviewTriggeredAt", null);
                 }
 
-                // 查询人工审核记录
-                Optional<ManualReviewEntity> manualReviewOpt = manualReviewService.findLatestByContentId(content.getId());
-                if (manualReviewOpt.isPresent()) {
-                    ManualReviewEntity manualReview = manualReviewOpt.get();
-                    item.put("reviewCompletedAt", manualReview.getReviewedAt());
-                    item.put("reviewerName", manualReview.getReviewerName()); // 添加审核员姓名
+                // 查询初次人工审核记录（first_review）
+                Optional<ManualReviewEntity> firstReviewOpt = manualReviewService.findLatestByContentIdAndReviewType(content.getId(), "first_review");
+                if (firstReviewOpt.isPresent()) {
+                    ManualReviewEntity firstReview = firstReviewOpt.get();
+                    item.put("reviewCompletedAt", firstReview.getReviewedAt());
+                    item.put("reviewerName", firstReview.getReviewerName()); // 审核员姓名
+                    item.put("reviewReason", firstReview.getReason()); // 初次审核理由
                 } else {
                     item.put("reviewCompletedAt", null);
                     item.put("reviewerName", null);
+                    item.put("reviewReason", null);
                 }
 
-                // 申诉时间（暂时为null，后续可扩展）
-                item.put("appealedAt", null);
+                // 申诉信息（从 manual_review 表查询 appeal_review）
+                Optional<ManualReviewEntity> appealReviewOpt = manualReviewService.findLatestByContentIdAndReviewType(content.getId(), "appeal_review");
+                if (appealReviewOpt.isPresent()) {
+                    ManualReviewEntity appealReview = appealReviewOpt.get();
+                    item.put("appealReason", appealReview.getReason()); // 申诉理由
+                    item.put("appealedAt", appealReview.getReviewedAt()); // 申诉时间
+                } else {
+                    item.put("appealReason", null);
+                    item.put("appealedAt", null);
+                }
 
                 // 状态映射（将数据库状态映射为前端显示状态）
                 String displayStatus = mapContentStatus(content.getStatus());
@@ -210,6 +225,8 @@ public class ManualModerationController {
                 return "pending";
             case "reviewing":
                 return "pending";  // reviewing状态在前端显示为pending（待人工审核）
+            case "appealing":
+                return "appealed";  // appealing状态在前端显示为appealed（有用户申诉）
             case "approved":
                 return "approved";
             case "rejected":

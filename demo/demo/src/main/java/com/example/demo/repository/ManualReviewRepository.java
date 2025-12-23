@@ -23,4 +23,7 @@ public interface ManualReviewRepository extends MongoRepository<ManualReviewEnti
 
     // 根据作品ID查询最新的审核记录
     Optional<ManualReviewEntity> findFirstByContentIdOrderByReviewedAtDesc(String contentId);
+
+    // 根据作品ID和审核类型查询最新的审核记录
+    Optional<ManualReviewEntity> findFirstByContentIdAndReviewTypeOrderByReviewedAtDesc(String contentId, String reviewType);
 }

@@ -36,4 +36,8 @@ public interface ContentRepository extends MongoRepository<ContentEntity, String
     // 根据关键字查询所有审核通过且未删除的作品（发现页面）
     @Query("{ 'status': ?0, 'deletedAt': null, 'title': {$regex: ?1, $options: 'i'} }")
     Page<ContentEntity> findByStatusAndKeywords(String status, String keywords, Pageable pageable);
+
+    // 查询多个状态的作品（用于审核队列，包含 reviewing 和 appealing）
+    @Query("{ 'status': {$in: ?0}, 'deletedAt': null }")
+    Page<ContentEntity> findByStatusInAndDeletedAtIsNull(java.util.List<String> statuses, Pageable pageable);
 }

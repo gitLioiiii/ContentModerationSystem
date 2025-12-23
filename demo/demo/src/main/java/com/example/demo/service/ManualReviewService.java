@@ -25,6 +25,9 @@ public interface ManualReviewService {
     // 根据作品ID查询最新的审核记录
     Optional<ManualReviewEntity> findLatestByContentId(String contentId);
 
+    // 根据作品ID和审核类型查询最新的审核记录
+    Optional<ManualReviewEntity> findLatestByContentIdAndReviewType(String contentId, String reviewType);
+
     // 根据多个条件筛选审核记录（分页）
     Page<ManualReviewEntity> findByFilters(
             String decision,
@@ -32,4 +35,10 @@ public interface ManualReviewService {
             String reviewerName,
             LocalDate reviewDate,
             Pageable pageable);
+
+    // 根据ID查询审核记录
+    Optional<ManualReviewEntity> findById(String id);
+
+    // 根据ID删除审核记录（硬删除）
+    void deleteById(String id);
 }

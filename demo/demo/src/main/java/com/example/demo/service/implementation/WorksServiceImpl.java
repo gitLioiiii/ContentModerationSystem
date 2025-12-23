@@ -114,6 +114,12 @@ public class WorksServiceImpl implements WorksService {
         return savedContent.getId() != null ? 1 : 0;
     }
 
+    @Override
+    public Integer update(ContentEntity content) {
+        ContentEntity savedContent = this.contentRepository.save(content);
+        return savedContent.getId() != null ? 1 : 0;
+    }
+
     // (发现页面)
     @Override
     public List<ContentEntity> fetchDiscoverWorks(Map<String, Object> filter) {

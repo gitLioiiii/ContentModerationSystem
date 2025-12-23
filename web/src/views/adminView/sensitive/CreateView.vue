@@ -6,9 +6,9 @@
         <ElFormItem prop="category" label="分类">
             <ElSelect v-model="model.category" placeholder="请选择分类" style="width: 100%;">
                 <ElOption label="政治敏感" value="political" />
-                <ElOption label="色情低俗" value="pornographic" />
-                <ElOption label="暴力恐怖" value="violent" />
-                <ElOption label="违法犯罪" value="illegal" />
+                <ElOption label="色情低俗" value="porn" />
+                <ElOption label="暴力恐怖" value="violence" />
+                <ElOption label="垃圾邮件" value="spam_mail" />
                 <ElOption label="广告营销" value="advertising" />
                 <ElOption label="其他" value="other" />
             </ElSelect>

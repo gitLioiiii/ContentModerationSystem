@@ -1,46 +1,35 @@
 <template>
   <div class="review-report">
-    <!-- 统计卡片区域 -->
     <div class="Cardview">
       <ElCard shadow="hover">
-        <i class="bi bi-exclamation-triangle card-icon"></i>
-        <!-- 所有 -->
         <div>Ai共处理违规条数</div>
         <div>{{ totalViolations }}</div>
       </ElCard>
       <ElCard shadow="hover">
-        <i class="bi bi-calendar-day card-icon"></i>
-        <!-- 今日 -->
         <div>今日违规未通过条数</div>
         <div>{{ todayViolations }}</div>
       </ElCard>
       <ElCard shadow="hover">
-        <i class="bi bi-hourglass-split card-icon"></i>
-        <!-- 需人工审核 -->
         <div>待人工审核条数</div>
         <div>{{ pendingReview }}</div>
       </ElCard>
       <ElCard shadow="hover">
-        <i class="bi bi-envelope-exclamation card-icon"></i>
-        <!-- 需要处理申诉 -->
         <div>待处理申诉量</div>
         <div>{{ appealCount }}</div>
       </ElCard>
       <ElCard shadow="hover">
-        <i class="bi bi-tags card-icon"></i>
         <div>敏感词条数</div>
         <div>{{ violationTypesCount }}</div>
       </ElCard>
     </div>
 
-    <!-- ECHARTS图表区域 -->
     <div class="chart-container">
       <div class="chart-view">
-        <!-- 今日违规条数柱状图 -->
+        <!-- 柱状图 -->
         <div id="daily-chart"></div>
       </div>
       <div class="chart-view">
-        <!-- 敏感词修改饼图 -->
+        <!-- 饼图 -->
         <div id="type-chart"></div>
       </div>
     </div>
@@ -76,8 +65,7 @@ onMounted(() => {
 
 const fetchAllStats = async () => {
   try {
-    // 调用综合统计接口
-    const response = await request.get('/review-stats/all')
+    const response = await request.get('/reviewlist/all')
 
     if (response.data.status === true) {
       const data = response.data.payload
@@ -109,15 +97,14 @@ const fetchAllStats = async () => {
 }
 
 
-// 更新今日违规趋势图（按小时统计）
+// 更新一周违规趋势图（按日期统计）
 const updateDailyChart = (trendData) => {
-  const hours = trendData.hours
+  const dates = trendData.dates
   const counts = trendData.counts
-  const todayDate = new Date().toLocaleDateString('zh-CN')
 
   dailyChart.setOption({
     title: {
-      text: `今日违规趋势（${todayDate}）`,
+      text: `一周违规趋势`,
       left: 'center',
       textStyle: {
         fontSize: 16,
@@ -139,11 +126,10 @@ const updateDailyChart = (trendData) => {
     },
     xAxis: {
       type: 'category',
-      data: hours,
+      data: dates,
       axisLabel: {
         fontSize: 11,
-        rotate: 45,
-        interval: 1
+        rotate: 0
       },
       axisTick: {
         alignWithLabel: true
@@ -170,20 +156,14 @@ const updateDailyChart = (trendData) => {
         name: '违规数',
         type: 'bar',
         data: counts,
-        barMaxWidth: 30,
+        barMaxWidth: 40,
         itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#FF6B6B' },
-            { offset: 1, color: '#FFB3B3' }
-          ]),
+          color: '#C3E7FE',
           borderRadius: [6, 6, 0, 0]
         },
         emphasis: {
           itemStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#FF4040' },
-              { offset: 1, color: '#FF8888' }
-            ])
+            color: '#89E9E0'
           }
         },
         label: {
@@ -205,7 +185,7 @@ const updateTypeChart = (distributionData) => {
 
   typeChart.setOption({
     title: {
-      text: `敏感词分类分布（总计: ${totalWords}个）`,
+      text: `敏感词分类分布（已启用: ${totalWords}个）`,
       left: 'center',
       textStyle: {
         fontSize: 16,
@@ -251,7 +231,7 @@ const updateTypeChart = (distributionData) => {
           }
         },
         data: data,
-        color: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F']
+        color: ['#C3E7FE', '#A8E6CF', '#FFD3B6', '#FFAAA5', '#B5A8E6', '#FFF4A3']
       }
     ]
   })
@@ -321,64 +301,11 @@ function handleResize() {
   color: #333;
 }
 
-.card-icon {
-  font-size: 40px;
-}
-
-.Cardview :deep(.el-card:nth-child(1)) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: transparent;
-  color: white;
-}
-
-.Cardview :deep(.el-card:nth-child(1) .el-card__body > div),
-.Cardview :deep(.el-card:nth-child(1) .card-icon) {
-  color: white !important;
-}
-
-.Cardview :deep(.el-card:nth-child(2)) {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  border-color: transparent;
-  color: white;
-}
-
-.Cardview :deep(.el-card:nth-child(2) .el-card__body > div),
-.Cardview :deep(.el-card:nth-child(2) .card-icon) {
-  color: white !important;
-}
-
-.Cardview :deep(.el-card:nth-child(3)) {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-  border-color: transparent;
-  color: white;
-}
-
-.Cardview :deep(.el-card:nth-child(3) .el-card__body > div),
-.Cardview :deep(.el-card:nth-child(3) .card-icon) {
-  color: white !important;
-}
-
-.Cardview :deep(.el-card:nth-child(4)) {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  border-color: transparent;
-  color: white;
-}
-
-.Cardview :deep(.el-card:nth-child(4) .el-card__body > div),
-.Cardview :deep(.el-card:nth-child(4) .card-icon) {
-  color: white !important;
-}
-
-.Cardview :deep(.el-card:nth-child(5)) {
-  background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-  border-color: transparent;
-  color: white;
-}
-
-.Cardview :deep(.el-card:nth-child(5) .el-card__body > div),
-.Cardview :deep(.el-card:nth-child(5) .card-icon) {
-  color: white !important;
-}
+.Cardview :deep(.el-card:nth-child(1)) { background: #F3F8FF; border-color: transparent; }
+.Cardview :deep(.el-card:nth-child(2)) { background: #F5FFF7; border-color: transparent; }
+.Cardview :deep(.el-card:nth-child(3)) { background: #FFF7F5; border-color: transparent; }
+.Cardview :deep(.el-card:nth-child(4)) { background: #F9F5FF; border-color: transparent; }
+.Cardview :deep(.el-card:nth-child(5)) { background: #FFFDF5; border-color: transparent; }
 
 .chart-container {
   display: flex;
