@@ -51,7 +51,7 @@ public class VideoModerationController {
                 frameInterval);
 
         try {
-            // ==== 第一步：保存上传的视频文件 ====
+            // 第一步：保存上传的视频文件
             File videoDir = new File(uploadRoot + File.separator + "ai-videos");
             if (!videoDir.exists()) {
                 videoDir.mkdirs();
@@ -75,7 +75,7 @@ public class VideoModerationController {
             }
             log.info("视频文件大小: {} MB", savedVideoFile.length() / (1024.0 * 1024.0));
 
-            // ==== 第二步：从视频中提取关键帧 ====
+            // 从视频中提取关键帧
             log.info("开始抽取视频帧...");
 
             // 准备帧存储目录（统一由控制器管理路径）
@@ -98,7 +98,7 @@ public class VideoModerationController {
                     .setMessage("视频抽帧失败，未能提取到任何帧");
             }
 
-            // ==== 第三步：并行对每一帧进行AI审核 ====
+            // 并行对每一帧进行AI审核
             log.info("开始并行审核 {} 帧图片...", totalFrames);
 
             // 创建异步任务列表

@@ -1,7 +1,7 @@
 <template>
   <!-- AI审核结果抽屉 -->
   <ElDrawer
-    v-model="visible"
+    v-model="drawerVisible"
     :with-header="true"
     :z-index="100"
     direction="rtl"
@@ -165,17 +165,12 @@
 
 <script setup>
 import { computed } from 'vue'
-import {
-  ElDrawer,
-  ElTag,
-  ElSpace,
-  ElCard,
-} from 'element-plus'
+import { ElDrawer, ElTag, ElSpace, ElCard, } from 'element-plus'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 // Props
 const props = defineProps({
-  visible: {
+  drawerVisible: {
     type: Boolean,
     default: false
   },
@@ -189,18 +184,15 @@ const props = defineProps({
   }
 })
 
-// Emits
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['update:drawerVisible'])
 
-// Computed
-const visible = computed({
-  get: () => props.visible,
-  set: (value) => emit('update:visible', value)
+const drawerVisible = computed({
+  get: () => props.drawerVisible, // 从父组件获取 drawerVisible 的值
+  set: (value) => emit('update:drawerVisible', value) // 当值改变时，通知父组件更新
 })
 
-// Methods
 const handleClose = () => {
-  emit('update:visible', false)
+  emit('update:drawerVisible', false)
 }
 
 // 获取状态类型（包含所有状态）

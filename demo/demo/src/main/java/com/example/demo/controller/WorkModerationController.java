@@ -58,7 +58,6 @@ public class WorkModerationController {
         long startTime = System.currentTimeMillis();
 
         try {
-            // ----- 第一步：查询作品信息 -----
             Optional<ContentEntity> contentOpt = contentRepository.findByIdAndDeletedAtIsNull(contentId);
             if (!contentOpt.isPresent()) {
                 log.error("作品不存在或已删除: {}", contentId);
@@ -70,7 +69,7 @@ public class WorkModerationController {
             ContentEntity content = contentOpt.get();
             log.info("开始审核作品 - 标题: {}, 用户: {}", content.getTitle(), content.getAuthor());
 
-            // ----- 第二步：对（标题+描述）进行文本审核-----
+            //文本审核
             log.info("开始文本审核...");
             long textStartTime = System.currentTimeMillis();
 
@@ -87,7 +86,7 @@ public class WorkModerationController {
             log.info("文本审核完成 - 结果: {}, 风险等级: {}, 耗时: {}ms",
                     textResponse.getResult(), textResponse.getRiskLevel(), textProcessingTime);
 
-            // -----第三步：对封面图片进行审核-----
+            //对封面审核
             WorkAutoReviewEntity.ImageReview imageReview = null;
             if (content.getCoverUrl() != null && !content.getCoverUrl().isEmpty()) {
                 log.info("开始封面图片审核...");
@@ -108,7 +107,7 @@ public class WorkModerationController {
                     log.info("封面审核完成 - 结果: {}, 匹配分数: {}, 耗时: {}ms",
                             imageResponse.getResult(), imageResponse.getMatchScore(), imageProcessingTime);
 
-                    // 构建图片审核结果
+                    // 图片审核结果
                     imageReview = new WorkAutoReviewEntity.ImageReview();
                     imageReview.setResult(imageResponse.getResult());
                     imageReview.setReason(imageResponse.getReason());
@@ -119,7 +118,7 @@ public class WorkModerationController {
                 }
             }
 
-            // ---- 第四步：对视频进行抽帧审核 ------
+            //视频进行抽帧
             WorkAutoReviewEntity.VideoReview videoReview = null;
             if (content.getVideoUrl() != null && !content.getVideoUrl().isEmpty()) {
                 log.info("开始视频审核...");
@@ -239,8 +238,8 @@ public class WorkModerationController {
                 }
             }
 
-            // --- 第五步：聚合审核结果 ----
-            log.info("开始聚合审核结果...");
+            // 全部审核结果
+            log.info("全部审核结果...");
 
             // 构建文本审核结果
             WorkAutoReviewEntity.TextReview textReview = new WorkAutoReviewEntity.TextReview();
@@ -284,11 +283,11 @@ public class WorkModerationController {
             workAutoReview.setFinalProcessingTime((int) (totalProcessingTime / 1000)); // 转换为秒
             workAutoReview.setReviewedAt(LocalDateTime.now());
 
-            // ---- 第六步：保存审核结果到数据库 ----
+            //存到数据库
             log.info("保存审核结果到数据库...");
             workAutoReviewService.save(workAutoReview);
 
-            // ---- 第七步：更新作品状态 ----
+            // 更新作品状态
             String contentStatus;
             if ("approved".equals(overallStatus)) {
                 contentStatus = "approved";
@@ -307,7 +306,7 @@ public class WorkModerationController {
             log.info("-------- 作品审核完成 - 作品ID: {}, 标题: {}, 总体状态: {}, 总耗时: {}ms --------",
                     contentId, content.getTitle(), overallStatus, totalProcessingTime);
 
-            //  第八步：返回结果 
+            //返回审核结果 
             ResultTemplate result = new ResultTemplate();
             result.putPayload("reviewId", workAutoReview.getId());
             result.putPayload("Status", overallStatus);

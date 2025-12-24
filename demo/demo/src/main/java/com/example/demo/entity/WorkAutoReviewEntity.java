@@ -44,7 +44,7 @@ public class WorkAutoReviewEntity {
         private String reason; // 审核理由
         private String riskLevel; // 风险：低/中/高
         private List<String> sensitiveWords; // 命中的敏感词列表
-        private Integer processingTime; // 处理耗时(毫秒)
+        private Integer processingTime; // 处理耗时(秒)
     }
 
     // 封面审核
@@ -53,7 +53,7 @@ public class WorkAutoReviewEntity {
         private String result; // 通过/不通过/人工审核
         private String reason; // 审核理由
         private Double matchScore; // 违规匹配分数
-        private Integer processingTime; // 处理耗时(毫秒)
+        private Integer processingTime; // 处理耗时(秒)
     }
 
     // 视频审核

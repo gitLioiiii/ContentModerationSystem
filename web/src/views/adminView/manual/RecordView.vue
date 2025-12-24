@@ -117,7 +117,7 @@
 
     <!-- AI审核详情抽屉 -->
     <AIreviewCard
-      v-model:visible="reviewDrawerVisible"
+      v-model:drawerVisible="reviewDrawerVisible"
       :review-data="currentReview"
       :work-title="currentWorkTitle"
     />

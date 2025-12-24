@@ -188,7 +188,7 @@
 
 <!-- AI审核结果抽屉 -->
     <AIreviewCard
-      v-model:visible="reviewDrawerVisible"
+      v-model:drawerVisible="reviewDrawerVisible"
       :review-data="currentReview"
       :work-title="currentWorkTitle"
     />
@@ -293,9 +293,7 @@ const fetchreviewingWorksCount = () => {
       const total = response.data.payload.pagination.total
       reviewingWorksCount.value = Math.min(total, 3) // 最大显示3
     }
-  }).catch(() => {
-    // 忽略错误，保持原值
-  })
+  }).catch(() => {})
 }
 
 // 监听分页变化
@@ -372,7 +370,7 @@ const uploadCover = () => {
     if (e.target.files.length > 0) {
       const file = e.target.files[0]
 
-      // 验证文件
+      // 验证
       const isImage = file.type.startsWith('image/')
       const isLt5M = file.size / 1024 / 1024 < 5
 
@@ -385,7 +383,7 @@ const uploadCover = () => {
         return
       }
 
-      // 上传文件
+      // 上传图片
       const formData = new FormData()
       formData.append('file', file, file.name)
       request.post('/upload/covers', formData).then((response) => {
@@ -460,9 +458,10 @@ const submitWork = () => {
 
       request.post('/works/create', workData).then((response) => {
         if (response.data.status === true) {
-          ElMessage.success('作品发布成功,正在审核中...')
+          ElMessage.success('作品发布成功')
           uploadDialogVisible.value = false
-          fetchWorks() // 刷新列表
+          // 刷新作品列表
+          fetchWorks()
         } else {
           ElMessage.error(response.data.message || '作品发布失败')
         }

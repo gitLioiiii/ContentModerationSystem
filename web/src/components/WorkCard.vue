@@ -245,11 +245,11 @@ const handleClick = () => {
 
 // 待AI审核标签 - 浅蓝色
 .status-pending {
-  background: #C3E7FE;
+  background: #3491FA;
   color: white;
 
   &:hover {
-    background: #C3E7FE;
+    background: #3491FA;
   }
 }
 

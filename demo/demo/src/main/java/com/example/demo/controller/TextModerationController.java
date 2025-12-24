@@ -26,7 +26,6 @@ public class TextModerationController {
             @RequestBody @Validated TextAutoRequest request,
             BindingResult bindingResult
     ) {
-        // 参数校验
         if (bindingResult.hasErrors()) {
             log.warn("文本审核请求参数校验失败: {}", bindingResult.getAllErrors());
             throw new ValidateFailedException();

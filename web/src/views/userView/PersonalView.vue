@@ -514,7 +514,6 @@ const fetchUserInfo = () => {
             if (userData.themeImage) {
                 model.themeImage = [{ filename: userData.themeImage }]
             }
-            // 更新 userStore，右上角显示最新头像
             userStore.updateUser(userData)
         } else {
             ElMessage.error('获取用户信息失败！')

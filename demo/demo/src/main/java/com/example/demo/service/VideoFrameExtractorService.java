@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-// 使用JavaCV（FFmpeg）从视频中按时间间隔提取关键帧
+// 视频按时间间隔提取关键帧
 @Slf4j
 @Service
 public class VideoFrameExtractorService {
@@ -42,12 +42,12 @@ public class VideoFrameExtractorService {
             grabber.start();
             log.info("FFmpegFrameGrabber启动成功");
 
-            // 获取视频信息
+            // 帧率，总帧数，时长
             double frameRate = grabber.getFrameRate();
             int totalFrames = grabber.getLengthInFrames();
-            double videoDuration = grabber.getLengthInTime() / 1000000.0;
+            double videoTime = grabber.getLengthInTime() / 1000000.0;
 
-            log.info("视频信息 - 帧率: {} FPS, 总帧数: {}, 时长: {} 秒", frameRate, totalFrames, String.format("%.2f", videoDuration));
+            log.info("视频信息 - 帧率（翻页速度）: {} FPS, 总帧数: {}, 时长: {} 秒", frameRate, totalFrames, String.format("%.2f", videoTime));
 
             // 验证帧率是否有效
             if (frameRate <= 0 || frameRate > 120) {

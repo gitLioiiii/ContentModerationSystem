@@ -28,7 +28,7 @@
         class="sidebar-menu"
         router
       >
-        <!-- ========== 普通用户菜单 ========== -->
+        <!-- ========== 用户菜单 ========== -->
         <!-- 发现 -->
         <ElMenuItem v-if="!isAdmin" index="/" :route="{ name: 'index' }" class="menu-item">
           <i class="bi bi-camera menu-icon"></i>
@@ -70,7 +70,7 @@
           <span v-if="!sidebarCollapsed">用户管理</span>
         </ElMenuItem>
 
-        <!-- ========== 管理员专属菜单 ========== -->
+        <!-- ========== 管理员菜单 ========== -->
         <!-- 人工审核 -->
         <ElSubMenu v-if="isAdmin" index="manual-review">
           <template #title><i class="bi bi-person-check menu-icon"></i><span v-if="!sidebarCollapsed">人工审核</span></template>
