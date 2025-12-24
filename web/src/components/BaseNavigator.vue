@@ -28,20 +28,21 @@
         class="sidebar-menu"
         router
       >
+        <!-- ========== 普通用户菜单 ========== -->
         <!-- 发现 -->
-        <ElMenuItem index="/" :route="{ name: 'index' }" class="menu-item">
+        <ElMenuItem v-if="!isAdmin" index="/" :route="{ name: 'index' }" class="menu-item">
           <i class="bi bi-camera menu-icon"></i>
           <span v-if="!sidebarCollapsed">发现</span>
         </ElMenuItem>
 
         <!-- 用户作品 -->
-        <ElMenuItem index="work" :route="{ name: 'work' }" class="menu-item">
+        <ElMenuItem v-if="!isAdmin" index="work" :route="{ name: 'work' }" class="menu-item">
           <i class="bi bi-brush menu-icon"></i>
           <span v-if="!sidebarCollapsed">用户作品</span>
         </ElMenuItem>
-        
+
         <!-- AI审核 -->
-        <ElSubMenu index="text">
+        <ElSubMenu v-if="!isAdmin" index="text">
           <template #title><i class="bi bi-anthropic menu-icon"></i><span v-if="!sidebarCollapsed">自动审核</span></template>
           <ElMenuItem index="text" :route="{ name: 'text' }" class="sub-menu-item">
             <i class="bi bi-fonts menu-icon"></i>
@@ -58,21 +59,20 @@
         </ElSubMenu>
 
         <!-- 关于我们 -->
-        <ElMenuItem index="about_us" :route="{ name: 'about_us' }" class="menu-item">
+        <ElMenuItem v-if="!isAdmin" index="about_us" :route="{ name: 'about_us' }" class="menu-item">
           <i class="bi bi-lightning-charge menu-icon"></i>
           <span v-if="!sidebarCollapsed">关于我们</span>
         </ElMenuItem>
 
         <!-- 用户管理 -->
-        <ElMenuItem index="users" :route="{ name: 'user_index' }" class="menu-item">
+        <ElMenuItem v-if="isAdmin" index="users" :route="{ name: 'user_index' }" class="menu-item">
           <i class="bi bi-person menu-icon"></i>
           <span v-if="!sidebarCollapsed">用户管理</span>
         </ElMenuItem>
 
-
-
+        <!-- ========== 管理员专属菜单 ========== -->
         <!-- 人工审核 -->
-        <ElSubMenu index="manual-review">
+        <ElSubMenu v-if="isAdmin" index="manual-review">
           <template #title><i class="bi bi-person-check menu-icon"></i><span v-if="!sidebarCollapsed">人工审核</span></template>
           <ElMenuItem index="record" :route="{ name: 'record' }" class="sub-menu-item">
             <i class="bi bi-clock-history menu-icon"></i>
@@ -85,7 +85,7 @@
         </ElSubMenu>
 
         <!-- 规则管理 -->
-        <ElSubMenu index="sensitive">
+        <ElSubMenu v-if="isAdmin" index="sensitive">
           <template #title><i class="bi bi-bookmark menu-icon"></i><span v-if="!sidebarCollapsed">规则管理</span></template>
           <ElMenuItem index="list" :route="{ name: 'list' }" class="sub-menu-item">
               <i class="bi bi-file-earmark-text menu-icon"></i>
@@ -109,16 +109,21 @@ import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { ElMenu, ElMenuItem, ElSubMenu } from 'element-plus'
 import { useSidebarStore } from '@/stores/sidebar'
+import { useUserStore } from '@/stores/user'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 const route = useRoute()
 const sidebarStore = useSidebarStore()
+const userStore = useUserStore()
 
 // 侧边栏折叠状态 - 从 store 获取
 const sidebarCollapsed = computed(() => sidebarStore.isCollapsed)
 
 // 当前激活的菜单
 const activeMenu = computed(() => route.path)
+
+// 用户角色权限
+const isAdmin = computed(() => userStore.isAdmin)
 </script>
 
 <style scoped lang="scss">

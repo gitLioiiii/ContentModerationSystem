@@ -20,7 +20,6 @@ public class AsyncImageModerationService {
         this.imageAutoService = imageAutoService;
     }
 
-    //  异步审核单张图片
     @Async
     public CompletableFuture<ImageAutoResponse> moderateImageAsync(ImageAutoRequest imageRequest) {
         try {
