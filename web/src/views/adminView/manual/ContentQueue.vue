@@ -4,7 +4,7 @@
     <h1 style="margin: 2rem 0 1rem 0; font-size: 1.5rem; font-weight: bold">待审核队列</h1>
 
     <!-- 筛选表单 -->
-    <ElForm :model="filterModel" inline class="filter-form">
+    <ElForm :model="filterModel" @submit.prevent="handleSearch" inline class="filter-form">
       <ElFormItem label="状态">
         <ElSelect v-model="filterModel.status" placeholder="全部" clearable style="width: 150px">
           <ElOption label="待人工审核" value="pending" />
@@ -23,6 +23,9 @@
           clearable
           style="width: 180px"
         />
+      </ElFormItem>
+      <ElFormItem>
+        <ElButton native-type="submit" type="primary">筛选</ElButton>
       </ElFormItem>
     </ElForm>
 
@@ -225,14 +228,11 @@ watch(
   { immediate: true },
 )
 
-// 监听筛选条件变化
-watch(
-  () => [filterModel.status, filterModel.date],
-  () => {
-    pagination.currentPage = 1
-    fetch()
-  },
-)
+// 筛选搜索事件
+const handleSearch = () => {
+  pagination.currentPage = 1
+  fetch()
+}
 
 // AI审核结果抽屉
 const reviewDrawerVisible = ref(false)

@@ -187,187 +187,22 @@
     />
 
 <!-- AI审核结果抽屉 -->
-    <ElDrawer
-      v-model="reviewDrawerVisible"
-      :with-header="true"
-      :z-index="100"
-      direction="rtl"
-      size="40%"
-    >
-      <div v-if="currentReview" class="review-content">
-        <ElSpace direction="vertical" alignment="normal" :fill="true" style="width: 100%">
-          <!-- 总体审核结果 -->
-          <ElCard class="review-card review-card-summary" shadow="hover" :body-style="{ backgroundColor: '#e3f2fd' }">
-            <h3 class="section-title">你的作品《{{ currentWorkTitle }}》审核结果为
-              <ElTag :type="getStatusType(currentReview.status)" size="large">
-                {{ getStatusText(currentReview.status) }}
-              </ElTag>
-            </h3>
-            <div class="processing-time">
-              <img src="@/assets/img/时间.png" alt="时间" class="time-icon" />
-              审核时长: {{ currentReview.finalProcessingTime }}秒
-            </div>
-          </ElCard>
-
-          <!-- 文本审核 -->
-          <ElCard v-if="currentReview.reviewResults?.textReview" class="review-card review-card-text" shadow="hover" :body-style="{ backgroundColor: '#f3e5f5' }">
-            <h3 class="section-title">
-              <i class="bi bi-file-text"></i>
-              文本审核（标题 + 描述）
-            </h3>
-            <div class="review-item">
-              <span class="label">审核结果:</span>
-              <ElTag :type="getResultType(currentReview.reviewResults.textReview.result)">
-                {{ currentReview.reviewResults.textReview.result }}
-              </ElTag>
-            </div>
-            <div class="review-item">
-              <span class="label">审核理由:</span>
-              <span>{{ currentReview.reviewResults.textReview.reason }}</span>
-            </div>
-            <div class="review-item">
-              <span class="label">风险等级:</span>
-              <ElTag :type="getRiskType(currentReview.reviewResults.textReview.riskLevel)">
-                {{ currentReview.reviewResults.textReview.riskLevel }}
-              </ElTag>
-            </div>
-            <div v-if="currentReview.reviewResults.textReview.sensitiveWords?.length > 0" class="review-item">
-              <span class="label">敏感词:</span>
-              <div class="sensitive-words">
-                <ElTag
-                  v-for="(word, index) in currentReview.reviewResults.textReview.sensitiveWords"
-                  :key="index"
-                  type="danger"
-                  size="small"
-                >
-                  {{ word }}
-                </ElTag>
-              </div>
-            </div>
-            <div class="review-item">
-              <span class="label">处理耗时:</span>
-              <span>{{ currentReview.reviewResults.textReview.processingTime }}秒</span>
-            </div>
-          </ElCard>
-
-          <!-- 封面审核 -->
-          <ElCard v-if="currentReview.reviewResults?.imageReview" class="review-card review-card-image" shadow="hover" :body-style="{ backgroundColor: '#e8f5e9' }">
-            <h3 class="section-title">
-              <i class="bi bi-image"></i>
-              封面审核
-            </h3>
-            <div class="review-item">
-              <span class="label">审核结果:</span>
-              <ElTag :type="getResultType(currentReview.reviewResults.imageReview.result)">
-                {{ currentReview.reviewResults.imageReview.result }}
-              </ElTag>
-            </div>
-            <div class="review-item">
-              <span class="label">审核理由:</span>
-              <span>{{ currentReview.reviewResults.imageReview.reason }}</span>
-            </div>
-            <div class="review-item">
-              <span class="label">违规匹配分数:</span>
-              <span>{{ currentReview.reviewResults.imageReview.matchScore.toFixed(1) }}/100</span>
-            </div>
-            <div class="review-item">
-              <span class="label">处理耗时:</span>
-              <span>{{ currentReview.reviewResults.imageReview.processingTime }}秒</span>
-            </div>
-          </ElCard>
-
-          <!-- 视频审核 -->
-          <ElCard v-if="currentReview.reviewResults?.videoReview" class="review-card review-card-video" shadow="hover" :body-style="{ backgroundColor: '#fff3e0' }">
-            <h3 class="section-title">
-              <i class="bi bi-camera-video"></i>
-              视频审核
-            </h3>
-            <div class="review-item">
-              <span class="label">审核结果:</span>
-              <ElTag :type="getResultType(currentReview.reviewResults.videoReview.result)">
-                {{ currentReview.reviewResults.videoReview.result }}
-              </ElTag>
-            </div>
-            <div class="review-item">
-              <span class="label">审核理由:</span>
-              <span>{{ currentReview.reviewResults.videoReview.reason }}</span>
-            </div>
-            <div class="review-item">
-              <span class="label">抽帧统计:</span>
-              <span>
-                总帧数: {{ currentReview.reviewResults.videoReview.Count }} /
-                风险帧数: {{ currentReview.reviewResults.videoReview.riskyCount }}
-              </span>
-            </div>
-            <div class="review-item">
-              <span class="label">最高风险分数:</span>
-              <span>{{ currentReview.reviewResults.videoReview.maxScore.toFixed(1) }}/100</span>
-            </div>
-            <div v-if="currentReview.reviewResults.videoReview.riskyList?.length > 0" class="review-item">
-              <span class="label">风险帧详情:</span>
-              <div class="risky-frames">
-                <div
-                  v-for="(frame, index) in currentReview.reviewResults.videoReview.riskyList"
-                  :key="index"
-                  class="risky-frame-item"
-                >
-                  <div class="frame-info">
-                    <span class="frame-index">风险帧 #{{ index + 1 }}</span>
-                    <span class="frame-time">时间: {{ frame.timestamp.toFixed(2) }}秒</span>
-                    <ElTag type="danger" size="small">分数: {{ frame.score.toFixed(1) }}/100</ElTag>
-                  </div>
-                  <div class="frame-reason">{{ frame.reason }}</div>
-                </div>
-              </div>
-            </div>
-            <div class="review-item">
-              <span class="label">处理耗时:</span>
-              <span>{{ currentReview.reviewResults.videoReview.processingTime }}秒</span>
-            </div>
-          </ElCard>
-
-          <!-- 审核时间 -->
-          <ElCard class="review-card review-card-time" shadow="hover" :body-style="{ backgroundColor: '#f5f5f5' }">
-            <h3 class="section-title">
-              <i class="bi bi-calendar"></i>
-              审核时间
-            </h3>
-            <div class="review-item">
-              <span>{{ formatDateTime(currentReview.reviewedAt) }}</span>
-            </div>
-          </ElCard>
-        </ElSpace>
-      </div>
-<!-- 如果没有审核过 -->
-      <div v-else class="no-review">
-        <i class="bi bi-exclamation-circle"></i>
-        <p>暂无审核结果</p>
-      </div>
-    </ElDrawer>
+    <AIreviewCard
+      v-model:visible="reviewDrawerVisible"
+      :review-data="currentReview"
+      :work-title="currentWorkTitle"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, watch, onMounted } from 'vue'
-import {
-  ElButton,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElSelect,
-  ElOption,
-  ElPagination,
-  ElDialog,
-  ElMessage,
-  ElMessageBox,
-  ElDrawer,
-  ElTag,
-  ElSpace,
-  ElCard,
-  ElNotification
+import { ElButton, ElForm, ElFormItem, ElInput, ElSelect,
+  ElOption, ElPagination, ElDialog, ElMessage, ElMessageBox, ElNotification
 } from 'element-plus'
 import WorkCard from '@/components/WorkCard.vue'
 import PlayVideo from '@/components/PlayVideo.vue'
+import AIreviewCard from '@/components/AIreviewCard.vue'
 import request from '@/utils/request'
 import { buildCoverURL, buildVideoURL, buildAvatarURL } from '@/utils/helper'
 import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -897,63 +732,6 @@ const fetchReviewResult = (workId, workTitle) => {
   })
 }
 
-// 获取状态类型
-const getStatusType = (status) => {
-  switch (status) {
-    case 'approved':
-      return 'success'
-    case 'rejected':
-      return 'danger'
-    case 'reviewing':
-      return 'warning'
-    default:
-      return 'info'
-  }
-}
-
-// 获取状态文本
-const getStatusText = (status) => {
-  switch (status) {
-    case 'approved':
-      return '通过'
-    case 'rejected':
-      return '拒绝'
-    case 'reviewing':
-      return '人工审核'
-    default:
-      return '未知'
-  }
-}
-
-// 获取审核结果类型
-const getResultType = (result) => {
-  if (result === '通过') return 'success'
-  if (result === '拒绝' || result === '不通过') return 'danger'
-  if (result === '人工审核' || result === '需人工审核') return 'warning'
-  return 'info'
-}
-
-// 获取风险等级类型
-const getRiskType = (riskLevel) => {
-  if (riskLevel === '低') return 'success'
-  if (riskLevel === '中') return 'warning'
-  if (riskLevel === '高') return 'danger'
-  return 'info'
-}
-
-// 格式化日期时间
-const formatDateTime = (dateTime) => {
-  if (!dateTime) return '未知'
-  const date = new Date(dateTime)
-  return date.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  })
-}
 </script>
 
 <style scoped lang="scss">
@@ -1145,16 +923,5 @@ const formatDateTime = (dateTime) => {
 
 .text-success {
   color: #67c23a;
-}
-
-.processing-time {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.time-icon {
-  width: 1.5rem;
-  height: 1.5rem;
 }
 </style>

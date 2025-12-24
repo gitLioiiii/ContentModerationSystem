@@ -127,9 +127,9 @@
 
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import { ElTable, ElTableColumn, ElPopconfirm, ElButton,
-        ElMessage, ElForm, ElFormItem, ElPagination, ElInput,
-        ElSelect, ElOption, ElTag, ElDialog, ElSwitch } from 'element-plus'
+import { ElTable, ElTableColumn, ElPopconfirm, ElButton, ElMessage, ElForm,
+          ElFormItem, ElPagination, ElInput, ElSelect, ElOption, ElTag, ElDialog, ElSwitch
+} from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import request from '@/utils/request'
 

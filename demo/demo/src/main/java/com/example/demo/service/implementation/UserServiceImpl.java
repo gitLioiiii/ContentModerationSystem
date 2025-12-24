@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService {
 
         // 分页对象
         Pageable pageable = PageRequest.of(
+            // 0页开始
             offset != null && limit != null ? offset / limit : 0,
             limit != null ? limit : 10
         );

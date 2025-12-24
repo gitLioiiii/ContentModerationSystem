@@ -155,13 +155,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import {
-    ElCard,
-    ElInput,
-    ElButton,
-    ElMessage,
-    ElTag
-} from 'element-plus'
+import { ElCard, ElInput, ElButton, ElMessage, ElTag } from 'element-plus'
 import request from '@/utils/request'
 
 // 响应式数据

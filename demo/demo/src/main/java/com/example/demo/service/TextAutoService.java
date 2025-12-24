@@ -114,12 +114,6 @@ public class TextAutoService {
         log.info("---------------------------------");
 
         try {
-            // 清理响应内容，去除可能的 markdown 代码块标记
-            // String cleanResponse = aiResponse
-            //     .replaceAll("```json\\s*", "")
-            //     .replaceAll("```\\s*", "")
-            //     .trim();
-
             // 使用 Jackson 解析 JSON
             JsonNode jsonNode = objectMapper.readTree(aiResponse);
 

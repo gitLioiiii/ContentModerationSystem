@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-// 视频审核的总体结论和关键帧信息
+// 视频审核
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class VideoModerationResponse {
 
-    // 总体审核结论：通过、不通过、人工审核
+    // 审核状态：通过、不通过、人工审核
     private String overallResult;
 
     // 总帧数（抽取的帧总数）
@@ -21,12 +21,15 @@ public class VideoModerationResponse {
     // 违规帧数
     private Integer violationFrames;
 
-    // 违规率（百分比）
-    private Double violationRate;
+    // 平均风险分数（所有帧的平均分，0-100）
+    private Double avgScore;
+
+    // 最高风险分数（所有帧中的最大分，0-100）
+    private Double maxScore;
 
     // 审核原因（总体原因）
     private String reason;
 
-    // 关键帧列表（包含违规帧和部分正常帧）
+    // 关键帧列表（包含违规帧和正常帧）
     private List<VideoFrameInfo> keyFrames;
 }

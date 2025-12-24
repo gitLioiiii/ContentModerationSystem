@@ -20,23 +20,7 @@ public class TextModerationController {
     public TextModerationController(TextAutoService textAutoService) {
         this.textAutoService = textAutoService;
     }
-
-    /**
-     * 文本审核接口
-     * 使用 Spring AI Ollama 进行智能文本内容审核
-     *
-     * <p>功能说明：</p>
-     * <ul>
-     *     <li>接收文本内容审核请求</li>
-     *     <li>调用 AI 模型进行智能审核</li>
-     *     <li>返回审核结果（通过/拒绝/需人工审核）、理由和风险等级</li>
-     * </ul>
-     *
-     * @param request       文本审核请求对象，包含待审核的文本内容
-     * @param bindingResult 参数校验结果
-     * @return 审核结果，包含审核状态、理由、风险等级等信息
-     * @throws ValidateFailedException 当请求参数校验失败时抛出
-     */
+    
     @PostMapping("/text")
     public ResultTemplate match_Ai_Text(
             @RequestBody @Validated TextAutoRequest request,

@@ -6,10 +6,9 @@
     shadow="hover"
     @click="handleClick"
   >
-    <!-- 作品的审核状态标签 -->
+    <!-- 左上角审核状态标签 -->
     <!-- 待AI审核 -->
     <div v-if="reviewStatus === 'pending'" class="status-badge status-pending">
-      <i class="bi bi-arrow-clockwise"></i>
       <span>AI审核</span>
     </div>
     <!-- 审核不通过 -->
@@ -246,74 +245,61 @@ const handleClick = () => {
 
 // 待AI审核标签 - 浅蓝色
 .status-pending {
-  background: linear-gradient(135deg, rgba(103, 194, 243, 0.95), rgba(64, 158, 255, 0.95));
+  background: #C3E7FE;
   color: white;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(103, 194, 243, 1), rgba(64, 158, 255, 1));
-  }
-
-  i {
-    animation: rotate 2s linear infinite;
-  }
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+    background: #C3E7FE;
   }
 }
 
 // AI审核不通过标签 - 红色
 .status-rejected {
-  background: linear-gradient(135deg, rgba(245, 108, 108, 0.95), rgba(220, 38, 38, 0.95));
+  background: #F53F3F;
   color: white;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(245, 108, 108, 1), rgba(220, 38, 38, 1));
+    background: #F53F3F;
   }
 }
 
 // 人工审核中标签 - 橙色
 .status-reviewing {
-  background: linear-gradient(135deg, rgba(250, 173, 20, 0.95), rgba(230, 162, 60, 0.95));
+  background: #FF7D00;
   color: white;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(250, 173, 20, 1), rgba(230, 162, 60, 1));
+    background: #FF7D00;
   }
 }
 
 // 人工审核不通过标签 - 深红色
 .status-manual-rejected {
-  background: linear-gradient(135deg, rgba(217, 48, 37, 0.95), rgba(185, 28, 28, 0.95));
+  background: #F76560;
   color: white;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(217, 48, 37, 1), rgba(185, 28, 28, 1));
+    background: #F76560;
   }
 }
 
 // 申诉中标签 - 紫色
 .status-appealing {
-  background: linear-gradient(135deg, rgba(147, 51, 234, 0.95), rgba(109, 40, 217, 0.95));
+  background: #722ED1;
   color: white;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(147, 51, 234, 1), rgba(109, 40, 217, 1));
+    background: #722ED1;
   }
 }
 
 // 申诉驳回标签 - 灰色
 .status-appeal-rejected {
-  background: linear-gradient(135deg, rgba(107, 114, 128, 0.95), rgba(75, 85, 99, 0.95));
+  background: #86909c;
   color: white;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(107, 114, 128, 1), rgba(75, 85, 99, 1));
+    background: #86909c;
   }
 }
 
@@ -380,7 +366,7 @@ const handleClick = () => {
   right: 0.5rem;
   width: 2rem;
   height: 2rem;
-  background-color: rgba(103, 194, 58, 0.9);
+  background-color: #FADC19;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -391,7 +377,7 @@ const handleClick = () => {
   box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.2);
 
   &:hover {
-    background-color: rgba(103, 194, 58, 1);
+    background-color: #FADC19;
     transform: scale(1.1);
   }
 

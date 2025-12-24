@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * 异步图片审核服务
- * 使用 Spring Boot 线程池并行处理图片审核任务
- */
+// 异步图片审核
+// 使用 Spring Boot 线程池并行处理图片审核任务
 @Slf4j
 @Service
 public class AsyncImageModerationService {
@@ -23,7 +21,6 @@ public class AsyncImageModerationService {
     }
 
     //  异步审核单张图片
-    //  使用 @Async 注解，该方法会在线程池中异步执行
     @Async
     public CompletableFuture<ImageAutoResponse> moderateImageAsync(ImageAutoRequest imageRequest) {
         try {

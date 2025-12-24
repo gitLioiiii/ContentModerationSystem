@@ -129,7 +129,8 @@ public class ManualReviewServiceImpl implements ManualReviewService {
             query,
             ManualReviewEntity.class
         );
-                            // 获取总数
+        
+        // 获取总数
         long total = mongoTemplate.count(query.skip(0).limit(0), ManualReviewEntity.class);
 
         // 返回分页结果

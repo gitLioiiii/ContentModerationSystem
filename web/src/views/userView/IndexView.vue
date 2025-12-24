@@ -64,14 +64,7 @@
 
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import {
-  ElButton,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElPagination,
-  ElMessage,
-} from 'element-plus'
+import { ElButton,ElForm,ElFormItem,ElInput,ElPagination,ElMessage, } from 'element-plus'
 import WorkCard from '@/components/WorkCard.vue'
 import PlayVideo from '@/components/PlayVideo.vue'
 import request from '@/utils/request'

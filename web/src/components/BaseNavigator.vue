@@ -39,19 +39,7 @@
           <i class="bi bi-brush menu-icon"></i>
           <span v-if="!sidebarCollapsed">用户作品</span>
         </ElMenuItem>
-
-        <!-- 关于我们 -->
-        <ElMenuItem index="about_us" :route="{ name: 'about_us' }" class="menu-item">
-          <i class="bi bi-lightning-charge menu-icon"></i>
-          <span v-if="!sidebarCollapsed">关于我们</span>
-        </ElMenuItem>
-
-        <!-- 用户管理 -->
-        <ElMenuItem index="users" :route="{ name: 'user_index' }" class="menu-item">
-          <i class="bi bi-person menu-icon"></i>
-          <span v-if="!sidebarCollapsed">用户管理</span>
-        </ElMenuItem>
-
+        
         <!-- AI审核 -->
         <ElSubMenu index="text">
           <template #title><i class="bi bi-anthropic menu-icon"></i><span v-if="!sidebarCollapsed">自动审核</span></template>
@@ -68,6 +56,20 @@
             <span v-if="!sidebarCollapsed">视频抽帧审核</span>
           </ElMenuItem>
         </ElSubMenu>
+
+        <!-- 关于我们 -->
+        <ElMenuItem index="about_us" :route="{ name: 'about_us' }" class="menu-item">
+          <i class="bi bi-lightning-charge menu-icon"></i>
+          <span v-if="!sidebarCollapsed">关于我们</span>
+        </ElMenuItem>
+
+        <!-- 用户管理 -->
+        <ElMenuItem index="users" :route="{ name: 'user_index' }" class="menu-item">
+          <i class="bi bi-person menu-icon"></i>
+          <span v-if="!sidebarCollapsed">用户管理</span>
+        </ElMenuItem>
+
+
 
         <!-- 人工审核 -->
         <ElSubMenu index="manual-review">

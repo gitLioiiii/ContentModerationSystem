@@ -40,7 +40,7 @@
         />
       </ElFormItem>
       <ElFormItem>
-        <ElButton native-type="submit" type="primary">搜索</ElButton>
+        <ElButton native-type="submit" type="primary">筛选</ElButton>
       </ElFormItem>
     </ElForm>
 
@@ -134,19 +134,8 @@
 
 <script setup>
 import { ref, reactive, watch } from 'vue'
-import {
-  ElForm,
-  ElFormItem,
-  ElSelect,
-  ElOption,
-  ElDatePicker,
-  ElButton,
-  ElTable,
-  ElTableColumn,
-  ElTag,
-  ElPagination,
-  ElMessage,
-  ElPopconfirm
+import { ElForm, ElFormItem, ElSelect, ElOption, ElDatePicker,
+  ElButton, ElTable, ElTableColumn, ElTag, ElPagination, ElMessage, ElPopconfirm
 } from 'element-plus'
 import AIreviewCard from '@/components/AIreviewCard.vue'
 import PlayVideo from '@/components/PlayVideo.vue'

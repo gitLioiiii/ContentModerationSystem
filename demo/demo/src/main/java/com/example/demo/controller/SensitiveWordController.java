@@ -115,17 +115,14 @@ public class SensitiveWordController {
         if (sensitiveWord.getWord() != null) {
             existingWord.setWord(sensitiveWord.getWord());
         }
-
         // 更新分类
         if (sensitiveWord.getCategory() != null) {
             existingWord.setCategory(sensitiveWord.getCategory());
         }
-
         // 更新级别
         if (sensitiveWord.getLevel() != null) {
             existingWord.setLevel(sensitiveWord.getLevel());
         }
-
         // 更新生效启用状态
         if (sensitiveWord.getEffective() != null) {
             existingWord.setEffective(sensitiveWord.getEffective());

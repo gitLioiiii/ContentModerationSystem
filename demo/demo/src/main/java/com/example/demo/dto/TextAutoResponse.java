@@ -10,13 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TextAutoResponse {
 
-// 审核结果：通过、拒绝、需人工审核
+// 状态：通过、拒绝、需人工审核
     private String result;
 
-// 审核理由
     private String reason;
 
-// 风险等级：低、中、高
     private String riskLevel;
 
 // 用户输入文本

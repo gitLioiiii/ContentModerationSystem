@@ -51,7 +51,7 @@
                     >
                         <img src="@/assets/img/视频上传.png" alt="上传视频" style="width: 80px; height: 80px;" />
                         <p class="upload-text">点击或拖拽视频到此处上传</p>
-                        <p class="upload-desc">支持 MP4、AVI、MOV 格式，大小不超过 100MB</p>
+                        <p class="upload-desc">支持 MP4、MOV、AVI 格式，大小不超过 100MB</p>
                     </div>
 
                     <!-- 隐藏的文件输入 -->
@@ -251,7 +251,7 @@ const isDragover = ref(false)
 const fileInput = ref(null)
 const videoPlayer = ref(null)
 const videoDuration = ref(0)
-const frameInterval = ref(2) // 默认每2秒抽取一帧
+const frameInterval = ref(3) // 默认每3秒抽取一帧
 
 // 计算预计抽取的帧数
 const estimatedFrames = computed(() => {

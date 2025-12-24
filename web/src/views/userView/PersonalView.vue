@@ -10,7 +10,7 @@
             <ElCard class="settings-card" :body-style="{ padding: '0' }" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <ElIcon :size="20"><User /></ElIcon>
+                        <i class="bi bi-person" style="font-size: 20px;"></i>
                         <span>基本信息</span>
                     </div>
                 </template>
@@ -21,9 +21,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Camera />
-                                        </ElIcon>
+                                        <i class="bi bi-camera" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">个人资料照片</div>
@@ -35,7 +33,7 @@
                                         :size="60"
                                         :src="model.avatar.length > 0 ? buildURL(model.avatar[0].filename) : undefined"
                                     >
-                                        <ElIcon :size="40"><component :is="'User'" /></ElIcon>
+                                        <i class="bi bi-person" style="font-size: 40px;"></i>
                                     </ElAvatar>
                                 </div>
                             </div>
@@ -48,9 +46,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <User />
-                                        </ElIcon>
+                                        <i class="bi bi-person" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">姓名</div>
@@ -58,7 +54,7 @@
                                 </div>
                                 <div class="item-value">
                                     <div class="value-text">{{ model.name || '未设置' }}</div>
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -70,9 +66,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Calendar />
-                                        </ElIcon>
+                                        <i class="bi bi-calendar" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">生日</div>
@@ -80,7 +74,7 @@
                                 </div>
                                 <div class="item-value">
                                     <div class="value-text">{{ formatBirthday(model.birthday) || '未设置' }}</div>
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -92,9 +86,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Male />
-                                        </ElIcon>
+                                        <i class="bi bi-gender-ambiguous" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">性别</div>
@@ -102,7 +94,7 @@
                                 </div>
                                 <div class="item-value">
                                     <div class="value-text">{{ formatGender(model.gender) }}</div>
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -114,7 +106,7 @@
             <ElCard class="settings-card" :body-style="{ padding: '0' }" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <ElIcon :size="20"><Message /></ElIcon>
+                        <i class="bi bi-envelope" style="font-size: 20px;"></i>
                         <span>联系信息</span>
                     </div>
                 </template>
@@ -125,9 +117,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Message />
-                                        </ElIcon>
+                                        <i class="bi bi-envelope" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">电子邮箱</div>
@@ -135,7 +125,7 @@
                                 </div>
                                 <div class="item-value">
                                     <div class="value-text">{{ model.email || '未设置' }}</div>
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -147,9 +137,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Phone />
-                                        </ElIcon>
+                                        <i class="bi bi-telephone" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">电话</div>
@@ -157,7 +145,7 @@
                                 </div>
                                 <div class="item-value">
                                     <div class="value-text">{{ model.phone || '未设置' }}</div>
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -169,9 +157,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Location />
-                                        </ElIcon>
+                                        <i class="bi bi-geo-alt" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">省份</div>
@@ -179,7 +165,7 @@
                                 </div>
                                 <div class="item-value">
                                     <div class="value-text">{{ model.province || '未设置' }}</div>
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -191,9 +177,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Location />
-                                        </ElIcon>
+                                        <i class="bi bi-geo-alt" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">城市</div>
@@ -201,7 +185,7 @@
                                 </div>
                                 <div class="item-value">
                                     <div class="value-text">{{ model.city || '未设置' }}</div>
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -213,7 +197,7 @@
             <ElCard class="settings-card" :body-style="{ padding: '0' }" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <ElIcon :size="20"><Lock /></ElIcon>
+                        <i class="bi bi-lock" style="font-size: 20px;"></i>
                         <span>账号安全</span>
                     </div>
                 </template>
@@ -224,9 +208,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#9aa0a6">
-                                            <Monitor />
-                                        </ElIcon>
+                                        <i class="bi bi-display" style="font-size: 24px; color: #9aa0a6;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">账号</div>
@@ -245,9 +227,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Lock />
-                                        </ElIcon>
+                                        <i class="bi bi-lock" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">密码</div>
@@ -255,7 +235,7 @@
                                 </div>
                                 <div class="item-value">
                                     <div class="value-text">••••••••</div>
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -267,9 +247,7 @@
                             <div class="item-content">
                                 <div class="item-start">
                                     <div class="item-icon">
-                                        <ElIcon :size="24" color="#5f6368">
-                                            <Picture />
-                                        </ElIcon>
+                                        <i class="bi bi-image" style="font-size: 24px; color: #5f6368;"></i>
                                     </div>
                                     <div class="item-main">
                                         <div class="item-label">主题背景</div>
@@ -277,7 +255,7 @@
                                     </div>
                                 </div>
                                 <div class="item-value">
-                                    <ElIcon class="arrow-icon"><component :is="'ArrowRight'" /></ElIcon>
+                                    <i class="bi bi-chevron-right arrow-icon"></i>
                                 </div>
                             </div>
                         </ElButton>
@@ -422,35 +400,9 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
-import {
-    ElForm,
-    ElFormItem,
-    ElInput,
-    ElButton,
-    ElMessage,
-    ElCard,
-    ElImage,
-    ElDialog,
-    ElDatePicker,
-    ElRadioGroup,
-    ElRadio,
-    ElIcon,
-    ElAvatar,
-    ElSelect,
-    ElOption
+import { ElForm, ElFormItem, ElInput, ElButton, ElMessage, ElCard, ElImage, ElDialog,
+  ElDatePicker, ElRadioGroup, ElRadio, ElAvatar, ElSelect, ElOption
 } from 'element-plus'
-import {
-    Camera,
-    User,
-    Calendar,
-    Male,
-    Message,
-    Phone,
-    Monitor,
-    Lock,
-    Picture,
-    Location
-} from '@element-plus/icons-vue'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 import request from '@/utils/request'

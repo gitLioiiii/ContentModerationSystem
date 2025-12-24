@@ -11,6 +11,6 @@ import com.example.demo.entity.WorkAutoReviewEntity;
 @Repository
 public interface WorkAutoReviewRepository extends MongoRepository<WorkAutoReviewEntity, String> {
 
-    // 根据作品ID查询审核结果
+    // 查询ai审核结果根据作品ID
     Optional<WorkAutoReviewEntity> findByContentId(String contentId);
 }

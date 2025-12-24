@@ -18,12 +18,12 @@ public class WorkAutoReviewEntity {
     private String id;
 
     @Indexed(unique = true)
-    private String contentId; // 关联作品的ID
+    private String contentId; // 作品的ID
 
-    private ReviewResults reviewResults; // 各个审核结果
+    private ReviewResults reviewResults; // 审核结果
 
     @Indexed
-    private String Status; // 整体审核状态: approved通过/rejected驳回/reviewing需人工审核
+    private String Status; // 状态: approved通过/rejected驳回/reviewing需人工审核
 
     private Integer finalProcessingTime; // 作品审核处理耗时(秒)
 
@@ -32,9 +32,9 @@ public class WorkAutoReviewEntity {
 
     @Data
     public static class ReviewResults {
-        private TextReview textReview; // 文本审核
-        private ImageReview imageReview; // 图片审核
-        private VideoReview videoReview; // 视频审核
+        private TextReview textReview;
+        private ImageReview imageReview;
+        private VideoReview videoReview;
     }
 
     // 文本审核（标题+描述）

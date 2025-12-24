@@ -101,18 +101,8 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-    ElForm,
-    ElFormItem,
-    ElInput,
-    ElButton,
-    ElMessage,
-    ElImage,
-    ElSelect,
-    ElOption,
-    ElDatePicker,
-    ElRadioGroup,
-    ElRadio
+import { ElForm, ElFormItem, ElInput, ElButton, ElMessage, ElImage,
+    ElSelect, ElOption, ElDatePicker, ElRadioGroup, ElRadio
 } from 'element-plus'
 
 import FileUploader from '@/components/FileUploader.vue'

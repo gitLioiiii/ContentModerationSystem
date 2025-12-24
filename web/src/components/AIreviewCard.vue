@@ -17,8 +17,8 @@
         <!-- 总体审核结果 -->
         <ElCard class="review-card review-card-summary" shadow="hover" :body-style="{ backgroundColor: '#e3f2fd' }">
           <h3 class="section-title">作品《{{ workTitle }}》的AI审核结果为
-            <ElTag :type="getStatusType(reviewData.Status)" size="large">
-              {{ getStatusText(reviewData.Status) }}
+            <ElTag :type="getStatusType(reviewData.status)" size="large">
+              {{ getStatusText(reviewData.status) }}
             </ElTag>
           </h3>
           <div class="processing-time">
@@ -111,10 +111,8 @@
             <span>{{ reviewData.reviewResults.videoReview.reason }}</span>
           </div>
           <div class="review-item">
-            <span class="label">抽帧统计:</span>
             <span>
-              总帧数: {{ reviewData.reviewResults.videoReview.Count }} /
-              风险帧数: {{ reviewData.reviewResults.videoReview.riskyCount }}
+              风险帧数为 {{ reviewData.reviewResults.videoReview.riskyCount }}
             </span>
           </div>
           <div class="review-item">
@@ -130,7 +128,7 @@
                 class="risky-frame-item"
               >
                 <div class="frame-info">
-                  <span class="frame-index">风险帧 #{{ index + 1 }}</span>
+                  <span class="frame-index">风险帧{{ index + 1 }}</span>
                   <span class="frame-time">时间: {{ frame.timestamp.toFixed(2) }}秒</span>
                   <ElTag type="danger" size="small">分数: {{ frame.score.toFixed(1) }}/100</ElTag>
                 </div>
@@ -227,7 +225,7 @@ const getStatusText = (status) => {
     case 'rejected':
       return '已拒绝'
     case 'reviewing':
-      return '待审核'
+      return '待人工审核'
     default:
       return '未知状态'
   }
@@ -291,12 +289,6 @@ const formatDateTime = (dateTime) => {
 
     &:last-child {
       margin-bottom: 0;
-    }
-
-    .label {
-      font-weight: 500;
-      color: #606266;
-      margin-right: 8px;
     }
 
     .sensitive-words {

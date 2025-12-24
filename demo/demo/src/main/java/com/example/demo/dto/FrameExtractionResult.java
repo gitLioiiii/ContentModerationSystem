@@ -12,7 +12,7 @@ public class FrameExtractionResult {
     // 时间戳
     private Double timestamp;
 
-    // 文件名（相对路径）
+    // 文件名
     private String filename;
 
     // 文件绝对路径

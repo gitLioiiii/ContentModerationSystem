@@ -11,7 +11,7 @@
  Target Server Version : 80201 (8.2.1)
  File Encoding         : 65001
 
- Date: 23/12/2025 16:17:23
+ Date: 24/12/2025 08:52:04
 */
 
 
@@ -201,6 +201,51 @@ db.getCollection("auto_review_forworks").insert([ {
     reviewedAt: ISODate("2025-12-23T08:05:25.176Z"),
     _class: "com.example.demo.entity.WorkAutoReviewEntity"
 } ]);
+db.getCollection("auto_review_forworks").insert([ {
+    _id: ObjectId("694a54e110f1e6cef91a49b6"),
+    contentId: "694a53ec10f1e6cef91a49b5",
+    reviewResults: {
+        textReview: {
+            result: "需人工审核",
+            reason: "包含暴力关键词，但未描述具体暴力场景，需人工复审确认是否违规",
+            riskLevel: "中",
+            sensitiveWords: [ ],
+            processingTime: NumberInt("79")
+        },
+        imageReview: {
+            result: "通过",
+            reason: "图片为卡通风格的兔子形象，手持农具进行劳作动作，无色情、暴力或政治敏感内容",
+            matchScore: 10,
+            processingTime: NumberInt("52")
+        },
+        videoReview: {
+            result: "人工审核",
+            reason: "视频存在疑似违规内容，建议人工复审。违规帧数: 2/10，违规率: 20.00%，最高风险分数: 55.00",
+            Count: NumberInt("10"),
+            riskyCount: NumberInt("2"),
+            maxScore: 55,
+            riskyList: [
+                {
+                    frameIndex: NumberInt("0"),
+                    timestamp: 0,
+                    score: 45,
+                    reason: "图片包含火灾现场、燃烧车辆及废墟等暴力场景元素，需进一步确认是否属于敏感暴力内容"
+                },
+                {
+                    frameIndex: NumberInt("1"),
+                    timestamp: 3,
+                    score: 55,
+                    reason: "图片包含火灾爆炸后的暴力场景，存在燃烧的车辆、废墟及浓烟，属于明显破坏性画面，需人工确认是否涉及违规暴力内容"
+                }
+            ],
+            processingTime: NumberInt("109")
+        }
+    },
+    Status: "reviewing",
+    finalProcessingTime: NumberInt("242"),
+    reviewedAt: ISODate("2025-12-23T08:37:53.132Z"),
+    _class: "com.example.demo.entity.WorkAutoReviewEntity"
+} ]);
 
 // ----------------------------
 // Collection structure for content
@@ -302,6 +347,25 @@ db.getCollection("content").insert([ {
     appealStatus: "none",
     violationCount: NumberInt("0"),
     createdAt: ISODate("2025-12-23T07:58:50.848Z"),
+    _class: "com.example.demo.entity.ContentEntity"
+} ]);
+db.getCollection("content").insert([ {
+    _id: ObjectId("694a53ec10f1e6cef91a49b5"),
+    userId: "6938e70753706af599a7cd91",
+    title: "暴力封面",
+    coverUrl: "/covers/7c6adffa-a441-417c-b8af-0b208b29fd47.jpg",
+    videoUrl: "/videos/5c9f0d56-0a3d-477d-850a-43adb0209f69.mp4",
+    description: "这是违规暴力视频",
+    authorAvatar: "/avatars/cbbc4ace-b9b6-44b3-85c5-62510f493b91.jpg",
+    author: "test",
+    location: {
+        province: "广东省",
+        city: "广州市"
+    },
+    status: "reviewing",
+    appealStatus: "none",
+    violationCount: NumberInt("0"),
+    createdAt: ISODate("2025-12-23T08:33:48.161Z"),
     _class: "com.example.demo.entity.ContentEntity"
 } ]);
 
@@ -627,6 +691,15 @@ db.getCollection("sensitive_words").insert([ {
     createdAt: ISODate("2025-12-23T07:21:52.838Z"),
     _class: "com.example.demo.entity.SensitiveWordEntity"
 } ]);
+db.getCollection("sensitive_words").insert([ {
+    _id: ObjectId("694a63d210f1e6cef91a49c0"),
+    word: "暴力",
+    category: "violence",
+    level: "medium",
+    effective: false,
+    createdAt: ISODate("2025-12-23T09:41:38.019Z"),
+    _class: "com.example.demo.entity.SensitiveWordEntity"
+} ]);
 
 // ----------------------------
 // Collection structure for user
@@ -825,7 +898,7 @@ db.getCollection("user").insert([ {
     name: "管理员",
     password: "{bcrypt}$2a$10$kfZ.dBsQwRtxuVq8bAWStuyVlEv4IzFqSm9Bn3Ha8knDcsr2H5SlC",
     role: "admin",
-    avatar: "/images/fafef73f-6171-45d2-961f-87abd90affa7.png",
+    avatar: "/avatars/c286759d-0a07-4f79-8180-40afad722a3f.png",
     phone: "15745678999",
     email: "3079573272@qq.com",
     birthday: ISODate("2025-12-18T16:00:00.000Z"),

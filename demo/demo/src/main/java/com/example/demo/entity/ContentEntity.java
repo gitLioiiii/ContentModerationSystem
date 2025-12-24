@@ -18,20 +18,20 @@ public class ContentEntity {
     @Id
     private String id;
 
-    private String userId; // 用户ID
-    private String title; // 标题
-    private String coverUrl; // 封面图片
-    private String videoUrl; // 视频文件URL
-    private String description; // 作品描述
-    private String authorAvatar; // 作者头像
-    private String author; // 用户名
+    private String userId;
+    private String title; 
+    private String coverUrl; 
+    private String videoUrl; 
+    private String description;
+    private String authorAvatar;
+    private String author;
 
-    private Location location; // 用户地理位置
+    private Location location; 
 
     @Indexed
     private String status; // 审核状态: pending(待审核)/approved(已通过)/rejected(已驳回)/appealing(申诉中)
     private String appealStatus = "none"; // 申诉状态: none(未申诉)/appealing(申诉中)/approved(申诉通过)/rejected(申诉驳回)
-    private Integer violationCount = 0; // 累计违规次数
+    private Integer violationCount = 0; // 累计违规的次数
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 

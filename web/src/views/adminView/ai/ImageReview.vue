@@ -46,7 +46,7 @@
                     >
                         <img src="@/assets/img/图片上传.png" alt="上传图片" style="width: 80px; height: 80px;" />
                         <p class="upload-text">点击或拖拽图片到此处上传</p>
-                        <p class="upload-desc">支持 JPG、PNG、GIF 格式，大小不超过 10MB</p>
+                        <p class="upload-desc">支持 JPG、PNG格式，大小不超过 10MB</p>
                     </div>
 
                     <!-- 隐藏的文件输入 -->
@@ -113,7 +113,7 @@
                                 :type="getMatchScoreType(result.matchScore)"
                                 size="large"
                             >
-                                {{ (result.matchScore * 100).toFixed(1) }}%
+                                {{ result.matchScore.toFixed(1) }}%
                             </ElTag>
                         </div>
                     </div>
@@ -358,9 +358,9 @@ const getResultType = (result) => {
 
 // 获取匹配分数标签类型
 const getMatchScoreType = (score) => {
-    if (score < 0.3) {
+    if (score < 30) {
         return 'success'  // 低风险（0-30%）
-    } else if (score < 0.7) {
+    } else if (score < 70) {
         return 'warning'  // 中等风险（30-70%）
     } else {
         return 'danger'   // 高风险（70-100%）

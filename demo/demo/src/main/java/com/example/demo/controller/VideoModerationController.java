@@ -131,6 +131,7 @@ public class VideoModerationController {
             List<VideoFrameInfo> allFrames = new ArrayList<>();
             int violationCount = 0;
             double totalMatchScore = 0.0;
+            double maxMatchScore = 0.0;
 
             for (int i = 0; i < extractedFrames.size(); i++) {
                 FrameExtractionResult frame = extractedFrames.get(i);
@@ -153,7 +154,11 @@ public class VideoModerationController {
                     violationCount++;
                 }
 
+                // 累加总分数并更新最大分数
                 totalMatchScore += imageResponse.getMatchScore();
+                if (imageResponse.getMatchScore() > maxMatchScore) {
+                    maxMatchScore = imageResponse.getMatchScore();
+                }
 
                 log.info("帧 {} ({}秒) 审核结果: {} - {}",
                         frame.getFrameNumber(),
@@ -162,7 +167,6 @@ public class VideoModerationController {
                         imageResponse.getReason());
             }
 
-            // ==== 第四步：汇总审核结果 ====
             double violationRate = (totalFrames > 0) ? (violationCount * 100.0 / totalFrames) : 0.0;
             double avgMatchScore = (totalFrames > 0) ? (totalMatchScore / totalFrames) : 0.0;
 
@@ -170,21 +174,21 @@ public class VideoModerationController {
             String overallResult;
             String overallReason;
 
-            if (violationRate >= 30.0 || avgMatchScore >= 0.7) {
-                // 违规率超过30%或平均分数>=0.7，判定为不通过
+            if (violationRate >= 30.0 || avgMatchScore >= 70.0 || maxMatchScore >= 85.0) {
+                // 违规率超过30% 或 平均分数>=70 或 最高分数>=85，判定为不通过
                 overallResult = "不通过";
-                overallReason = String.format("视频包含违规内容。违规帧数: %d/%d，违规率: %.2f%%",
-                        violationCount, totalFrames, violationRate);
-            } else if (violationRate >= 10.0 || avgMatchScore >= 0.3) {
-                // 违规率10-30%或平均分数0.3-0.7，需要人工审核
+                overallReason = String.format("视频包含违规内容。违规帧数: %d/%d (%.2f%%)，平均分数: %.2f，最高分数: %.2f",
+                        violationCount, totalFrames, violationRate, avgMatchScore, maxMatchScore);
+            } else if (violationRate >= 10.0 || avgMatchScore >= 30.0 || maxMatchScore >= 60.0) {
+                // 违规率10-30% 或 平均分数30-70 或 最高分数60-85，需要人工审核
                 overallResult = "人工审核";
-                overallReason = String.format("视频存在疑似违规内容，建议人工复审。违规帧数: %d/%d，违规率: %.2f%%",
-                        violationCount, totalFrames, violationRate);
+                overallReason = String.format("视频存在疑似违规内容，建议人工复审。违规帧数: %d/%d (%.2f%%)，平均分数: %.2f，最高分数: %.2f",
+                        violationCount, totalFrames, violationRate, avgMatchScore, maxMatchScore);
             } else {
-                // 违规率<10%且平均分数<0.3，判定为通过
+                // 违规率<10% 且 平均分数<30 且 最高分数<60，判定为通过
                 overallResult = "通过";
-                overallReason = String.format("视频内容健康，无明显违规。违规帧数: %d/%d，违规率: %.2f%%",
-                        violationCount, totalFrames, violationRate);
+                overallReason = String.format("视频内容健康，无明显违规。违规帧数: %d/%d (%.2f%%)，平均分数: %.2f，最高分数: %.2f",
+                        violationCount, totalFrames, violationRate, avgMatchScore, maxMatchScore);
             }
 
             // 选择关键帧（违规帧 + 部分正常帧，最多显示10帧）
@@ -195,14 +199,15 @@ public class VideoModerationController {
             response.setOverallResult(overallResult);
             response.setTotalFrames(totalFrames);
             response.setViolationFrames(violationCount);
-            response.setViolationRate(Math.round(violationRate * 100.0) / 100.0); // 保留2位小数
+            response.setAvgScore(Math.round(avgMatchScore * 100.0) / 100.0); // 保留2位小数
+            response.setMaxScore(Math.round(maxMatchScore * 100.0) / 100.0); // 保留2位小数
             response.setReason(overallReason);
             response.setKeyFrames(keyFrames);
 
-            log.info("视频审核完成 - 总体结论: {}, 总帧数: {}, 违规帧数: {}, 违规率: %.2f%%",
-                    overallResult, totalFrames, violationCount, violationRate);
+            log.info("视频审核完成 - 总体结论: {}, 总帧数: {}, 违规帧数: {}, 平均分数: {}, 最高分数: {}",
+                    overallResult, totalFrames, violationCount,
+                    String.format("%.2f", avgMatchScore), String.format("%.2f", maxMatchScore));
 
-            // ==== 第五步：返回结果 ====
             ResultTemplate result = new ResultTemplate();
             result.putPayload("moderation", response);
 

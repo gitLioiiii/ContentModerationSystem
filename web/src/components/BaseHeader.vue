@@ -77,7 +77,6 @@
             </span>
             <span v-else><i class="bi bi-person"></i></span>
           </ElAvatar>
-          <span v-if="userStore.logged" class="online-status"></span>
         </div>
         <template #dropdown>
           <ElDropdownMenu>
@@ -373,17 +372,6 @@ const logout = () => {
 
 .user-avatar {
   flex-shrink: 0;
-}
-
-.online-status {
-  position: absolute;
-  bottom: 0.375rem;
-  right: 0.375rem;
-  width: 0.75rem;
-  height: 0.75rem;
-  border: 2px solid hsl(0 0% 100%);
-  border-radius: 9999px;
-  background-color: rgb(34 197 94);
 }
 
 :deep(.el-dropdown-menu__item) {

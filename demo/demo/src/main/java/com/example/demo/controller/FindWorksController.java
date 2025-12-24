@@ -14,15 +14,16 @@ import com.example.demo.utils.ResultTemplate;
 
 @RestController
 @RequestMapping("/works")
-public class FindWorkController {
+public class FindWorksController {
 
     private final WorksService worksService;
 
-    public FindWorkController(WorksService worksService) {
+    public FindWorksController(WorksService worksService) {
         this.worksService = worksService;
     }
 
-    // 发现页面 - 获取所有用户审核通过的作品
+    // 发现页面
+    // 获取所有用户审核通过的作品
     @GetMapping("/discover")
     public ResultTemplate discover(
         @RequestParam(required = false) Integer page,
@@ -31,7 +32,7 @@ public class FindWorkController {
     ) {
         ResultTemplate result = new ResultTemplate();
 
-        // 搜索条件
+        // 关键词
         Map<String, Object> filter = new HashMap<>();
 
         if (keywords != null && !keywords.isEmpty()) {

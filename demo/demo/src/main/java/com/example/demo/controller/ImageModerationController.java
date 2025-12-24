@@ -92,12 +92,8 @@ public class ImageModerationController {
                 mimeType = "image/jpeg";
             } else if (filename.toLowerCase().endsWith(".png")) {
                 mimeType = "image/png";
-            } else if (filename.toLowerCase().endsWith(".gif")) {
-                mimeType = "image/gif";
-            } else if (filename.toLowerCase().endsWith(".webp")) {
-                mimeType = "image/webp";
-            } else {
-                mimeType = "image/png"; // 默认值
+            }else {
+                mimeType = "image/png"; // 默认为png
             }
         }
         aiRequest.setMimeType(mimeType);
