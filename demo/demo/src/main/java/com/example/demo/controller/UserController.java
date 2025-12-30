@@ -105,14 +105,11 @@ public class UserController {
     public ResultTemplate current() throws NotFoundException {
         ResultTemplate result = new ResultTemplate();
 
-        // 从 SecurityContext 获取当前认证用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new NotFoundException();
         }
-
-        // 获取用户名
         String username = authentication.getName();
 
         // 根据用户名查询用户信息

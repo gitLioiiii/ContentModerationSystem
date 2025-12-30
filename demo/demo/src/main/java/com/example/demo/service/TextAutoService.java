@@ -39,7 +39,7 @@ public class TextAutoService {
         log.info("开始文本审核，文本长度: {} 字符", content.length());
 
         try {
-            // 第一步：敏感词过滤
+            // 敏感词过滤
             log.info("执行敏感词过滤检查...");
             TextAutoResponse sensitiveWordCheckResult = checkSensitiveWords(content);
             if (sensitiveWordCheckResult != null) {
@@ -47,9 +47,9 @@ public class TextAutoService {
                 return sensitiveWordCheckResult;
             }
 
-            // 第二步：敏感词检查通过，继续 AI 审核
+            // 敏感词检查通过
             log.info("敏感词检查通过，开始 AI 审核...");
-            // 调用 Spring AI ChatClient 改成内联式审核
+            // 调用SpringAIChatClient
             String aiResponse = this.chatClient.prompt()
                 .system("""
                     你是一个专业的内容审核专家，负责审核用户提交的文本内容。

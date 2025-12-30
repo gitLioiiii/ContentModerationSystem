@@ -19,6 +19,7 @@ public class ContentEntity {
     private String id;
 
     private String userId;
+
     private String title; 
     private String coverUrl; 
     private String videoUrl; 

@@ -211,7 +211,7 @@ public class VideoModerationController {
             ResultTemplate result = new ResultTemplate();
             result.putPayload("moderation", response);
 
-            // 删除临时视频文件（可选）
+            // 删除临时视频文件
             try {
                 if (savedVideoFile.exists()) {
                     savedVideoFile.delete();
@@ -245,7 +245,7 @@ public class VideoModerationController {
             }
         }
 
-        // 如果违规帧不足，补充正常帧
+        // 如果违规帧没有，显示正常帧
         int step = Math.max(1, allFrames.size() / (maxCount - keyFrames.size()));
         for (int i = 0; i < allFrames.size() && keyFrames.size() < maxCount; i += step) {
             VideoFrameInfo frame = allFrames.get(i);

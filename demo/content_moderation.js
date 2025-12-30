@@ -11,7 +11,7 @@
  Target Server Version : 80201 (8.2.1)
  File Encoding         : 65001
 
- Date: 24/12/2025 08:52:04
+ Date: 30/12/2025 17:13:19
 */
 
 
@@ -246,6 +246,95 @@ db.getCollection("auto_review_forworks").insert([ {
     reviewedAt: ISODate("2025-12-23T08:37:53.132Z"),
     _class: "com.example.demo.entity.WorkAutoReviewEntity"
 } ]);
+db.getCollection("auto_review_forworks").insert([ {
+    _id: ObjectId("694b76d600051d361d518eb3"),
+    contentId: "694b762100051d361d518eb2",
+    reviewResults: {
+        textReview: {
+            result: "通过",
+            reason: "内容为描述自然景观的中性词汇，无任何违规信息",
+            riskLevel: "低",
+            sensitiveWords: [ ],
+            processingTime: NumberInt("21")
+        },
+        imageReview: {
+            result: "通过",
+            reason: "图片为水下自然景观插画，包含阳光、鱼群、海藻等元素，无色情、暴力或政治敏感内容",
+            matchScore: 20,
+            processingTime: NumberInt("6")
+        },
+        videoReview: {
+            result: "通过",
+            reason: "视频内容健康，无明显违规。违规帧数: 0/6，违规率: 0.00%",
+            Count: NumberInt("6"),
+            riskyCount: NumberInt("0"),
+            maxScore: 0,
+            riskyList: [ ],
+            processingTime: NumberInt("29")
+        }
+    },
+    Status: "approved",
+    finalProcessingTime: NumberInt("57"),
+    reviewedAt: ISODate("2025-12-24T05:15:02.301Z"),
+    _class: "com.example.demo.entity.WorkAutoReviewEntity"
+} ]);
+db.getCollection("auto_review_forworks").insert([ {
+    _id: ObjectId("694ba412c6a764aeba7a97a2"),
+    contentId: "694ba2a4c6a764aeba7a97a1",
+    reviewResults: {
+        textReview: {
+            result: "需人工审核",
+            reason: "涉及军事主题，可能存在政治敏感风险，需人工复审内容细节",
+            riskLevel: "中",
+            sensitiveWords: [ ],
+            processingTime: NumberInt("89")
+        },
+        imageReview: {
+            result: "通过",
+            reason: "图片为冬季雪景插画，包含雪人、雪松、雪山等元素，无任何色情、暴力或政治敏感内容",
+            matchScore: 10,
+            processingTime: NumberInt("9")
+        },
+        videoReview: {
+            result: "不通过",
+            reason: "视频包含违规内容。违规帧数: 4/12，违规率: 33.33%，最高风险分数: 45.00",
+            Count: NumberInt("12"),
+            riskyCount: NumberInt("4"),
+            maxScore: 45,
+            riskyList: [
+                {
+                    frameIndex: NumberInt("1"),
+                    timestamp: 2.96963630296964,
+                    score: 40,
+                    reason: "图片中出现携带武器的四足机器人，存在轻微暴力相关元素；左上角含'人民日报'搜索提示需确认是否存在政治关联风险"
+                },
+                {
+                    frameIndex: NumberInt("5"),
+                    timestamp: 14.8481815148482,
+                    score: 40,
+                    reason: "图片包含持枪军事人员场景，虽无明确违规内容但存在轻微敏感性，需人工复核确认"
+                },
+                {
+                    frameIndex: NumberInt("7"),
+                    timestamp: 20.7874541207875,
+                    score: 45,
+                    reason: "图片中显示手持枪支指向建筑物的场景，存在武器元素但未展示实际暴力行为，需人工确认是否属于合法射击场景或存在潜在安全风险"
+                },
+                {
+                    frameIndex: NumberInt("8"),
+                    timestamp: 23.7570904237571,
+                    score: 45,
+                    reason: "图片包含'人民日报'水印，需人工确认是否涉及政治敏感内容，但主体场景为建筑与车辆，无明确色情或暴力元素"
+                }
+            ],
+            processingTime: NumberInt("263")
+        }
+    },
+    Status: "rejected",
+    finalProcessingTime: NumberInt("362"),
+    reviewedAt: ISODate("2025-12-24T08:28:02.744Z"),
+    _class: "com.example.demo.entity.WorkAutoReviewEntity"
+} ]);
 
 // ----------------------------
 // Collection structure for content
@@ -366,6 +455,44 @@ db.getCollection("content").insert([ {
     appealStatus: "none",
     violationCount: NumberInt("0"),
     createdAt: ISODate("2025-12-23T08:33:48.161Z"),
+    _class: "com.example.demo.entity.ContentEntity"
+} ]);
+db.getCollection("content").insert([ {
+    _id: ObjectId("694b762100051d361d518eb2"),
+    userId: "6938e70753706af599a7cd91",
+    title: "海洋",
+    coverUrl: "/covers/d9f3eee3-e033-4263-80ec-58781ecc12c7.jpg",
+    videoUrl: "/videos/cffb8115-7371-4fb1-bf6d-ce31ca949c7a.mp4",
+    description: "大海",
+    authorAvatar: "/avatars/cbbc4ace-b9b6-44b3-85c5-62510f493b91.jpg",
+    author: "test",
+    location: {
+        province: "广东省",
+        city: "广州市"
+    },
+    status: "approved",
+    appealStatus: "none",
+    violationCount: NumberInt("0"),
+    createdAt: ISODate("2025-12-24T05:12:01.801Z"),
+    _class: "com.example.demo.entity.ContentEntity"
+} ]);
+db.getCollection("content").insert([ {
+    _id: ObjectId("694ba2a4c6a764aeba7a97a1"),
+    userId: "6938e70753706af599a7cd91",
+    title: "发布作品",
+    coverUrl: "/covers/21dd20b2-60aa-46ff-a014-b28d61093bd1.jpg",
+    videoUrl: "/videos/59c3a8c1-3690-4287-9137-01d3a020928b.mp4",
+    description: "军事视频",
+    authorAvatar: "/avatars/cbbc4ace-b9b6-44b3-85c5-62510f493b91.jpg",
+    author: "test",
+    location: {
+        province: "广东省",
+        city: "广州市"
+    },
+    status: "rejected",
+    appealStatus: "none",
+    violationCount: NumberInt("0"),
+    createdAt: ISODate("2025-12-24T08:21:56.06Z"),
     _class: "com.example.demo.entity.ContentEntity"
 } ]);
 
@@ -898,13 +1025,13 @@ db.getCollection("user").insert([ {
     name: "管理员",
     password: "{bcrypt}$2a$10$kfZ.dBsQwRtxuVq8bAWStuyVlEv4IzFqSm9Bn3Ha8knDcsr2H5SlC",
     role: "admin",
-    avatar: "/avatars/c286759d-0a07-4f79-8180-40afad722a3f.png",
+    avatar: "/avatars/d8b7432e-7174-43c1-8f26-084451387007.jpg",
     phone: "15745678999",
     email: "3079573272@qq.com",
     birthday: ISODate("2025-12-18T16:00:00.000Z"),
     gender: "man",
     province: "广东省",
-    city: "江门市",
+    city: "潮州市",
     status: "active",
     registeredAt: ISODate("2025-12-19T03:32:02.169Z"),
     _class: "com.example.demo.entity.UserEntity"

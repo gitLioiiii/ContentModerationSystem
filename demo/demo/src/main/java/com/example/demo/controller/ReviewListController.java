@@ -32,10 +32,7 @@ public class ReviewListController {
         this.sensitiveWordRepository = sensitiveWordRepository;
     }
 
-    // 包括：AI共处理违规条数、今日违规未通过条数、待人工审核条数、待处理申诉量、敏感词条数
-    @GetMapping("/overview")
-    public ResultTemplate getOverview() {
-        log.info("获取审核统计概览数据");
+    private ResultTemplate getOverview() {
 
         try {
             Map<String, Object> overview = new HashMap<>();
@@ -98,9 +95,8 @@ public class ReviewListController {
         }
     }
 
-// 柱状图展示 - 一周每日违规量
-    @GetMapping("/daily-trend")
-    public ResultTemplate getDailyTrend() {
+    // 柱状图展示 - 一周每日违规量
+    private ResultTemplate getDailyTrend() {
         log.info("获取一周违规趋势数据");
 
         try {
@@ -165,9 +161,8 @@ public class ReviewListController {
         }
     }
 
-// 饼图展示
-    @GetMapping("/sensitive-words-distribution")
-    public ResultTemplate getSensitiveWordsDistribution() {
+    // 饼图展示
+    private ResultTemplate getSensitiveWordsDistribution() {
         log.info("获取敏感词分类分布数据");
 
         try {

@@ -181,7 +181,6 @@
             <ElCard v-else class="empty-card" shadow="hover">
                 <div class="empty-state">
                     <i class="bi bi-camera-video" style="font-size: 80px; color: #909399;"></i>
-                    <p class="empty-text">请在左侧上传视频并点击"开始审核"</p>
                     <p class="empty-desc">审核结果将在这里显示</p>
                 </div>
             </ElCard>
@@ -251,7 +250,7 @@ const isDragover = ref(false)
 const fileInput = ref(null)
 const videoPlayer = ref(null)
 const videoDuration = ref(0)
-const frameInterval = ref(3) // 默认每3秒抽取一帧
+const frameInterval = ref(3) 
 
 // 计算预计抽取的帧数
 const estimatedFrames = computed(() => {

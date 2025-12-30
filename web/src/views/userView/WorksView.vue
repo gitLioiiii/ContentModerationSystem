@@ -256,7 +256,6 @@ const fetchWorks = () => {
   if (filterModel.keywords) {
     params.append('keywords', filterModel.keywords)
   }
-
   if (filterModel.status) {
     params.append('status', filterModel.status)
   }
@@ -286,17 +285,16 @@ const fetchreviewingWorksCount = () => {
   const params = new URLSearchParams()
   params.append('status', 'pending')
   params.append('page', 1)
-  params.append('pageSize', 1) // 只需要获取总数
+  params.append('pageSize', 1)
 
   request.get('/works', { params }).then((response) => {
     if (response.data.status === true) {
       const total = response.data.payload.pagination.total
-      reviewingWorksCount.value = Math.min(total, 3) // 最大显示3
+      reviewingWorksCount.value = Math.min(total, 3)
     }
   }).catch(() => {})
 }
 
-// 监听分页变化
 watch(
   () => [pagination.currentPage, pagination.pageSize],
   () => {
@@ -348,14 +346,10 @@ const uploadRules = reactive({
 
 // 打开发布模态框
 const openUploadDialog = () => {
-  // 重置表单
+  // 重置表单（包括清空字段值和验证状态）
   if (uploadFormRef.value) {
     uploadFormRef.value.resetFields()
   }
-  uploadModel.title = ''
-  uploadModel.coverUrl = ''
-  uploadModel.videoUrl = ''
-  uploadModel.description = ''
 
   uploadDialogVisible.value = true
 }

@@ -15,7 +15,7 @@ public class SensitiveWordUtil {
             .mapToInt(String::length).min().orElse(1);
     }
 
-    // Trie 树
+    // Trie 树单词查找
     private TrieNode buildTrie(List<String> words) {
         TrieNode root = new TrieNode();
         for (String word : words) {

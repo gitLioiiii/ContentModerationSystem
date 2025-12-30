@@ -30,8 +30,8 @@ public class ImageAutoService {
 
     // 图片审核方法
     public ImageAutoResponse AiImage(ImageAutoRequest request) {
-        String imageUrl = request.getImageUrl();  // 前端显示用的URL
-        String filePath = request.getFilePath();  // AI读取用的本地文件路径
+        String imageUrl = request.getImageUrl(); 
+        String filePath = request.getFilePath(); 
         String mimeType = request.getMimeType();
         log.info("开始图片审核 - 显示URL: {}, 文件路径: {}, MIME类型: {}", imageUrl, filePath, mimeType);
 

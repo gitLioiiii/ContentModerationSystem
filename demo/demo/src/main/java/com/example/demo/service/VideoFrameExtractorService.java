@@ -20,7 +20,6 @@ import java.util.UUID;
 public class VideoFrameExtractorService {
 
     // 从视频文件中提取关键帧
-    // frameOutputDir: 帧图片保存目录的绝对路径
     public List<FrameExtractionResult> extractFrames(String videoPath, int frameIntervalSeconds, String frameOutputDir) throws Exception {
         log.info("----- 开始视频抽帧 -----");
         log.info("视频路径: {}", videoPath);

@@ -8,7 +8,7 @@
             <ul class="list-inside space-y-1 ml-4">
                 <li><strong>前端：</strong>Vue 3 + Vue Router + Element-Plus + Scss  + Echarts + Axios + Pinia + Tailwind CSS</li>
                 <li><strong>后端：</strong>Spring Boot + Spring Security + JWT + Spring Ai </li>
-                <li>JavaCv + Springboot自带线程池 + spring-boot-starter-data-mongodb</li>
+                <li>JavaCv + Springboot自带线程池 + Spring Data MongoDB</li>
                 <li><strong>AI审核：</strong>Ollama (本地语言模型) + qwen3-vl:235b-cloud</li>
                 <li><strong>数据库：</strong>MogonDB</li>
             </ul>

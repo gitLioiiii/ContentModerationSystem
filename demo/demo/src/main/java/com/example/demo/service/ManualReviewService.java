@@ -33,8 +33,7 @@ public interface ManualReviewService {
             String decision,
             String reviewType,
             String reviewerName,
-            LocalDate reviewDate,
-            Pageable pageable);
+            LocalDate reviewDate, Pageable pageable);
 
     // 根据ID查询审核记录
     Optional<ManualReviewEntity> findById(String id);
