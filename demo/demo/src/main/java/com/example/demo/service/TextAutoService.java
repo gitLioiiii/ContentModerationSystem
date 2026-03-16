@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -24,11 +25,11 @@ public class TextAutoService {
     private final ObjectMapper objectMapper;
     private final SensitiveWordService sensitiveWordService;
 
-    // 构造法
-    public TextAutoService(ChatClient.Builder chatClientBuilder,
+    // 构造法（注入本地 ChatClient）
+    public TextAutoService(@Qualifier("localChatClient") ChatClient chatClient,
                         ObjectMapper objectMapper,
                         SensitiveWordService sensitiveWordService) {
-        this.chatClient = chatClientBuilder.build();
+        this.chatClient = chatClient;
         this.objectMapper = new ObjectMapper();
         this.sensitiveWordService = sensitiveWordService;
     }

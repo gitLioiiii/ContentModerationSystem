@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,9 @@ public class ImageAutoService {
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
 
-    // 构造方法
-    public ImageAutoService(ChatClient.Builder chatClientBuilder) {
-        this.chatClient = chatClientBuilder.build();
+    // 构造方法（注入本地 ChatClient）
+    public ImageAutoService(@Qualifier("localChatClient") ChatClient chatClient) {
+        this.chatClient = chatClient;
         this.objectMapper = new ObjectMapper();
     }
 
