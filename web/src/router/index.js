@@ -15,16 +15,6 @@ const router = createRouter({
         breadcrumbCurrent: '发现新内容',
       },
     },
-    // 用户作品
-    {
-      path: '/work',
-      name: 'work',
-      component: () => import('@/views/userView/WorksView.vue'),
-      meta: {
-        breadcrumbParent: '作品',
-        breadcrumbCurrent: '用户的作品页面',
-      },
-    },
     // 关于我们
     {
       path: '/about_us',
@@ -147,7 +137,7 @@ const router = createRouter({
       component: () => import('@/views/userView/PersonalView.vue'),
       meta: {
         breadcrumbParent: '用户中心',
-        breadcrumbCurrent: '个人信息',
+        breadcrumbCurrent: '个人中心',
       },
     },
     //登录、注册

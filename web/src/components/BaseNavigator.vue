@@ -36,10 +36,10 @@
         </ElMenuItem>
 
         <!-- 用户作品 -->
-        <ElMenuItem v-if="!isAdmin" index="work" :route="{ name: 'work' }" class="menu-item">
+        <!-- <ElMenuItem v-if="!isAdmin" index="work" :route="{ name: 'work' }" class="menu-item">
           <i class="bi bi-brush menu-icon"></i>
           <span v-if="!sidebarCollapsed">用户作品</span>
-        </ElMenuItem>
+        </ElMenuItem> -->
 
         <!-- AI审核 -->
         <ElSubMenu v-if="!isAdmin" index="text">

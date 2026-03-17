@@ -1,10 +1,9 @@
 <template>
-    <div class="personal-container" :style="containerBackground">
-        <div class="cards-wrapper">
-            <!-- 页面标题 -->
-            <div class="page-header">
-                <h1 class="page-title">个人信息设置</h1>
-            </div>
+      <!-- Tab 切换 -->
+        <ElTabs v-model="activeTab" >
+            <ElTabPane label="个人信息" name="personal">
+                <div class="personal-container" :style="containerBackground">
+                    <div class="cards-wrapper">
 
             <!-- 基本信息卡片 -->
             <ElCard class="settings-card" :body-style="{ padding: '0' }" shadow="hover">
@@ -262,7 +261,14 @@
                     </div>
                 </div>
             </ElCard>
-        </div>
+                    </div>
+                </div>
+            </ElTabPane>
+            <!-- 用户作品页面 -->
+            <ElTabPane label="我的作品" name="works">
+                <WorksView />
+            </ElTabPane>
+        </ElTabs>
 
         <!-- 头像编辑模态框 -->
         <ElDialog
@@ -395,13 +401,12 @@
                 </div>
             </template>
         </ElDialog>
-    </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElForm, ElFormItem, ElInput, ElButton, ElMessage, ElCard, ElImage, ElDialog,
-  ElDatePicker, ElRadioGroup, ElRadio, ElAvatar, ElSelect, ElOption
+  ElDatePicker, ElRadioGroup, ElRadio, ElAvatar, ElSelect, ElOption, ElTabs, ElTabPane
 } from 'element-plus'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
@@ -409,8 +414,10 @@ import request from '@/utils/request'
 import { buildURL, buildThemeURL } from '@/utils/helper'
 import { useUserStore } from '@/stores/user'
 import { getProvinceList, getCitiesByProvince } from '@/utils/regions'
+import WorksView from '@/views/userView/WorksView.vue'
 
 const userStore = useUserStore()
+const activeTab = ref('personal')
 const editForm = ref(null)
 const avatarDialogVisible = ref(false)
 const editDialogVisible = ref(false)
@@ -750,12 +757,34 @@ const removeAvatar = () => {
 </script>
 
 <style scoped>
+
+.page-header {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 0 1rem 0;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #303133;
+    margin: 0;
+}
+
+:deep(.user-center-tabs > .el-tabs__header) {
+    margin-bottom: 1.5rem;
+}
+
+:deep(.user-center-tabs .el-tabs__item) {
+    font-size: 16px;
+    font-weight: 500;
+}
+
 .personal-container {
-    padding: 2rem;
     display: flex;
     justify-content: center;
-    min-height: 100vh;
-    background-color: #f5f5f5;
+    padding: 1rem 0;
+    border-radius: 8px;
 }
 
 .cards-wrapper {
@@ -764,18 +793,6 @@ const removeAvatar = () => {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-}
-
-/* 页面标题 */
-.page-header {
-    padding: 1rem 0;
-}
-
-.page-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #303133;
-    margin: 0;
 }
 
 /* 卡片样式 */
@@ -1003,22 +1020,21 @@ const removeAvatar = () => {
 
 /* 响应式布局 */
 @media (max-width: 768px) {
-    .personal-container {
+    .user-center-container {
         padding: 1rem;
-        background-color: #fff;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    .personal-container {
+        padding: 0.5rem 0;
     }
 
     .cards-wrapper {
         max-width: 100%;
         gap: 1rem;
-    }
-
-    .page-header {
-        padding: 0.5rem 0;
-    }
-
-    .page-title {
-        font-size: 1.5rem;
     }
 
     .settings-card {
