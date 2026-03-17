@@ -1,5 +1,5 @@
 <template>
-    <div class="image-review-container">
+    <div class="image-review-container" :class="{ 'dark-theme': isDark }">
         <!-- 页面标题 -->
         <div class="page-header">
             <h1 class="page-title">图像内容审核</h1>
@@ -201,6 +201,9 @@ import { ref } from 'vue'
 import { ElCard, ElButton, ElMessage, ElTag } from 'element-plus'
 import request from '@/utils/request'
 import { buildImageURL } from '@/utils/helper'
+import { useTheme } from '@/utils/useTheme'
+
+const { isDark } = useTheme()
 
 // 响应式数据
 const imageFile = ref(null)
@@ -748,5 +751,81 @@ const getMatchScoreType = (score) => {
         width: 100%;
         height: 200px;
     }
+}
+
+/* ======= 暗黑主题 ======= */
+.image-review-container.dark-theme {
+    background-color: #121212;
+}
+
+.image-review-container.dark-theme .page-title {
+    color: #e5e5e5;
+}
+
+.image-review-container.dark-theme .page-desc {
+    color: #6a6a6a;
+}
+
+.image-review-container.dark-theme .card-header {
+    color: #e5e5e5;
+}
+
+.image-review-container.dark-theme .upload-area {
+    border-color: #3a3a3a;
+    background-color: #2a2a2a;
+}
+
+.image-review-container.dark-theme .upload-area:hover {
+    border-color: #409eff;
+    background-color: #1a2a3a;
+}
+
+.image-review-container.dark-theme .upload-area.is-dragover {
+    border-color: #409eff;
+    background-color: #1a2a3a;
+}
+
+.image-review-container.dark-theme .upload-text {
+    color: #a0a0a0;
+}
+
+.image-review-container.dark-theme .upload-desc {
+    color: #6a6a6a;
+}
+
+.image-review-container.dark-theme .empty-text {
+    color: #a0a0a0;
+}
+
+.image-review-container.dark-theme .empty-desc {
+    color: #6a6a6a;
+}
+
+.image-review-container.dark-theme .result-item {
+    border-bottom-color: #3a3a3a;
+}
+
+.image-review-container.dark-theme .result-label {
+    color: #a0a0a0;
+}
+
+.image-review-container.dark-theme .result-value {
+    color: #e5e5e5;
+}
+
+.image-review-container.dark-theme .history-item {
+    background-color: #1e1e1e;
+}
+
+.image-review-container.dark-theme .history-item:hover {
+    background-color: #2a2a2a;
+}
+
+.image-review-container.dark-theme .history-time {
+    color: #6a6a6a;
+}
+
+.image-review-container.dark-theme .history-reason {
+    color: #a0a0a0;
 }
 </style>

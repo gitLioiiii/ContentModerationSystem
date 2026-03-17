@@ -1,5 +1,5 @@
 <template>
-    <div class="text-review-container">
+    <div class="text-review-container" :class="{ 'dark-theme': isDark }">
         <!-- 页面标题 -->
         <div class="page-header">
             <h1 class="page-title">文本内容审核</h1>
@@ -157,6 +157,9 @@
 import { ref } from 'vue'
 import { ElCard, ElInput, ElButton, ElMessage, ElTag } from 'element-plus'
 import request from '@/utils/request'
+import { useTheme } from '@/utils/useTheme'
+
+const { isDark } = useTheme()
 
 // 响应式数据
 const textContent = ref('')
@@ -543,5 +546,62 @@ const getRiskType = (level) => {
         grid-template-columns: 1fr;
         max-height: 250px;
     }
+}
+
+/* ======= 暗黑主题 ======= */
+.text-review-container.dark-theme {
+    background-color: #121212;
+}
+
+.text-review-container.dark-theme .page-title {
+    color: #e5e5e5;
+}
+
+.text-review-container.dark-theme .page-desc {
+    color: #6a6a6a;
+}
+
+.text-review-container.dark-theme .card-header {
+    color: #e5e5e5;
+}
+
+.text-review-container.dark-theme .empty-text {
+    color: #a0a0a0;
+}
+
+.text-review-container.dark-theme .empty-desc {
+    color: #6a6a6a;
+}
+
+.text-review-container.dark-theme .result-item {
+    border-bottom-color: #3a3a3a;
+}
+
+.text-review-container.dark-theme .result-label {
+    color: #a0a0a0;
+}
+
+.text-review-container.dark-theme .result-value {
+    color: #e5e5e5;
+}
+
+.text-review-container.dark-theme .original-text {
+    background-color: #2a2a2a;
+}
+
+.text-review-container.dark-theme .history-item {
+    background-color: #1e1e1e;
+}
+
+.text-review-container.dark-theme .history-item:hover {
+    background-color: #2a2a2a;
+}
+
+.text-review-container.dark-theme .history-time {
+    color: #6a6a6a;
+}
+
+.text-review-container.dark-theme .history-text {
+    color: #a0a0a0;
 }
 </style>

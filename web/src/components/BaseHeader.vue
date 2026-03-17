@@ -2,6 +2,7 @@
   <!-- Header 容器 -->
   <header
     class="base-header-container"
+    :class="{ 'dark-theme': isDark }"
     :style="{
       height: '50px',
       left: sidebarStore.isCollapsed ? '4rem' : '14rem',
@@ -100,12 +101,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElButton, ElBreadcrumb, ElBreadcrumbItem, ElDropdown, ElDropdownMenu, ElDropdownItem, ElAvatar, ElMessage, ElTag } from 'element-plus'
 import { ArrowRight } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useSidebarStore } from '@/stores/sidebar'
+import { useTheme } from '@/utils/useTheme'
 import { buildURL } from '@/utils/helper'
 import request from '@/utils/request'
 import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -114,9 +116,7 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const sidebarStore = useSidebarStore()
-
-// 主题状态
-const isDark = ref(false)
+const { isDark, toggleTheme } = useTheme()
 
 // 用户头像
 const userAvatar = computed(() => {
@@ -142,13 +142,6 @@ const toggleSidebar = () => {
 // 刷新页面
 const handleRefresh = () => {
   location.reload()
-}
-
-// 主题切换
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  document.documentElement.classList.toggle('dark', isDark.value)
-  ElMessage.success(`已切换到${isDark.value ? '暗色' : '亮色'}模式`)
 }
 
 // 全屏切换
@@ -413,6 +406,45 @@ const logout = () => {
   .base-header-container {
     left: 0 !important;
     width: 100% !important;
+  }
+}
+
+// 暗黑主题
+.base-header-container.dark-theme {
+  background-color: #1e1e1e;
+  border-bottom-color: #3a3a3a;
+
+  .header-btn {
+    color: rgba(229, 229, 229, 0.8);
+
+    &:hover {
+      background-color: #3a3a3a;
+      color: #e5e5e5;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 1px #555;
+    }
+  }
+
+  .user-avatar-wrapper {
+    &:hover {
+      background-color: #3a3a3a;
+    }
+  }
+
+  :deep(.el-breadcrumb__inner) {
+    color: #a0a0a0;
+  }
+
+  :deep(.el-breadcrumb__separator) {
+    color: #666;
+  }
+
+  :deep(.el-tag) {
+    background-color: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e5e5e5;
   }
 }
 </style>

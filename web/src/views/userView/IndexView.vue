@@ -1,5 +1,5 @@
 <template>
-  <div class="discover-view">
+  <div class="discover-view" :class="{ 'dark-theme': isDark }">
     <div class="header-section">
       <h2 class="page-title">发现</h2>
     </div>
@@ -69,7 +69,10 @@ import WorkCard from '@/components/WorkCard.vue'
 import PlayVideo from '@/components/PlayVideo.vue'
 import request from '@/utils/request'
 import { buildCoverURL, buildVideoURL, buildAvatarURL } from '@/utils/helper'
+import { useTheme } from '@/utils/useTheme'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+
+const { isDark } = useTheme()
 
 // 作品列表
 const works = ref([])
@@ -214,5 +217,20 @@ const handlePlayVideo = (work) => {
   margin-top: 24px;
   display: flex;
   justify-content: center;
+}
+
+// 暗黑主题
+.discover-view.dark-theme {
+  .page-title {
+    color: #e5e5e5;
+  }
+
+  .filter-form {
+    background-color: #1e1e1e;
+  }
+
+  .empty-state {
+    color: #6a6a6a;
+  }
 }
 </style>

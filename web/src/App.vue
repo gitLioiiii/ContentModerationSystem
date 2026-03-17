@@ -22,6 +22,7 @@
 import { RouterView, useRoute } from 'vue-router'
 import { computed } from 'vue'
 import { useSidebarStore } from '@/stores/sidebar'
+import { useTheme } from '@/utils/useTheme'
 
 import BaseHeader from '@/components/BaseHeader.vue'
 import BaseSidebar from '@/components/BaseNavigator.vue'
@@ -30,6 +31,9 @@ import BaseFooter from '@/components/BaseFooter.vue'
 const route = useRoute()
 const sidebarStore = useSidebarStore()
 const HideChrome = computed(() => route.meta?.HideChrome === true)
+
+// 改变颜色主题
+useTheme()
 </script>
 
 <style lang="scss">
@@ -88,5 +92,41 @@ body {
   .base-main.sidebar-collapsed {
     margin-left: 60px; /* 移动端折叠宽度 */
   }
+}
+
+/* ======= 暗黑主题全局样式 ======= */
+
+/* 主内容区域 */
+html.dark-theme .base-main {
+  background-color: #121212;
+}
+
+html.dark-theme body {
+  background-color: #121212;
+}
+
+/* Element Plus 暗黑主题 */
+html.dark-theme {
+  --el-bg-color: #1e1e1e;
+  --el-bg-color-overlay: #2a2a2a;
+  --el-bg-color-page: #121212;
+  --el-text-color-primary: #e5e5e5;
+  --el-text-color-regular: #ccc;
+  --el-text-color-secondary: #a0a0a0;
+  --el-text-color-placeholder: #6a6a6a;
+  --el-border-color: #3a3a3a;
+  --el-border-color-light: #3a3a3a;
+  --el-border-color-lighter: #2a2a2a;
+  --el-border-color-extra-light: #2a2a2a;
+  --el-fill-color: #2a2a2a;
+  --el-fill-color-light: #333;
+  --el-fill-color-lighter: #3a3a3a;
+  --el-fill-color-blank: #1e1e1e;
+  --el-mask-color: rgba(0, 0, 0, 0.7);
+  --el-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.3);
+  --el-box-shadow-light: 0 2px 8px 0 rgba(0, 0, 0, 0.2);
+  --el-box-shadow-lighter: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
+
+  color-scheme: dark;
 }
 </style>

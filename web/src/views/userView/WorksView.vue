@@ -1,5 +1,5 @@
 <template>
-  <div class="works-view">
+  <div class="works-view" :class="{ 'dark-theme': isDark }">
     <div class="header-section">
       <h2 class="page-title">我的作品</h2>
       <div class="header-buttons">
@@ -205,7 +205,10 @@ import PlayVideo from '@/components/PlayVideo.vue'
 import AIreviewCard from '@/components/AIreviewCard.vue'
 import request from '@/utils/request'
 import { buildCoverURL, buildVideoURL, buildAvatarURL } from '@/utils/helper'
+import { useTheme } from '@/utils/useTheme'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+
+const { isDark } = useTheme()
 
 // 作品列表
 const works = ref([])
@@ -916,5 +919,50 @@ const fetchReviewResult = (workId, workTitle) => {
 
 .text-success {
   color: #67c23a;
+}
+
+// 暗黑主题
+.works-view.dark-theme {
+  .page-title {
+    color: #e5e5e5;
+  }
+
+  .filter-form {
+    background-color: #1e1e1e;
+  }
+
+  .empty-state {
+    color: #6a6a6a;
+  }
+
+  .upload-placeholder {
+    border-color: #3a3a3a;
+
+    &:hover {
+      border-color: #409eff;
+      background-color: #2a2a2a;
+    }
+
+    i {
+      color: #555;
+    }
+
+    .upload-text {
+      color: #a0a0a0;
+    }
+  }
+
+  .upload-tip {
+    color: #6a6a6a;
+  }
+
+  .location-display {
+    background-color: #2a2a2a;
+    color: #a0a0a0;
+
+    .no-location {
+      color: #6a6a6a;
+    }
+  }
 }
 </style>

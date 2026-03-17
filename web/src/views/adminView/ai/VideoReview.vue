@@ -1,5 +1,5 @@
 <template>
-    <div class="video-review-container">
+    <div class="video-review-container" :class="{ 'dark-theme': isDark }">
         <!-- 页面标题 -->
         <div class="page-header">
             <h1 class="page-title">视频内容审核</h1>
@@ -239,6 +239,9 @@ import { ref, computed } from 'vue'
 import { ElCard, ElButton, ElMessage, ElTag, ElInputNumber } from 'element-plus'
 import request from '@/utils/request'
 import { buildImageURL } from '@/utils/helper'
+import { useTheme } from '@/utils/useTheme'
+
+const { isDark } = useTheme()
 
 // 响应式数据
 const videoFile = ref(null)
@@ -893,5 +896,120 @@ const getResultType = (result) => {
         width: 100%;
         height: 120px;
     }
+}
+
+/* ======= 暗黑主题 ======= */
+.video-review-container.dark-theme {
+    background-color: #121212;
+}
+
+.video-review-container.dark-theme .page-title {
+    color: #e5e5e5;
+}
+
+.video-review-container.dark-theme .page-desc {
+    color: #6a6a6a;
+}
+
+.video-review-container.dark-theme .card-header {
+    color: #e5e5e5;
+}
+
+.video-review-container.dark-theme .upload-area {
+    border-color: #3a3a3a;
+    background-color: #2a2a2a;
+}
+
+.video-review-container.dark-theme .upload-area:hover {
+    border-color: #409eff;
+    background-color: #1a2a3a;
+}
+
+.video-review-container.dark-theme .upload-area.is-dragover {
+    border-color: #409eff;
+    background-color: #1a2a3a;
+}
+
+.video-review-container.dark-theme .upload-text {
+    color: #a0a0a0;
+}
+
+.video-review-container.dark-theme .upload-desc {
+    color: #6a6a6a;
+}
+
+.video-review-container.dark-theme .empty-text {
+    color: #a0a0a0;
+}
+
+.video-review-container.dark-theme .empty-desc {
+    color: #6a6a6a;
+}
+
+.video-review-container.dark-theme .frame-settings {
+    background-color: #2a2a2a;
+}
+
+.video-review-container.dark-theme .setting-label {
+    color: #a0a0a0;
+}
+
+.video-review-container.dark-theme .setting-info {
+    color: #6a6a6a;
+}
+
+.video-review-container.dark-theme .result-item {
+    border-bottom-color: #3a3a3a;
+}
+
+.video-review-container.dark-theme .result-label {
+    color: #a0a0a0;
+}
+
+.video-review-container.dark-theme .result-value {
+    color: #e5e5e5;
+}
+
+.video-review-container.dark-theme .frame-stats span {
+    background-color: #2a2a2a;
+    color: #a0a0a0;
+}
+
+.video-review-container.dark-theme .frame-item {
+    border-color: #3a3a3a;
+    background-color: #1e1e1e;
+}
+
+.video-review-container.dark-theme .frame-info {
+    background-color: #2a2a2a;
+}
+
+.video-review-container.dark-theme .frame-reason {
+    background-color: #1e1e1e;
+    color: #a0a0a0;
+}
+
+.video-review-container.dark-theme .history-item {
+    background-color: #1e1e1e;
+}
+
+.video-review-container.dark-theme .history-item:hover {
+    background-color: #2a2a2a;
+}
+
+.video-review-container.dark-theme .history-thumbnail {
+    background-color: #3a3a3a;
+}
+
+.video-review-container.dark-theme .history-time {
+    color: #6a6a6a;
+}
+
+.video-review-container.dark-theme .history-stats {
+    color: #a0a0a0;
+}
+
+.video-review-container.dark-theme .history-reason {
+    color: #a0a0a0;
 }
 </style>

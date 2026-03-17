@@ -1,4 +1,5 @@
 <template>
+    <div class="personal-view" :class="{ 'dark-theme': isDark }">
       <!-- Tab 切换 -->
         <ElTabs v-model="activeTab" >
             <ElTabPane label="个人信息" name="personal">
@@ -401,6 +402,7 @@
                 </div>
             </template>
         </ElDialog>
+    </div>
 </template>
 
 <script setup>
@@ -414,9 +416,11 @@ import request from '@/utils/request'
 import { buildURL, buildThemeURL } from '@/utils/helper'
 import { useUserStore } from '@/stores/user'
 import { getProvinceList, getCitiesByProvince } from '@/utils/regions'
+import { useTheme } from '@/utils/useTheme'
 import WorksView from '@/views/userView/WorksView.vue'
 
 const userStore = useUserStore()
+const { isDark } = useTheme()
 const activeTab = ref('personal')
 const editForm = ref(null)
 const avatarDialogVisible = ref(false)
@@ -535,8 +539,11 @@ const fetchUserInfo = () => {
 const containerBackground = computed(() => {
     if (model.themeImage.length > 0) {
         const bgUrl = buildThemeURL(model.themeImage[0].filename)
+        const overlay = isDark.value
+            ? 'rgba(18, 18, 18, 0.60)'
+            : 'rgba(255, 255, 255, 0.50)'
         return {
-            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.50), rgba(255, 255, 255, 0.50)), url('${bgUrl}')`,
+            backgroundImage: `linear-gradient(${overlay}, ${overlay}), url('${bgUrl}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
@@ -1085,5 +1092,75 @@ const removeAvatar = () => {
     .avatar-actions .el-button {
         min-width: 100px;
     }
+}
+
+/* ======= 暗黑主题 ======= */
+.personal-view.dark-theme .page-title {
+    color: #e5e5e5;
+}
+
+.personal-view.dark-theme .card-header {
+    color: #e5e5e5;
+}
+
+.personal-view.dark-theme .settings-card {
+    background-color: rgba(30, 30, 30, 0.65);
+}
+
+.personal-view.dark-theme :deep(.settings-card .el-card__header) {
+    background-color: rgba(30, 30, 30, 0.80);
+}
+
+.personal-view.dark-theme .information-item:not(:last-child)::after {
+    background-color: #3a3a3a;
+}
+
+.personal-view.dark-theme .information-button:hover {
+    background-color: #2a2a2a !important;
+}
+
+.personal-view.dark-theme .item-icon {
+    background-color: #3a3a3a;
+}
+
+.personal-view.dark-theme .item-icon i {
+    color: #a0a0a0 !important;
+}
+
+.personal-view.dark-theme .item-label {
+    color: #e5e5e5;
+}
+
+.personal-view.dark-theme .item-desc {
+    color: #6a6a6a;
+}
+
+.personal-view.dark-theme .value-text {
+    color: #a0a0a0;
+}
+
+.personal-view.dark-theme .disabled-text {
+    color: #555;
+}
+
+.personal-view.dark-theme .arrow-icon {
+    color: #555;
+}
+
+.personal-view.dark-theme :deep(.el-avatar) {
+    background-color: #3a3a3a;
+    border-color: #2a2a2a;
+}
+
+.personal-view.dark-theme .avatar-dialog-preview {
+    background-color: #2a2a2a;
+}
+
+.personal-view.dark-theme :deep(.el-dialog__header) {
+    border-bottom-color: #3a3a3a;
+}
+
+.personal-view.dark-theme :deep(.el-dialog__footer) {
+    border-top-color: #3a3a3a;
 }
 </style>

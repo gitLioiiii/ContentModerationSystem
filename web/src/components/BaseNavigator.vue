@@ -1,7 +1,7 @@
 <template>
   <aside
     class="base-navigator"
-    :class="{ 'is-collapsed': sidebarCollapsed, 'is-hidden': sidebarStore.isHidden }"
+    :class="{ 'is-collapsed': sidebarCollapsed, 'is-hidden': sidebarStore.isHidden, 'dark-theme': isDark }"
     :style="{
       width: sidebarCollapsed ? '60px' : '220px',
     }"
@@ -110,11 +110,13 @@ import { RouterLink, useRoute } from 'vue-router'
 import { ElMenu, ElMenuItem, ElSubMenu } from 'element-plus'
 import { useSidebarStore } from '@/stores/sidebar'
 import { useUserStore } from '@/stores/user'
+import { useTheme } from '@/utils/useTheme'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
 const route = useRoute()
 const sidebarStore = useSidebarStore()
 const userStore = useUserStore()
+const { isDark } = useTheme()
 
 // 侧边栏折叠状态 - 从 store 获取
 const sidebarCollapsed = computed(() => sidebarStore.isCollapsed)
@@ -282,6 +284,51 @@ const isAdmin = computed(() => userStore.isAdmin)
   .base-navigator {
     &:not(.is-hidden) {
       box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+// 暗黑主题
+.base-navigator.dark-theme {
+  background-color: #1e1e1e;
+  border-right-color: #3a3a3a;
+
+  .logo-section {
+    border-bottom-color: rgba(58, 58, 58, 0.5);
+  }
+
+  .logo-text {
+    color: #e5e5e5;
+  }
+
+  .logo-link:hover .logo-text {
+    color: #5edfd6;
+  }
+
+  .sidebar-menu {
+    :deep(.el-menu-item),
+    :deep(.el-sub-menu__title) {
+      color: #a0a0a0;
+
+      &:hover {
+        background-color: #2a2a2a !important;
+        color: #e5e5e5;
+      }
+
+      &.is-active {
+        background-color: #2a2a2a !important;
+        color: #5edfd6 !important;
+      }
+    }
+
+    :deep(.el-sub-menu__icon-arrow) {
+      color: #a0a0a0;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    &:not(.is-hidden) {
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.4);
     }
   }
 }

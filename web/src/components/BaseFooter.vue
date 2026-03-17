@@ -3,7 +3,8 @@
         class="base-footer"
         :class="{
             'sidebar-hidden': sidebarStore.isHidden,
-            'sidebar-collapsed': sidebarStore.isCollapsed
+            'sidebar-collapsed': sidebarStore.isCollapsed,
+            'dark-theme': isDark
         }"
     >
         <div>Copyright &copy; 2025 QST.</div>
@@ -13,8 +14,10 @@
 
 <script setup>
 import { useSidebarStore } from '@/stores/sidebar'
+import { useTheme } from '@/utils/useTheme'
 
 const sidebarStore = useSidebarStore()
+const { isDark } = useTheme()
 </script>
 
 <style scoped>
@@ -55,5 +58,12 @@ const sidebarStore = useSidebarStore()
 .base-footer.sidebar-hidden.sidebar-collapsed {
     left: 0;
     width: 100%;
+}
+
+/* 暗黑主题 */
+.base-footer.dark-theme {
+    background-color: #1e1e1e;
+    border-top-color: #3a3a3a;
+    color: #a0a0a0;
 }
 </style>
