@@ -180,6 +180,9 @@ public class ManualModerationController {
 
             ContentEntity content = contentOpt.get();
 
+            // 判断审核类型：如果作品是申诉中状态，则为申诉审核
+            String reviewType = "appealing".equals(content.getStatus()) ? "appeal_review" : "first_review";
+
             // 创建人工审核记录
             ManualReviewEntity manualReview = new ManualReviewEntity();
             manualReview.setContentId(contentId);
@@ -189,7 +192,7 @@ public class ManualModerationController {
             manualReview.setReviewerName(reviewer.getName()); // 设置审核员姓名
             manualReview.setDecision(decision);
             manualReview.setReason(comment);
-            manualReview.setReviewType("first_review");
+            manualReview.setReviewType(reviewType);
             manualReview.setReviewedAt(LocalDateTime.now());
 
             // 保存审核记录
@@ -198,8 +201,16 @@ public class ManualModerationController {
             // 更新作品状态
             if ("pass".equals(decision)) {
                 content.setStatus("approved");
+                if ("appeal_review".equals(reviewType)) {
+                    content.setAppealStatus("approved");
+                }
             } else if ("reject".equals(decision)) {
-                content.setStatus("rejected");
+                if ("appeal_review".equals(reviewType)) {
+                    content.setStatus("appeal_rejected");
+                    content.setAppealStatus("rejected");
+                } else {
+                    content.setStatus("rejected");
+                }
             }
             contentRepository.save(content);
 
