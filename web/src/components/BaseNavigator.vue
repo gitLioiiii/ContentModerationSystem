@@ -35,6 +35,12 @@
           <span v-if="!sidebarCollapsed">发现</span>
         </ElMenuItem>
 
+        <!-- 聊天室 -->
+        <ElMenuItem v-if="!isAdmin" index="/chat" :route="{ name: 'chat' }" class="menu-item">
+          <i class="bi bi-chat-dots menu-icon"></i>
+          <span v-if="!sidebarCollapsed">聊天室</span>
+        </ElMenuItem>
+
         <!-- 用户作品 -->
         <!-- <ElMenuItem v-if="!isAdmin" index="work" :route="{ name: 'work' }" class="menu-item">
           <i class="bi bi-brush menu-icon"></i>

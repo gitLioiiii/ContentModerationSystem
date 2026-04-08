@@ -61,6 +61,8 @@ public class SecurityConfiguration {
                     // "/public/**",
                     // "/static/**"
                 ).permitAll();
+                // 放行WebSocket端点
+                authorize.requestMatchers("/ws/**").permitAll();
                 // 放行用户匿名注册接口
 				authorize.requestMatchers("/user/create").permitAll();
                 // 其他所有请求都需要JWT认证

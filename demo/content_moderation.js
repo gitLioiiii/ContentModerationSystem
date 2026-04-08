@@ -1052,3 +1052,45 @@ db.getCollection("user").insert([ {
     registeredAt: ISODate("2025-12-19T05:59:05.154Z"),
     _class: "com.example.demo.entity.UserEntity"
 } ]);
+
+// ----------------------------
+// Collection structure for chat_messages
+// ----------------------------
+db.getCollection("chat_messages").drop();
+db.createCollection("chat_messages");
+db.getCollection("chat_messages").createIndex({
+    userId: NumberInt("1")
+}, {
+    name: "userId_1"
+});
+db.getCollection("chat_messages").createIndex({
+    createdAt: NumberInt("-1")
+}, {
+    name: "createdAt_-1"
+});
+
+// ----------------------------
+// Documents of chat_messages
+// ----------------------------
+db.getCollection("chat_messages").insert([ {
+    _id: ObjectId("6a4b76d600051d361d518ec0"),
+    userId: "6938e70753706af599a7cd91",
+    username: "test",
+    name: "房玄龄",
+    avatar: "/avatars/cbbc4ace-b9b6-44b3-85c5-62510f493b91.jpg",
+    content: "大家好，这是聊天室的第一条消息！",
+    type: "text",
+    createdAt: ISODate("2026-04-08T08:00:00.000Z"),
+    _class: "com.example.demo.entity.ChatMessageEntity"
+} ]);
+db.getCollection("chat_messages").insert([ {
+    _id: ObjectId("6a4b76d600051d361d518ec1"),
+    userId: "6944e9a9e9e6f39dffa3d97e",
+    username: "test2",
+    name: "瀚海",
+    avatar: "/avatars/e56d8663-9575-460e-a3f3-167ed5adb1fa.jpg",
+    content: "你好！聊天室功能不错",
+    type: "text",
+    createdAt: ISODate("2026-04-08T08:01:00.000Z"),
+    _class: "com.example.demo.entity.ChatMessageEntity"
+} ]);

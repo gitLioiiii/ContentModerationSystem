@@ -129,6 +129,16 @@ const router = createRouter({
         breadcrumbCurrent: '审核记录页面',
       },
     },
+    // 聊天室
+    {
+      path: '/chat',
+      name: 'chat',
+      component: () => import('@/views/userView/ChatRoomView.vue'),
+      meta: {
+        breadcrumbParent: '发现',
+        breadcrumbCurrent: '聊天室',
+      },
+    },
     // 用户
     // 个人信息路由
     {
