@@ -1094,3 +1094,25 @@ db.getCollection("chat_messages").insert([ {
     createdAt: ISODate("2026-04-08T08:01:00.000Z"),
     _class: "com.example.demo.entity.ChatMessageEntity"
 } ]);
+
+// ----------------------------
+// Collection structure for review_config
+// ----------------------------
+db.getCollection("review_config").drop();
+db.createCollection("review_config");
+
+// ----------------------------
+// Documents of review_config (默认审核阈值配置)
+// ----------------------------
+db.getCollection("review_config").insert([ {
+    _id: ObjectId("6a4c00d600051d361d518ed0"),
+    imagePassThreshold: NumberInt("30"),
+    imageRejectThreshold: NumberInt("70"),
+    videoRejectViolationRate: 30.0,
+    videoRejectMaxScore: 70.0,
+    videoManualViolationRate: 10.0,
+    videoManualMaxScore: 30.0,
+    videoFrameInterval: NumberInt("3"),
+    updatedAt: ISODate("2026-04-08T08:00:00.000Z"),
+    _class: "com.example.demo.entity.ReviewConfigEntity"
+} ]);

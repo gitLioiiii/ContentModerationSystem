@@ -101,10 +101,10 @@
               <i class="bi bi-book menu-icon"></i>
               <span v-if="!sidebarCollapsed">敏感词库</span>
           </ElMenuItem>
-          <!-- <ElMenuItem index="" class="sub-menu-item">
+          <ElMenuItem index="review-config" :route="{ name: 'review_config' }" class="sub-menu-item">
               <i class="bi bi-bar-chart menu-icon"></i>
               <span v-if="!sidebarCollapsed">审核阈值</span>
-          </ElMenuItem> -->
+          </ElMenuItem>
         </ElSubMenu>
     </ElMenu>
   </aside>

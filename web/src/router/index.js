@@ -129,6 +129,16 @@ const router = createRouter({
         breadcrumbCurrent: '审核记录页面',
       },
     },
+    // 审核阈值配置
+    {
+      path: '/review-config',
+      name: 'review_config',
+      component: () => import('@/views/adminView/sensitive/ReviewConfigView.vue'),
+      meta: {
+        breadcrumbParent: '规则管理',
+        breadcrumbCurrent: '审核阈值配置',
+      },
+    },
     // 聊天室
     {
       path: '/chat',

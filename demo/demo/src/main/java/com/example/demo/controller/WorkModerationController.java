@@ -3,7 +3,9 @@ package com.example.demo.controller;
 import com.example.demo.dto.*;
 import com.example.demo.entity.ContentEntity;
 import com.example.demo.entity.WorkAutoReviewEntity;
+import com.example.demo.entity.ReviewConfigEntity;
 import com.example.demo.repository.ContentRepository;
+import com.example.demo.repository.ReviewConfigRepository;
 import com.example.demo.service.*;
 import com.example.demo.utils.ResultTemplate;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ public class WorkModerationController {
     private final AsyncImageModerationService asyncImageModerationService;
     private final ContentRepository contentRepository;
     private final WorkAutoReviewService workAutoReviewService;
+    private final ReviewConfigRepository reviewConfigRepository;
 
     @Value("${application.upload-root}")
     private String uploadRoot;
@@ -41,13 +44,15 @@ public class WorkModerationController {
             VideoFrameExtractorService videoFrameExtractorService,
             AsyncImageModerationService asyncImageModerationService,
             ContentRepository contentRepository,
-            WorkAutoReviewService workAutoReviewService) {
+            WorkAutoReviewService workAutoReviewService,
+            ReviewConfigRepository reviewConfigRepository) {
         this.textAutoService = textAutoService;
         this.imageAutoService = imageAutoService;
         this.videoFrameExtractorService = videoFrameExtractorService;
         this.asyncImageModerationService = asyncImageModerationService;
         this.contentRepository = contentRepository;
         this.workAutoReviewService = workAutoReviewService;
+        this.reviewConfigRepository = reviewConfigRepository;
     }
 
     // 作品综合审核
@@ -58,6 +63,10 @@ public class WorkModerationController {
         long startTime = System.currentTimeMillis();
 
         try {
+            // 加载审核阈值配置
+            ReviewConfigEntity reviewConfig = reviewConfigRepository.findAll().stream().findFirst()
+                    .orElseGet(ReviewConfigEntity::new);
+
             Optional<ContentEntity> contentOpt = contentRepository.findByIdAndDeletedAtIsNull(contentId);
             if (!contentOpt.isPresent()) {
                 log.error("作品不存在或已删除: {}", contentId);
@@ -136,10 +145,10 @@ public class WorkModerationController {
                         frameDir.mkdirs();
                     }
 
-                    // 视频抽帧
+                    // 视频抽帧（使用配置的间隔）
                     List<FrameExtractionResult> extractedFrames = videoFrameExtractorService.extractFrames(
                             videoFile.getAbsolutePath(),
-                            3, //抽帧间隔为3秒
+                            reviewConfig.getVideoFrameInterval(),
                             frameDir.getAbsolutePath()
                     );
 
@@ -206,11 +215,11 @@ public class WorkModerationController {
                         String videoResult;
                         String videoReason;
 
-                        if (violationRate >= 30.0 || maxScore >= 70.0) {
+                        if (violationRate >= reviewConfig.getVideoRejectViolationRate() || maxScore >= reviewConfig.getVideoRejectMaxScore()) {
                             videoResult = "不通过";
                             videoReason = String.format("视频包含违规内容。违规帧数: %d/%d，违规率: %.2f%%，最高风险分数: %.2f",
                                     riskyFrameCount, totalFrames, violationRate, maxScore);
-                        } else if (violationRate >= 10.0 || maxScore >= 30.0) {
+                        } else if (violationRate >= reviewConfig.getVideoManualViolationRate() || maxScore >= reviewConfig.getVideoManualMaxScore()) {
                             videoResult = "人工审核";
                             videoReason = String.format("视频存在疑似违规内容，建议人工复审。违规帧数: %d/%d，违规率: %.2f%%，最高风险分数: %.2f",
                                     riskyFrameCount, totalFrames, violationRate, maxScore);
