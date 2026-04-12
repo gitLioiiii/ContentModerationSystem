@@ -49,6 +49,7 @@
 
     <!-- 输入区域 -->
     <div class="input-area">
+      <img :src="statusImg" class="chat-status-img" alt="status" />
       <ElInput
         v-model="inputContent"
         :disabled="!connected"
@@ -67,13 +68,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElInput, ElButton, ElMessage } from 'element-plus'
 import { Client } from '@stomp/stompjs'
 import request from '@/utils/request'
 import { useUserStore } from '@/stores/user'
 import { useTheme } from '@/utils/useTheme'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import chatingImg from '@/assets/img/chating.jpg'
+import idleImg from '@/assets/img/idle.jpg'
 
 const { isDark } = useTheme()
 const userStore = useUserStore()
@@ -82,6 +85,8 @@ const messages = ref([])
 const inputContent = ref('')
 const connected = ref(false)
 const messageListRef = ref(null)
+const isTyping = computed(() => inputContent.value.length > 0)
+const statusImg = computed(() => isTyping.value ? chatingImg : idleImg)
 
 // 当前用户信息
 const currentUserId = userStore.user?.user?.id || ''
@@ -332,9 +337,18 @@ onUnmounted(() => {
 // 输入区域
 .input-area {
   display: flex;
+  align-items: center;
   gap: 10px;
   flex-shrink: 0;
   padding-top: 8px;
+
+  .chat-status-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
 
   .el-input {
     flex: 1;
