@@ -6,11 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
+// import org.springframework.stereotype.Repository;
 
 import com.example.demo.entity.ContentEntity;
 
-@Repository
+// @Repository
 public interface ContentRepository extends MongoRepository<ContentEntity, String> {
 
     // 根据用户ID和删除状态查询作品（分页）

@@ -110,7 +110,16 @@ public class WorkModerationController {
                     imageRequest.setFilePath(coverFile.getAbsolutePath());
                     imageRequest.setMimeType("image/jpeg");
 
-                    ImageAutoResponse imageResponse = imageAutoService.AiImage(imageRequest);
+                    // 根据配置选择本地或云端模型审核封面
+                    ImageAutoResponse imageResponse;
+                    String coverMode = reviewConfig.getCoverModerationMode();
+                    if ("cloud".equals(coverMode)) {
+                        log.info("封面审核使用云端模型");
+                        imageResponse = asyncImageModerationService.moderateImageAsync(imageRequest).get();
+                    } else {
+                        log.info("封面审核使用本地模型");
+                        imageResponse = imageAutoService.AiImage(imageRequest);
+                    }
 
                     long imageProcessingTime = System.currentTimeMillis() - imageStartTime;
                     log.info("封面审核完成 - 结果: {}, 匹配分数: {}, 耗时: {}ms",

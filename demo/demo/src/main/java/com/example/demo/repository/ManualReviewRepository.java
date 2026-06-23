@@ -5,11 +5,11 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
+// import org.springframework.stereotype.Repository;
 
 import com.example.demo.entity.ManualReviewEntity;
 
-@Repository
+// @Repository
 public interface ManualReviewRepository extends MongoRepository<ManualReviewEntity, String> {
 
     // 根据作品ID查询审核记录（分页）

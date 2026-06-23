@@ -24,7 +24,7 @@ public class ImageAutoService {
     private final ObjectMapper objectMapper;
 
     // 构造方法（注入本地 ChatClient）
-    public ImageAutoService(@Qualifier("localChatClient") ChatClient chatClient) {
+    public ImageAutoService(@Qualifier("cloudChatClient") ChatClient chatClient) {
         this.chatClient = chatClient;
         this.objectMapper = new ObjectMapper();
     }

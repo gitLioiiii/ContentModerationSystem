@@ -36,6 +36,9 @@ public class ReviewConfigEntity {
     // 抽帧间隔（秒）
     private int videoFrameInterval = 3;
 
+    // 封面审核模式：local 本地模型 / cloud 云端模型
+    private String coverModerationMode = "local";
+
     // 更新时间
     private LocalDateTime updatedAt;
 

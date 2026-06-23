@@ -52,14 +52,19 @@
       <img :src="statusImg" class="chat-status-img" alt="status" />
       <ElInput
         v-model="inputContent"
-        :disabled="!connected"
+        :disabled="sending"
         placeholder="输入消息..."
         @keyup.enter="sendMessage"
         maxlength="500"
         show-word-limit
         clearable
       />
-      <ElButton type="primary" :disabled="!connected || !inputContent.trim()" @click="sendMessage">
+      <ElButton
+        type="primary"
+        :loading="sending"
+        :disabled="sending || !inputContent.trim()"
+        @click="sendMessage"
+      >
         <i class="bi bi-send"></i>
         发送
       </ElButton>
@@ -171,10 +176,11 @@ const connectWebSocket = () => {
   stompClient.activate()
 }
 
-// 发送消息
+// 发送消息：经后端审核后由 Redis 广播到所有在线用户
+const sending = ref(false)
 const sendMessage = () => {
   const content = inputContent.value.trim()
-  if (!content || !stompClient || !connected.value) return
+  if (!content || sending.value) return
 
   const message = {
     userId: currentUserId,
@@ -185,12 +191,40 @@ const sendMessage = () => {
     type: 'text',
   }
 
-  stompClient.publish({
-    destination: '/app/chat.send',
-    body: JSON.stringify(message),
+  sending.value = true
+  const loading = ElMessage({
+    message: '正在审核消息，请稍候...',
+    type: 'info',
+    duration: 0,
   })
-
-  inputContent.value = ''
+  request.post('/chat/send', message, { timeout: 60000 })
+    .then((response) => {
+      if (response.data.status === true) {
+        inputContent.value = ''
+      } else {
+        // 审核未通过，展示拦截信息（延长显示时间，方便用户查看违规原因）
+        ElMessage({
+          message: response.data.message || '消息未通过审核',
+          type: 'error',
+          duration: 8000,
+          showClose: true,
+        })
+      }
+    })
+    .catch((err) => {
+      if (err?.code === 'ECONNABORTED') {
+        ElMessage.error('审核超时，请稍后重试')
+      } else if (err?.response?.status === 401) {
+        ElMessage.error('登录已过期，请重新登录')
+      } else {
+        const msg = err?.response?.data?.message || '发送失败，请稍后重试'
+        ElMessage.error(msg)
+      }
+    })
+    .finally(() => {
+      loading.close()
+      sending.value = false
+    })
 }
 
 onMounted(() => {

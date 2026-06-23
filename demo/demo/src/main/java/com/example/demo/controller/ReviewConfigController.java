@@ -50,6 +50,9 @@ public class ReviewConfigController {
         config.setVideoManualViolationRate(newConfig.getVideoManualViolationRate());
         config.setVideoManualMaxScore(newConfig.getVideoManualMaxScore());
         config.setVideoFrameInterval(newConfig.getVideoFrameInterval());
+        if (newConfig.getCoverModerationMode() != null && !newConfig.getCoverModerationMode().isEmpty()) {
+            config.setCoverModerationMode(newConfig.getCoverModerationMode());
+        }
         config.setUpdatedAt(LocalDateTime.now());
 
         reviewConfigRepository.save(config);

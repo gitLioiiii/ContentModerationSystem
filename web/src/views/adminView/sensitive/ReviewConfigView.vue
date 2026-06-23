@@ -8,6 +8,19 @@
     <div v-loading="loading" class="config-content">
       <ElForm :model="configForm" label-width="180px" label-position="right" class="config-form">
 
+        <!-- 封面审核模型选择 -->
+        <div class="section-card">
+          <h3 class="section-title"><i class="bi bi-cpu"></i> 封面审核模型</h3>
+          <p class="section-desc">本地模型保护数据隐私（响应较慢），云端模型响应更快</p>
+
+          <ElFormItem label="审核模型">
+            <ElRadioGroup v-model="configForm.coverModerationMode">
+              <ElRadio value="local">本地模型（隐私优先）</ElRadio>
+              <ElRadio value="cloud">云端模型（速度优先）</ElRadio>
+            </ElRadioGroup>
+          </ElFormItem>
+        </div>
+
         <!-- 图片审核阈值 -->
         <div class="section-card">
           <h3 class="section-title"><i class="bi bi-image"></i> 图片审核阈值</h3>
@@ -77,7 +90,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { ElForm, ElFormItem, ElSlider, ElButton, ElMessage } from 'element-plus'
+import { ElForm, ElFormItem, ElSlider, ElButton, ElMessage, ElRadioGroup, ElRadio } from 'element-plus'
 import request from '@/utils/request'
 import { useTheme } from '@/utils/useTheme'
 import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -94,6 +107,7 @@ const configForm = reactive({
   videoManualViolationRate: 10,
   videoManualMaxScore: 30,
   videoFrameInterval: 3,
+  coverModerationMode: 'local',
 })
 
 const defaultConfig = {
@@ -104,6 +118,7 @@ const defaultConfig = {
   videoManualViolationRate: 10,
   videoManualMaxScore: 30,
   videoFrameInterval: 3,
+  coverModerationMode: 'local',
 }
 
 const loadConfig = () => {

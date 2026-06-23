@@ -26,7 +26,7 @@ public class TextAutoService {
     private final SensitiveWordService sensitiveWordService;
 
     // 构造法（注入本地 ChatClient）
-    public TextAutoService(@Qualifier("localChatClient") ChatClient chatClient,
+    public TextAutoService(@Qualifier("cloudChatClient") ChatClient chatClient,
                         ObjectMapper objectMapper,
                         SensitiveWordService sensitiveWordService) {
         this.chatClient = chatClient;

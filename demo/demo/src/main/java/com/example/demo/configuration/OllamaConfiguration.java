@@ -57,17 +57,17 @@ public class OllamaConfiguration {
     }
 
     // 本地 ChatClient（用于文本和图片审核）
-    @Bean("localChatClient")
-    public ChatClient localChatClient() {
-        OllamaApi localApi = OllamaApi.builder()
-                .baseUrl(ollamaProperties.getLocal().getBaseUrl())
-                .build();
-        OllamaChatModel chatModel = OllamaChatModel.builder()
-                .ollamaApi(localApi)
-                .defaultOptions(OllamaChatOptions.builder()
-                        .model(ollamaProperties.getLocal().getModel())
-                        .build())
-                .build();
-        return ChatClient.builder(chatModel).build();
-    }
+//     @Bean("localChatClient")
+//     public ChatClient localChatClient() {
+//         OllamaApi localApi = OllamaApi.builder()
+//                 .baseUrl(ollamaProperties.getLocal().getBaseUrl())
+//                 .build();
+//         OllamaChatModel chatModel = OllamaChatModel.builder()
+//                 .ollamaApi(localApi)
+//                 .defaultOptions(OllamaChatOptions.builder()
+//                         .model(ollamaProperties.getLocal().getModel())
+//                         .build())
+//                 .build();
+//         return ChatClient.builder(chatModel).build();
+//     }
 }
